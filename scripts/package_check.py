@@ -26,6 +26,7 @@ ALLOWED = {
     ".ps1",
     ".js",
     ".example",
+    ".cmd",
 }
 PATTERNS = [
     r"gh[pousr]_[A-Za-z0-9]{30,}",

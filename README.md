@@ -6,7 +6,7 @@ Eye Detected connects model experiments to reviewable annotations through versio
 
 **v0.2 · On-premises annotation storage and research pipelines · Research only · Python 3.11–3.12**
 
-Target code source of truth: [siriponsri/OcuForge](https://github.com/siriponsri/OcuForge). Start with [คู่มือเริ่มต้นภาษาไทย](docs/START_HERE_TH.md). GitHub publication was blocked by integration permissions; see [handoff steps](docs/GITHUB_HANDOFF_TH.md). Read the [delivery report](validation/FINAL_DELIVERY_REPORT.md) for measured validation status and external checks.
+Target code source of truth: [siriponsri/OcuForge](https://github.com/siriponsri/OcuForge). The repository is live on GitHub. Start with [คู่มือเริ่มต้นภาษาไทย](docs/START_HERE_TH.md). Read the [delivery report](validation/FINAL_DELIVERY_REPORT.md) for measured validation status and external checks.
 
 ## Workspace
 
@@ -35,7 +35,21 @@ flowchart TD
 
 The tracks import only the shared contracts, never each other's implementation. The synthetic integration demo runs real CPU optimization with `TinyTestEncoder`, then converts a **separately declared synthetic lesion point** through the review workflow. It does not simulate successful DINOv3 inference or claim that MIL attention localizes lesions.
 
-## Run the starter
+## Quick start
+
+For a fresh Windows development machine or a new team member:
+
+```cmd
+git clone https://github.com/siriponsri/OcuForge.git
+cd OcuForge
+bootstrap.cmd
+```
+
+`bootstrap.cmd` creates or reuses the virtual environment, installs the CPU PyTorch 2.5.1 baseline, installs the three packages in editable mode and development requirements, bootstraps the pinned Codex skills, runs `pytest` and the synthetic roundtrip, and checks Docker capability. Docker is reported separately because it is optional for core Python development and is not started by bootstrap.
+
+The normal new-machine flow is `clone -> bootstrap.cmd -> continue the current project phase`. A new machine does not restart project phases. Bootstrap only reconstructs and verifies local developer state; it does not reset repository changes or project state.
+
+### Manual setup fallback
 
 After installing Python 3.11 or 3.12, run from this repository root:
 

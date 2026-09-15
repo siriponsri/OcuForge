@@ -90,7 +90,9 @@ Third-party skills must not silently install tooling, create or mutate remote is
 
 ## Repo-local Codex Skills
 
-Codex skills live under `.codex/skills/`. On a fresh clone, run `.codex/bootstrap-skills.ps1` on Windows or `.codex/bootstrap-skills.sh` on macOS/Linux to install pinned third-party skills.
+Codex skills live under `.codex/skills/`. On a fresh Windows machine, the default human onboarding entrypoint is root `bootstrap.cmd`; `.codex/bootstrap-skills.ps1` remains the internal/reusable skill bootstrap invoked by it. On macOS/Linux, the skill bootstrap remains available through `.codex/bootstrap-skills.sh`.
+
+Machine bootstrap reconstructs and verifies local developer state. It does not reset repository changes or restart the current project phase/state.
 
 - `karpathy-guidelines` — `.codex/skills/karpathy-guidelines/SKILL.md`. Use for non-trivial implementation, review, refactor, and configuration work.
 - `debugging-code` — `.codex/skills/debugging-code/SKILL.md`. Use for hard runtime bugs when static inspection and tests are insufficient. Do not install debugger tooling without owner approval.
