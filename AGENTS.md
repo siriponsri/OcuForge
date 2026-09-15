@@ -3,7 +3,6 @@
 ## Mission
 
 OcuForge is a research and clinician-review foundation for retinal imaging workflows. It is not a diagnostic product.
-The repository contains three Python packages:
 
 - `eyes-detected-contracts/src/eyes_contracts`: versioned schemas, protocol identity, provenance, and validators.
 - `eyes-detected-models/src/eyes_detected`: research pipelines, encoders, MIL/ordinal models, evaluation, QC, and active-learning utilities.
@@ -26,8 +25,6 @@ For implementation work:
 
 Prefer one objective, one bounded patch, and one commit. Every changed line should trace to the requested objective or to a necessary regression fix discovered while verifying it.
 
-If the request is ambiguous in a way that can materially change behavior, surface the ambiguity before implementing. If a simpler approach exists, prefer it.
-
 ## Clinical and Data Invariants
 
 These rules are non-negotiable unless the owner explicitly changes the governing specification:
@@ -37,16 +34,16 @@ These rules are non-negotiable unless the owner explicitly changes the governing
 - Preserve image, annotation, prediction, protocol, provenance, and revision identities/hashes.
 - Never reinterpret local binary `DR` / `no-DR` experience labels as ordinal DR grades 0-4.
 - `no-DR` does not imply adjudicated ordinal grade 0.
-- DR grading protocol versions are immutable historical references. New guidance requires a new protocol version or explicit migration; do not silently rewrite historical labels.
+- DR grading protocol versions are immutable historical references. New guidance requires a new protocol version or explicit migration.
 - DME remains a separate axis. Fundus/UWF evidence alone must not be described as OCT-confirmed DME.
-- MIL attention/evidence maps are model aggregation evidence, not validated lesion localization unless a lesion-specific method and evaluation establish that claim.
+- MIL attention/evidence maps are model aggregation evidence, not validated lesion localization unless lesion-specific validation establishes that claim.
 - Research outputs must not be presented as diagnoses or production clinical decisions.
 
 ## Repository Text and Cross-Platform I/O
 
-Repository-controlled text files are UTF-8. When Python reads or writes project JSON, JSONL, Markdown, source, or other text files, use explicit `encoding="utf-8"` rather than relying on the OS default.
+Repository-controlled text files are UTF-8. Use explicit `encoding="utf-8"` for project text I/O instead of relying on the OS default.
 
-Keep paths reasonably short and cross-platform. Avoid unnecessarily nesting long content hashes in filenames/directories when a semantically equivalent shorter layout preserves identity.
+Keep paths reasonably short and cross-platform. Avoid unnecessarily nesting long content hashes when a semantically equivalent shorter layout preserves identity.
 
 ## Build, Test, and Validation
 
@@ -59,7 +56,7 @@ make lint
 make config
 ```
 
-Equivalent focused commands are acceptable, for example:
+Focused equivalents are acceptable:
 
 ```bash
 python -m pytest path/to/test_file.py -q
@@ -68,9 +65,9 @@ python scripts/validate_configs.py
 python scripts/synthetic_roundtrip.py
 ```
 
-Default tests must remain offline. Live CVAT, MongoDB, GPU, model-weight, and deployment checks are separate integration gates and must not be faked in the default suite.
+Default tests must remain offline. Live CVAT, MongoDB, GPU, model-weight, and deployment checks are separate integration gates and must not be faked.
 
-When fixing a defect, first reproduce the actual failure with the smallest useful loop. Fix the root cause, then run the narrow regression test before the broader suite.
+When fixing a defect, reproduce the smallest useful failure, fix the root cause, run the narrow regression test, then run the broader suite.
 
 ## Coding Style
 
@@ -78,34 +75,40 @@ Use four-space indentation, `snake_case` for modules/functions/variables, `Pasca
 
 Match surrounding style. Do not reformat unrelated code. Remove only imports, variables, or helpers made obsolete by the current change.
 
-## Agent Skills Policy
+## Instruction and Skill Precedence
 
-External skills supplement this file; they do not override OcuForge's safety, data, clinical, architecture, or scope rules.
+Priority is:
 
-### `karpathy-guidelines`
+1. Explicit owner/task instruction and the current phase/gate.
+2. This `AGENTS.md`.
+3. OcuForge specifications, contracts, and tests.
+4. Repo-local or third-party skill procedures.
 
-Use for non-trivial implementation, review, refactor, and configuration work. Apply its core discipline: surface assumptions, prefer the simplest viable solution, keep edits surgical, and define verifiable success criteria.
+A skill may improve method, but it must not broaden scope, weaken tests, move clinical/private data to cloud services, or change clinical semantics without explicit owner authorization.
 
-### `debugging-code`
+Third-party skills must not silently install tooling, create or mutate remote issues/branches, upload data, or change external systems unless the owner explicitly requested that side effect.
 
-Use when a bug cannot be resolved reliably from static inspection and tests alone, especially for runtime state, hangs, call flow, or difficult state-dependent failures. Prefer evidence and a reproducible failure over speculative fixes. Do not make OcuForge runtime depend on the debugger tooling.
+## Repo-local Codex Skills
 
-### `wayfinder`
+Codex skills live under `.codex/skills/`. On a fresh clone, run `.codex/bootstrap-skills.ps1` on Windows or `.codex/bootstrap-skills.sh` on macOS/Linux to install pinned third-party skills.
 
-Use only when explicitly invoked for work that genuinely spans multiple agent sessions and has unresolved architectural/product decisions. It is a planning/decision-mapping tool, not the default implementation workflow. When the route is already decided, skip it and implement the bounded task.
+- `karpathy-guidelines` — `.codex/skills/karpathy-guidelines/SKILL.md`. Use for non-trivial implementation, review, refactor, and configuration work.
+- `debugging-code` — `.codex/skills/debugging-code/SKILL.md`. Use for hard runtime bugs when static inspection and tests are insufficient. Do not install debugger tooling without owner approval.
+- `wayfinder` — `.codex/skills/wayfinder/SKILL.md`. Explicit invocation only, for genuinely multi-session work with unresolved decisions. Its support skills may be installed by the bootstrap script.
+- `ocuforge-ai-research` — `.codex/skills/ocuforge-ai-research/SKILL.md`. Use for literature-gap analysis, research-question framing, dataset/model selection, experiment design, leakage audit, baselines, ablations, metrics, statistical validation, and evidence-backed research claims.
 
-If a skill conflicts with this `AGENTS.md`, the OcuForge rules in this file win.
+If a listed third-party skill is missing, do not invent its contents. Either run the bootstrap with owner approval or continue using this repository's rules without that skill.
 
 ## Commit and Handoff Rules
 
 Before claiming completion, report:
 
 - files changed;
-- the root cause or implementation rationale;
-- commands/tests run and their exact pass/fail result;
+- root cause or implementation rationale;
+- commands/tests run and exact pass/fail result;
 - assumptions or external dependencies not verified;
 - unresolved issues, if any.
 
 Use concise imperative commit subjects. Do not commit generated artifacts, datasets, weights, credentials, or machine-local configuration.
 
-For multi-machine work, keep repository policy and safe templates in Git. Keep machine-specific Codex configuration and secrets outside the repository, using `.codex.example/` only as the tracked bootstrap template.
+For multi-machine work, keep repository policy, `.codex/`, and safe templates in Git. Keep machine-specific Codex configuration and secrets outside the repository, using `.codex.example/` only as the tracked config template.

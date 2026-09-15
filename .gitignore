@@ -29,3 +29,13 @@ artifacts/
 *.npz
 *.safetensors
 /deploy/onprem/.env
+
+# Third-party Codex skills installed locally from pinned upstream commits.
+/.codex/skills/karpathy-guidelines/
+/.codex/skills/debugging-code/
+/.codex/skills/wayfinder/
+/.codex/skills/grilling/
+/.codex/skills/domain-modeling/
+/.codex/skills/research/
+/.codex/skills/prototype/
+/.codex/THIRD_PARTY_LICENSES/

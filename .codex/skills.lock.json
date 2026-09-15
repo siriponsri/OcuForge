@@ -1,0 +1,42 @@
+{
+  "schema_version": 1,
+  "updated": "2026-09-15",
+  "skills": [
+    {
+      "name": "karpathy-guidelines",
+      "kind": "third-party",
+      "repository": "https://github.com/multica-ai/andrej-karpathy-skills.git",
+      "ref": "2c606141936f1eeef17fa3043a72095b4765b9c2",
+      "source_path": "skills/karpathy-guidelines",
+      "destination": ".codex/skills/karpathy-guidelines"
+    },
+    {
+      "name": "debugging-code",
+      "kind": "third-party",
+      "repository": "https://github.com/AlmogBaku/debug-skill.git",
+      "ref": "26ef325fe2188209d053f42a6ca0000942a94932",
+      "source_path": "skills/debugging-code",
+      "destination": ".codex/skills/debugging-code"
+    },
+    {
+      "name": "wayfinder",
+      "kind": "third-party",
+      "repository": "https://github.com/mattpocock/skills.git",
+      "ref": "3cca18b368ae95cdbdebbff572ccafa662551015",
+      "source_path": "skills/engineering/wayfinder",
+      "destination": ".codex/skills/wayfinder",
+      "support_paths": {
+        "skills/productivity/grilling": ".codex/skills/grilling",
+        "skills/engineering/domain-modeling": ".codex/skills/domain-modeling",
+        "skills/engineering/research": ".codex/skills/research",
+        "skills/engineering/prototype": ".codex/skills/prototype"
+      }
+    },
+    {
+      "name": "ocuforge-ai-research",
+      "kind": "local",
+      "source_path": ".codex/skills/ocuforge-ai-research",
+      "destination": ".codex/skills/ocuforge-ai-research"
+    }
+  ]
+}

@@ -1,18 +1,26 @@
-# External Skill Sources
+# OcuForge Skill Sources
 
-This file records the upstream skill sources considered for OcuForge developer workflows.
+The active repo-local skill pack lives under `.codex/`. Bootstrap it on each fresh clone:
 
-| Skill | Upstream | Intended use in OcuForge | Default? |
+- Windows: `.\.codex\bootstrap-skills.ps1`
+- macOS/Linux: `bash .codex/bootstrap-skills.sh`
+
+Primary skills:
+
+| Skill | Source | Intended use | Default? |
 |---|---|---|---|
-| `karpathy-guidelines` | https://github.com/multica-ai/andrej-karpathy-skills/tree/main/skills/karpathy-guidelines | Careful, simple, surgical, goal-driven engineering | Yes for non-trivial code/config work |
-| `wayfinder` | https://github.com/mattpocock/skills/tree/main/skills/engineering/wayfinder | Multi-session decision mapping | No; explicit invocation only |
-| `debugging-code` | https://github.com/AlmogBaku/debug-skill | Runtime debugger workflow and DAP tooling | On demand for hard runtime bugs |
+| `karpathy-guidelines` | `multica-ai/andrej-karpathy-skills` | Simple, surgical, goal-driven engineering | Yes for non-trivial code/config work |
+| `debugging-code` | `AlmogBaku/debug-skill` | Runtime state/debugger workflow | On demand |
+| `wayfinder` | `mattpocock/skills` | Multi-session decision mapping | Explicit invocation only |
+| `ocuforge-ai-research` | Local OcuForge skill | Research questions, prior art, experiment design, leakage, baselines, ablations, metrics, evidence claims | Yes for AI-research tasks |
+
+Pinned third-party revisions are recorded in `.codex/skills.lock.json`.
 
 ## Precedence
 
 1. Owner request and explicit phase/gate.
 2. Root `AGENTS.md`.
 3. OcuForge specifications/contracts/tests.
-4. External skill procedures.
+4. Skill procedures.
 
-A skill may improve method, but it must not broaden scope, weaken tests, move clinical/private data to cloud services, or change clinical semantics without explicit owner authorization.
+Skills must not broaden scope, weaken tests, move private clinical data to cloud services, or change clinical semantics without explicit owner authorization.
