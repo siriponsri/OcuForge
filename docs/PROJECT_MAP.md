@@ -3,6 +3,11 @@
 This page is the short human handoff map for OcuForge. It explains where work belongs and which gate is current.
 The normative rules are in [CTR_MODULE_CONTRACT.md](CTR_MODULE_CONTRACT.md); this page does not replace them.
 
+The current POC direction is
+[POC_MASTER_PLAN_INTERACTIVE_LESION.md](POC_MASTER_PLAN_INTERACTIVE_LESION.md): train the
+global and ROI models first, then expose interactive suggestions through the internal QA workbench and the
+customer-facing GUI.
+
 ## What OcuForge Is
 
 OcuForge is a research and clinician-review foundation for retinal imaging workflows. It preserves shared
@@ -14,7 +19,7 @@ contracts, model research, annotation review, and local data governance. It is n
 |---|---|---|---|
 | CTR | CONTRACTS | Schemas, protocols, provenance, validators, shared interfaces | `eyes-detected-contracts/` |
 | MDL | MODELS | Encoders, training, inference, evaluation, model evidence | `eyes-detected-models/` |
-| LBL | LABELER | CVAT integration, clinician review, correction, adjudication, export | `eyes-detected-labeler/` |
+| LBL | LABELER | ROI review, Label Studio QA, CVAT integration, correction | `eyes-detected-labeler/` |
 | DAT | DATA | Local image objects, Mongo metadata, revisions, releases, backup/restore | `labeler_bridge/storage.py`, `deploy/onprem/` |
 | RUN | RUNTIME | Bootstrap, Docker/Compose, deployment, environment and execution boundaries | `bootstrap.cmd`, `scripts/`, `deploy/`, `.codex/` |
 | RSC | RESEARCH | Experiments, leakage controls, metrics, reproducibility, evidence claims | `docs/`, `validation/`, experiment configuration |
@@ -61,6 +66,7 @@ may silently upload private data or provision cloud resources.
 | Machine bootstrap | PASS |
 | Phase 2A - Docker-independent local data foundation | PASS |
 | Phase 2B - Live MongoDB acceptance | PENDING / NOT RUN |
+| Model-first interactive lesion POC | PLANNING PIVOT ACCEPTED; R0 / MDL PENDING |
 
 Phase 2A passing does not mean that Phase 2 overall has passed.
 
@@ -70,7 +76,8 @@ Phase 2A passing does not mean that Phase 2 overall has passed.
 |---|---|
 | Contract, schema, or protocol | CTR |
 | Model, training, or evaluation | MDL |
-| CVAT or annotation workflow | LBL |
+| ROI labeling/QA or retained CVAT workflow | LBL |
+| Customer-facing interactive GUI | GUI + RUN, using shared CTR interfaces |
 | Mongo, image, or release store | DAT |
 | Docker, Vast, bootstrap, or runtime | RUN |
 | Experiment, metric, or leakage control | RSC |
@@ -88,9 +95,14 @@ Run these commands from the repository root:
 | `02_phase2_local_data.cmd` | Run the synthetic-only Phase 2B live-Mongo gate on a Docker-capable machine. CVAT stays off. |
 | `python -m pytest` | Run the offline test suite after bootstrap. |
 | `python scripts/synthetic_roundtrip.py` | Run the synthetic research/annotation roundtrip; it does not prove clinical performance. |
+| `docs/POC_MASTER_PLAN_INTERACTIVE_LESION.md` | Read the model-first POC sequence and R0 / MDL outputs. |
 | `deploy/onprem/README.md` | Read the local on-prem manual handoff and Phase 2B prerequisites. |
 
 ## Current Next Action
 
-Run `02_phase2_local_data.cmd` on a Docker-capable machine. It must report the live Mongo acceptance result before
-the team claims Phase 2B complete. Do not start CVAT or use hospital data as part of this synthetic gate.
+The next POC action is **R0 / MDL — Dataset + Lesion Taxonomy Freeze**. Produce the dataset audit,
+supported annotations and counts, taxonomy mapping, negative-sampling assessment, identity-aware split policy,
+metrics, compute estimate, and first experiment before training. The separate Phase 2B live-Mongo gate remains
+pending and can be run on a Docker-capable machine; it is not a prerequisite to inventing
+a lesion taxonomy, and it
+must use synthetic fixtures only.

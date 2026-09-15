@@ -1,5 +1,14 @@
 # GPU execution ภายหลัง
 
+## Current model-first gate
+
+GPU work follows the R0 / MDL dataset and lesion-taxonomy freeze. The target is a global model plus an ROI
+lesion
+classifier; the final class count remains approximately seven pending audit. No large GPU run belongs in the
+planning pivot commit. Vast.ai and RunPod remain limited to reviewed public or synthetic
+data and public model assets;
+hospital images, labels, embeddings, predictions and checkpoints remain local/on-premises.
+
 Vast.ai และ RunPod เป็น provider choices ไม่มี plugin ที่เชื่อมต่อและไม่มีการจองเครื่องหรือใช้เงินในรอบนี้
 
 หลังรัน synthetic demo สามารถสร้างแผนคำสั่งได้:

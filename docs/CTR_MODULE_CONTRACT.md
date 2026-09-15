@@ -23,6 +23,19 @@ They are intentionally different:
 
 The primary goal is to let multiple contributors or agents work in parallel without creating hidden coupling between model research, clinician annotation, local data storage, runtime infrastructure, and research governance.
 
+### Current POC direction
+
+The current execution order is model-first interactive lesion classification.
+`MDL` owns the global and ROI models. `LBL` supports internal ROI review through
+Label Studio Community and retained annotation adapters. `RUN` supports the shared
+inference boundary and runtime surfaces; the custom GUI is customer-facing. The
+exact lesion taxonomy remains pending dataset/annotation audit and must be frozen.
+
+The immediate sequence is dataset/taxonomy freeze, global baseline, ROI classifier,
+Label Studio validation, and
+custom GUI integration. DICOM, model monitoring, and HL7/FHIR remain planned afterward. CVAT remains
+optional advanced labeling infrastructure and is not deleted or migrated by this pivot.
+
 ---
 
 ## 2. Canonical Module IDs
@@ -33,7 +46,7 @@ Use these six canonical module IDs in plans, issues, handoffs, specifications, a
 |---|---:|---|
 | `CONTRACTS` | `CTR` | Shared schemas, protocols, provenance, validation, interface contracts |
 | `MODELS` | `MDL` | Encoders, feature extraction, MIL/CORAL, training, inference, evaluation |
-| `LABELER` | `LBL` | CVAT integration, clinician review, correction, adjudication, annotation export |
+| `LABELER` | `LBL` | ROI review, Label Studio QA, retained CVAT integration, correction, export |
 | `DATA` | `DAT` | Local/on-prem metadata, immutable image objects, revisions, releases, backup/restore |
 | `RUNTIME` | `RUN` | Docker, local deployment, GPU execution, environment/bootstrap, public-cloud execution boundaries |
 | `RESEARCH` | `RSC` | Research design, dataset manifests, leakage controls, baselines, metrics, reproducibility, evidence claims |
@@ -97,6 +110,7 @@ eyes-detected-contracts/
 - training loops;
 - checkpoint handling;
 - prediction generation;
+- ROI lesion classification;
 - model-side evaluation;
 - active-learning/OOD research utilities;
 - model evidence generation.
@@ -135,6 +149,7 @@ MODELS -X-> LABELER implementation
 **Owns**
 
 - CVAT integration;
+- Label Studio Community ROI labeling and QA integration;
 - annotation task creation/synchronization;
 - prediction suggestion import;
 - geometry conversion;

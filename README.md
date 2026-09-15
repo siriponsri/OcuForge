@@ -1,8 +1,10 @@
 <p align="left"><img src="assets/ocuforge.svg" alt="OcuForge — Eye Detected" width="460"></p>
 
-# A foundation for retinal model research and clinician annotation
+# A model-first foundation for retinal research and clinician review
 
-Eye Detected connects model experiments to reviewable annotations through versioned data contracts. Researchers can develop the model pipeline while the annotation workflow is prepared independently.
+Eye Detected connects model experiments to reviewable annotations through versioned
+data contracts. The current POC
+prioritizes a global retinal model followed by interactive ROI lesion classification in a customer-facing GUI.
 
 **v0.2 · On-premises annotation storage and research pipelines · Research only · Python 3.11–3.12**
 
@@ -14,13 +16,29 @@ Target code source of truth: [siriponsri/OcuForge](https://github.com/siriponsri
 |---|---|---|---|
 | CTR | Contracts | Schemas, protocols, provenance, validation, shared interfaces | `eyes-detected-contracts/` |
 | MDL | Models | Encoders, training, inference, evaluation, model evidence | `eyes-detected-models/` |
-| LBL | Labeler | CVAT integration, clinician review, correction, adjudication | `eyes-detected-labeler/` |
+| LBL | Labeler | ROI review, Label Studio QA, CVAT integration | `eyes-detected-labeler/` |
 | DAT | Local Data | Mongo metadata, immutable image objects, revisions, release/backup | `labeler_bridge/storage.py`, `deploy/onprem/` |
 | RUN | Runtime / Deployment | Bootstrap, Docker/Compose, environment and execution boundaries | `bootstrap.cmd`, `scripts/`, `deploy/` |
 | RSC | Research Control | Experiments, leakage controls, metrics, reproducibility, evidence claims | `docs/`, `validation/` |
 
 Modules define architectural ownership. Phases define execution order and current project progress. See the
 [normative module contract](docs/CTR_MODULE_CONTRACT.md) and the [human project map](docs/PROJECT_MAP.md).
+
+## Current POC Direction
+
+The authoritative plan is [POC Master Plan — Interactive Lesion](docs/POC_MASTER_PLAN_INTERACTIVE_LESION.md).
+The customer-facing flow is:
+
+```text
+retinal image -> global model result -> user-selected ROI -> lesion suggestion -> confirm / change / reject
+```
+
+The global model and ROI lesion classifier are separate capabilities. The final lesion taxonomy remains
+`TAXONOMY_PENDING_AUDIT`; the target is approximately seven classes, and
+`NO_SUPPORTED_LESION_IN_ROI` is an ROI-local semantic rather than a claim that the eye is normal. Label Studio
+Community is the internal ROI labeling/QA workbench. The custom GUI is customer-facing,
+while CVAT is retained as optional advanced annotation infrastructure. SAM refinement,
+DICOM, model monitoring, and HL7/FHIR remain deferred until after the model + GUI milestone.
 
 ## Project Status
 
@@ -38,20 +56,23 @@ Phase 2A passing does not mean that Phase 2 overall has passed.
 
 ```mermaid
 flowchart TD
- A["Synthetic / authorized image manifest"] --> B["Track A: patches and encoder"]
- B --> C["Attention MIL and CORAL"]
- C --> D["Prediction contract and evidence"]
- D --> E["Track B: CVAT review"]
- E --> F["Correction and adjudication history"]
- F --> G["Annotation contract validation"]
- G --> H{"Locked evaluation split?"}
- H -->|Yes| I["Evaluation only"]
- H -->|No| J["Eligible research training pool"]
- J --> K["Diversity-first annotation batch"]
- K --> E
+ A["Audited public / synthetic data"] --> B["MDL-A global model"]
+ A --> C["Audited ROI annotations"]
+ C --> D["MDL-B ROI lesion classifier"]
+ B --> E["Shared model / evidence contracts"]
+ D --> E
+ E --> F["Label Studio Community internal QA"]
+ E --> G["Custom GUI customer POC"]
+ F --> H["Confirm / change / reject"]
+ G --> H
+ I["CVAT optional advanced labeling"] --> E
 ```
 
-The tracks import only the shared contracts, never each other's implementation. The synthetic integration demo runs real CPU optimization with `TinyTestEncoder`, then converts a **separately declared synthetic lesion point** through the review workflow. It does not simulate successful DINOv3 inference or claim that MIL attention localizes lesions.
+The tracks import only the shared contracts, never each other's implementation. The synthetic integration demo
+remains
+an offline engineering check using `TinyTestEncoder` and a separately declared synthetic lesion point. It does
+not
+simulate successful DINOv3 inference or claim that MIL attention localizes lesions.
 
 ## Quick start
 
@@ -92,7 +113,9 @@ docker compose -f eyes-detected-models/compose.yaml build cpu-test
 docker compose -f eyes-detected-models/compose.yaml run --rm cpu-test
 ```
 
-The build needs internet for dependencies; the CPU demo container runs with no network. CVAT uses its upstream deployment; see [CVAT setup](eyes-detected-labeler/docs/CVAT_SETUP_TH.md).
+The build needs internet for dependencies; the CPU demo container runs with no network.
+Existing CVAT integration uses
+its upstream deployment; see [CVAT setup](eyes-detected-labeler/docs/CVAT_SETUP_TH.md).
 
 ## Data meaning and clinical scope
 
@@ -112,7 +135,7 @@ AI predictions, evidence maps and candidate lesions are research outputs. DME is
 | Docker / GPU image | Configuration supplied; runtime verification reported separately |
 | Vast.ai / RunPod | Docker/Compose and public-only pipeline launcher supplied; GPU runtime unverified |
 | FiftyOne | Optional adapter; external integration unverified |
-| Lesion detector, local adaptation, main benchmark | **PLANNED** |
+| Global baseline, ROI lesion classifier, interactive model GUI | **PLANNED; R0 / MDL audit first** |
 
 ## On-premises storage and expanded pipelines
 
@@ -121,13 +144,16 @@ Hospital images, labels, features, predictions, checkpoints and backups stay on 
 - [แผน NoSQL ภายในโรงพยาบาล](docs/ON_PREMISE_NOSQL_PLAN_TH.md): schema, versioning, access boundaries, capacity, backup and restore acceptance.
 - [Local MongoDB Compose](deploy/onprem/README.md): authenticated database with no published port, local image ingestion and trusted operator commands (`eyes-local`).
 - [Model pipeline runbook](docs/PIPELINE_RUNBOOK_TH.md): audit → frozen DINO features → binary or ordinal MIL → held-out evaluation → prediction export (`eyes-pipeline`).
-- [Labeler task workflow](docs/LOCAL_LABELER_WORKFLOW_TH.md): durable task state, explicit review, immutable revisions and expert finalization. CVAT is the annotation UI; this release adds no custom web editor.
+- [Labeler task workflow](docs/LOCAL_LABELER_WORKFLOW_TH.md): durable task state, explicit review,
+  immutable revisions and expert finalization. Existing CVAT workflow is retained; Label Studio
+  Community and the custom GUI are planned for the model-first POC.
 
 Vast.ai/RunPod runners accept only reviewed public or synthetic manifests. No automatic transfer or provisioning is implemented. Vercel is reserved for synthetic demos/documentation; the clinical application is not deployed there. MongoDB/CVAT/GPU live deployment remains a target-host acceptance gate; see the measured report.
 
 ## Documentation
 
 - [Architecture and boundaries](docs/DUAL_TRACK_ARCHITECTURE.md)
+- [POC master plan](docs/POC_MASTER_PLAN_INTERACTIVE_LESION.md)
 - [ICO grading and version changes](docs/GRADING_PROTOCOL_TH.md)
 - [Local setup](docs/LOCAL_SETUP_TH.md) · [GPU execution](docs/GPU_EXECUTION_TH.md)
 - [Data and source limitations](eyes-detected-models/docs/DATASETS.md)

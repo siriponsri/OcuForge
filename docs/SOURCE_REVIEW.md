@@ -18,3 +18,17 @@ Review date: 2026-09-09. Supplied PDFs were inspected locally; no patient images
 The user's old Drive runbook/license notes were read for project continuity. No old metric, weight, deployment or license status is promoted into this release. Longitudinal prediction and SAM3 remain outside this starter.
 
 The paper PDFs and ICO PDF are not redistributed. Keep the supplied originals in the project's controlled documentation area. Public links above are source references, not upload targets.
+
+## Current POC research position
+
+The model-first interactive lesion plan is a planning decision, not evidence that a final
+taxonomy, dataset license, class count, or model performance has been validated. The
+active-learning source supports AI suggestion plus human
+review pattern, but it does not establish the exact OcuForge lesion classes or clinical utility.
+
+R0 / MDL must complete the dataset and annotation audit before training: verify source/access terms,
+supported lesion semantics and counts, annotation exhaustiveness for negative sampling,
+and patient/eye/image-aware
+split identity. The target remains approximately seven lesion classes pending audit, with
+`NO_SUPPORTED_LESION_IN_ROI` kept as an
+ROI-local semantic. No private clinical data or derived artifact is eligible for public GPU execution.

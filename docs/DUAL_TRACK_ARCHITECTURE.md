@@ -2,18 +2,26 @@
 
 ```mermaid
 flowchart TD
- A["Track A: research package"] --> P["prediction.v0.1"]
- P --> B["Track B: CVAT bridge"]
- B --> N["annotation.v0.1 and history"]
- N --> V["Contracts: integrity checks"]
- V --> T["Eligible train pool"]
- V --> S["Locked evaluation pool"]
- T --> A
- A --> Q["annotation_batch.v0.1"]
- Q --> B
+ A["Reviewed public / synthetic data"] --> G["MDL-A global retinal model"]
+ A --> R["Audited ROI annotations"]
+ R --> L["MDL-B ROI lesion classifier"]
+ G --> C["Shared CTR model / provenance contracts"]
+ L --> C
+ C --> S["Label Studio Community internal ROI QA"]
+ C --> U["Custom GUI customer POC"]
+ S --> H["Confirm / change / reject"]
+ U --> H
+ V["CVAT optional advanced labeling"] --> C
 ```
 
-Contracts contain no torch or CVAT implementation. The root integration script orchestrates both packages through files. Seven schemas are generated from Pydantic models. JSON Schema validates structural constraints; the Python validator also enforces geometry, modality/provenance, protocol and cross-record invariants.
+The current POC is model-first: global inference and ROI lesion classification precede
+the interactive GUI milestone.
+Label Studio Community is an internal ROI labeling/QA workbench; the custom GUI is
+customer-facing; CVAT remains optional advanced infrastructure. Contracts contain no
+torch, GUI, Label Studio, or CVAT implementation. The root
+integration script orchestrates packages through files. Seven schemas are generated from Pydantic models. JSON
+Schema validates structural constraints; the Python validator also enforces geometry,
+modality/provenance, protocol and cross-record invariants.
 
 Image coordinates use normalized pixel centers: x=0..width-1, y=0..height-1. Patches use canvas crop edges and explicit source affine mapping; source coordinates may extend into letterbox padding and must be clipped only for display. Source images are never silently cropped.
 

@@ -10,6 +10,34 @@ OcuForge is a research and clinician-review foundation for retinal imaging workf
 
 Keep the contracts-first boundary: models and labeler may depend on contracts, but models and labeler must not depend on each other.
 
+## Current POC Direction
+
+The authoritative model-first interactive lesion direction is
+[POC_MASTER_PLAN_INTERACTIVE_LESION.md](docs/POC_MASTER_PLAN_INTERACTIVE_LESION.md).
+The current planning state is:
+
+```text
+POC_PRIMARY=MODEL_INTERACTIVE_GUI
+MODEL_TRAINING_PRIORITY=HIGH
+GLOBAL_MODEL=PRIMARY
+ROI_LESION_CLASSIFIER=PRIMARY_POC_FEATURE
+LESION_TAXONOMY=FREEZE_BEFORE_TRAINING
+TARGET_LESION_COUNT=APPROXIMATELY_7_PENDING_AUDIT
+NO_LESION=NO_SUPPORTED_LESION_IN_ROI
+LABEL_STUDIO_COMMUNITY=INTERNAL_ROI_QA_WORKBENCH
+CUSTOM_GUI=CUSTOMER_FACING
+CVAT=OPTIONAL_ADVANCED_LABELING
+SAM=OPTIONAL_REFINEMENT
+DICOM=PLANNED_AFTER_MODEL_GUI
+MODEL_MONITORING=PLANNED_AFTER_MODEL_GUI
+HL7_FHIR=PLANNED_AFTER_MODEL_GUI
+PUBLIC_GPU_PRIVATE_DATA=FORBIDDEN
+```
+
+This is a planning pivot only. Do not start the next implementation phase,
+launch a large GPU run, or freeze the final lesion class list until the R0 /
+MDL dataset and taxonomy audit passes.
+
 Before cross-package or cross-runtime work, read `docs/CTR_MODULE_CONTRACT.md`. Respect module ownership, dependency direction,
 and data/runtime boundaries. Phases define execution order; modules define architectural ownership. Use `docs/PROJECT_MAP.md`
 for human/team navigation.
@@ -113,6 +141,35 @@ If a listed third-party skill is missing, do not invent its contents. Either run
 - Keep `bootstrap.cmd` as the fixed Windows machine entrypoint because it is the repository-wide onboarding contract.
 - Each phase README must contain a short handoff index mapping the order, canonical command, prerequisites, expected status output, and next manual action.
 - Handoff commands reconstruct or verify local environment/state only; they must not reset project phase/state or start a later phase.
+
+## Parallel Workstreams and Branch Hygiene
+
+OcuForge may run parallel Labeler and Research workstreams. Parallelism is an
+execution strategy, not a change to module ownership.
+
+- Labeler Arm primarily owns `LBL`, `DAT`, and local/on-prem `RUN` work.
+- Research Arm primarily owns `MDL`, `RSC`, and public/synthetic `RUN` work.
+- `CTR` is a shared boundary; cross-arm contract changes require an explicit integration decision.
+- Parallel agents use separate Git branches and worktrees; never share a writable worktree.
+- The primary `main` worktree is for integration/review; feature work normally happens off `main`.
+- Before modifying another arm's file, report the cross-module dependency and request integration.
+- Read `docs/RUN_PARALLEL_WORKFLOW.md` before starting or closing a parallel branch/worktree.
+
+A branch/worktree is temporary and must be cleaned up after its work is integrated.
+
+For every completed feature branch:
+
+1. Finish validation on the feature branch.
+2. Commit and push only the intended changes.
+3. Merge through the agreed integration path; manual merge is allowed when explicitly chosen by the owner.
+4. Verify the merge is present on `main`.
+5. Remove the completed worktree.
+6. Delete the merged local branch.
+7. Delete the merged remote branch when it is no longer needed.
+8. Run `git worktree prune` and verify there are no stale worktrees/branches.
+9. Return the primary `main` worktree to a clean, up-to-date state.
+
+Do not delete an unmerged branch or worktree unless the owner explicitly authorizes discarding that work.
 
 ## Commit and Handoff Rules
 
