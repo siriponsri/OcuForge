@@ -57,7 +57,9 @@ def load_images(path, dataset_path=None, cloud=False):
     if dataset_path:
         import yaml
 
-        dataset = DatasetManifest.model_validate(yaml.safe_load(Path(dataset_path).read_text()))
+        dataset = DatasetManifest.model_validate(
+            yaml.safe_load(Path(dataset_path).read_text(encoding="utf-8"))
+        )
         if any(i.dataset_id != dataset.dataset_id or i.source_type != dataset.source_type for i in images):
             raise ValueError("Image/dataset identity mismatch")
     if cloud:
@@ -76,7 +78,7 @@ def load_images(path, dataset_path=None, cloud=False):
 def load_targets(path, images):
     rows = [
         Target.model_validate(json.loads(line))
-        for line in Path(path).read_text().splitlines()
+        for line in Path(path).read_text(encoding="utf-8").splitlines()
         if line.strip()
     ]
     index = {r.image_id: r for r in rows}
@@ -131,7 +133,7 @@ def audit(manifest, data_root, out, dataset_path=None, cloud=False):
         "cloud_checked": cloud,
     }
     Path(out).parent.mkdir(parents=True, exist_ok=True)
-    Path(out).write_text(json.dumps(report, indent=2))
+    Path(out).write_text(json.dumps(report, indent=2), encoding="utf-8")
     if failures:
         raise ValueError(f"Audit failed for {failures} image(s); inspect local audit report")
     return report

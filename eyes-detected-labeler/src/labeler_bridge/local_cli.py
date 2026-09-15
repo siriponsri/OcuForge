@@ -80,12 +80,12 @@ def main():
             target.parent.mkdir(parents=True, exist_ok=True)
             # Exclusive create and owner-only mode; operator must quiesce writers first.
             fd = os.open(target, os.O_WRONLY | os.O_CREAT | os.O_EXCL, 0o600)
-            with os.fdopen(fd, "w") as f:
+            with os.fdopen(fd, "w", encoding="utf-8") as f:
                 json.dump(store.export_documents(), f, indent=2)
             print("LOCAL_DOCUMENT_BACKUP_ONLY")
             return
         if a.command == "restore":
-            store.restore_documents(json.loads(Path(a.file).read_text()))
+            store.restore_documents(json.loads(Path(a.file).read_text(encoding="utf-8")))
             print("RESTORED_IN_EMPTY_DATABASE")
             return
         if a.command == "ingest":
@@ -127,7 +127,10 @@ def main():
             doc = flow.import_predictions(a.batch_id, read_records(a.predictions), a.actor)
         elif a.command == "export":
             doc = flow.export(
-                a.batch_id, json.loads(Path(a.decisions).read_text()), a.actor, a.active_seconds
+                a.batch_id,
+                json.loads(Path(a.decisions).read_text(encoding="utf-8")),
+                a.actor,
+                a.active_seconds,
             )
         elif a.command == "finalize":
             doc = flow.finalize(a.batch_id, a.actor)

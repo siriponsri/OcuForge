@@ -45,7 +45,7 @@ def main():
             out.mkdir(parents=True, exist_ok=True)
             for i, patch in enumerate(patches):
                 Image.fromarray(patch).save(out / f"patch_{i:02}.png")
-            (out / "coordinates.json").write_text(json.dumps(meta, indent=2))
+            (out / "coordinates.json").write_text(json.dumps(meta, indent=2), encoding="utf-8")
             print("25 patches and coordinates written")
         elif a.command == "select-batch":
             import numpy as np

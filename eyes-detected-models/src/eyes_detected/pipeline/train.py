@@ -27,7 +27,7 @@ class ResearchMIL(nn.Module):
 
 def load_features(directory, images):
     directory = Path(directory)
-    rows = json.loads((directory / "index.json").read_text())
+    rows = json.loads((directory / "index.json").read_text(encoding="utf-8"))
     index = {r["image_id"]: r for r in rows}
     if len(index) != len(rows):
         raise ValueError("Duplicate feature image ID")
@@ -112,7 +112,7 @@ def train(
     dataset_path=None,
     cloud=False,
 ):
-    config = json.loads(Path(config_path).read_text())
+    config = json.loads(Path(config_path).read_text(encoding="utf-8"))
     task = config.get("task", "ordinal")
     if task not in ["ordinal", "binary"]:
         raise ValueError("task must be ordinal or binary")
@@ -197,7 +197,7 @@ def train(
         "val_ids": val_ids,
         "scientific_result_eligible": False,
     }
-    (out / "run.json").write_text(json.dumps(run, indent=2))
+    (out / "run.json").write_text(json.dumps(run, indent=2), encoding="utf-8")
     try:
         for epoch in range(start, epochs):
             order = random.Random(seed + epoch).sample(train_ids, len(train_ids))
@@ -245,13 +245,13 @@ def train(
             tmp.replace(out / "last.pt")
             if improved:
                 torch.save(ckpt, out / "best.pt")
-            (out / "history.json").write_text(json.dumps(history, indent=2))
+            (out / "history.json").write_text(json.dumps(history, indent=2), encoding="utf-8")
         run["status"] = "COMPLETED"
         run["epochs_completed"] = len(history)
         run["best_val_loss"] = best
     except Exception:
         run["status"] = "FAILED"
-        (out / "run.json").write_text(json.dumps(run, indent=2))
+        (out / "run.json").write_text(json.dumps(run, indent=2), encoding="utf-8")
         raise
-    (out / "run.json").write_text(json.dumps(run, indent=2))
+    (out / "run.json").write_text(json.dumps(run, indent=2), encoding="utf-8")
     return run

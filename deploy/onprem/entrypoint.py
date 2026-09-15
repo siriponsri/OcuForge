@@ -3,7 +3,7 @@ from pathlib import Path
 import sys
 from urllib.parse import quote
 
-password = Path("/run/secrets/mongo_app_password").read_text().strip()
+password = Path("/run/secrets/mongo_app_password").read_text(encoding="utf-8").strip()
 if len(password) < 24:
     raise SystemExit("Missing strong local database secret")
 os.environ["MONGO_URI"] = (

@@ -1,0 +1,25 @@
+# OcuForge Codex configuration template
+#
+# This file is intentionally safe to commit as an example.
+# Copy the settings you want into the real per-machine Codex config:
+#
+# Windows:
+#   %USERPROFILE%\.codex\config.toml
+#
+# macOS/Linux:
+#   ~/.codex/config.toml
+#
+# Never place API keys, tokens, passwords, PHI, hospital paths, or other secrets here.
+#
+# Keep this template conservative. Add machine-specific settings only after
+# checking the Codex version/documentation on that machine.
+
+# A restrictive default for unfamiliar machines. Change only if your workflow requires it.
+sandbox_mode = "read-only"
+approval_policy = "on-request"
+
+# Model and reasoning settings are intentionally not pinned here.
+# Different machines/accounts may expose different supported model names and
+# reasoning options. Configure those in the real per-machine config.toml.
+#
+# Likewise, keep MCP/server credentials and private paths out of this tracked template.

@@ -34,18 +34,26 @@ def main():
         elif a.command == "health":
             print(json.dumps(CVATClient().health()))
         elif a.command == "bootstrap-project":
-            print(json.dumps(CVATClient().create_project(json.loads(Path(a.spec).read_text()))))
+            print(
+                json.dumps(
+                    CVATClient().create_project(json.loads(Path(a.spec).read_text(encoding="utf-8")))
+                )
+            )
         elif a.command == "import-batch":
             batch = validate_batch(read_records(a.batch)[0], read_records(a.images))
             print(f"VALID batch {batch.batch_id}: {batch.requested_n}")
         elif a.command == "import-payload":
             print(
                 json.dumps(
-                    CVATClient().import_annotations(a.task_id, json.loads(Path(a.payload).read_text()))
+                    CVATClient().import_annotations(
+                        a.task_id, json.loads(Path(a.payload).read_text(encoding="utf-8"))
+                    )
                 )
             )
         elif a.command == "fetch-annotations":
-            Path(a.out).write_text(json.dumps(CVATClient().get_annotations(a.task_id), indent=2))
+            Path(a.out).write_text(
+                json.dumps(CVATClient().get_annotations(a.task_id), indent=2), encoding="utf-8"
+            )
         elif a.command == "import-demo-predictions":
             root = Path(a.smoke_dir)
             out = Path(a.out)
@@ -53,8 +61,8 @@ def main():
             im = read_records(root / "images.jsonl")[0]
             pred = read_records(root / "predictions.jsonl")[0]
             payload, sidecar = import_prediction(pred, im)
-            (out / "cvat_import.json").write_text(json.dumps(payload, indent=2))
-            (out / "provenance_sidecar.json").write_text(json.dumps(sidecar, indent=2))
+            (out / "cvat_import.json").write_text(json.dumps(payload, indent=2), encoding="utf-8")
+            (out / "provenance_sidecar.json").write_text(json.dumps(sidecar, indent=2), encoding="utf-8")
             aid = next(iter(sidecar))
             payload["shapes"][0]["points"][0] += 1
             annotations = export_annotations(
@@ -71,7 +79,7 @@ def main():
             locked = transition(adjudicated, "LOCK", "SYNTHETIC_EXPERT")
             write_records(out / "annotations.jsonl", [locked])
             (out / "session_summary.json").write_text(
-                json.dumps(session_summary([locked], 60, synthetic_demo=True), indent=2)
+                json.dumps(session_summary([locked], 60, synthetic_demo=True), indent=2), encoding="utf-8"
             )
             print("Synthetic correction + adjudication + lock exported; no live CVAT called")
     except (ValueError, RuntimeError, OSError, KeyError) as e:

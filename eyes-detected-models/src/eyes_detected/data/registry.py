@@ -15,4 +15,4 @@ class DatasetRegistry:
         return d
 
     def load(self, path):
-        return self.register(yaml.safe_load(Path(path).read_text()))
+        return self.register(yaml.safe_load(Path(path).read_text(encoding="utf-8")))

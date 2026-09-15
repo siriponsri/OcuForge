@@ -208,8 +208,8 @@ def smoke_train(out, protocol_path, seed=42, steps=5):
         status="COMPLETED",
     )
     write_records(out / "experiment_run.json", [run])
-    (out / "feature_index.json").write_text(json.dumps(keys, indent=2))
-    (out / "patch_geometry.json").write_text(json.dumps(geometry, indent=2))
+    (out / "feature_index.json").write_text(json.dumps(keys, indent=2), encoding="utf-8")
+    (out / "patch_geometry.json").write_text(json.dumps(geometry, indent=2), encoding="utf-8")
     summary = {
         "encoder": encoder.encoder_id,
         "steps": steps,
@@ -220,5 +220,5 @@ def smoke_train(out, protocol_path, seed=42, steps=5):
         "predictions": len(preds),
         "selected": batch.requested_n,
     }
-    (out / "smoke_metrics.json").write_text(json.dumps(summary, indent=2))
+    (out / "smoke_metrics.json").write_text(json.dumps(summary, indent=2), encoding="utf-8")
     return summary

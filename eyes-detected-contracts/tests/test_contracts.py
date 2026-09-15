@@ -144,7 +144,7 @@ def test_protocol_hash_and_change(tmp_path, protocol):
     assert data["severe_reference"]["hemorrhages_per_quadrant_at_least"] == 20
     data["version"] = "0.2.0"
     p = tmp_path / "p.json"
-    p.write_text(json.dumps(data))
+    p.write_text(json.dumps(data), encoding="utf-8")
     _, ref2 = load_protocol(p)
     assert ref2.config_sha256 != ref.config_sha256
     record = DRPrediction(grade=0, ordinal_probs=[0.4, 0.3, 0.2, 0.1], confidence=0.6, grading_protocol=ref)
@@ -155,7 +155,9 @@ def test_protocol_hash_and_change(tmp_path, protocol):
 def test_generated_schemas(image, prediction):
     root = Path(__file__).resolve().parents[1] / "schemas"
     for record in [image, prediction]:
-        schema = json.loads((root / (record.schema_version + ".schema.json")).read_text())
+        schema = json.loads(
+            (root / (record.schema_version + ".schema.json")).read_text(encoding="utf-8")
+        )
         jsonschema.Draft202012Validator.check_schema(schema)
         jsonschema.validate(record.model_dump(mode="json"), schema)
         bad = record.model_dump(mode="json") | {"unexpected": "bad"}

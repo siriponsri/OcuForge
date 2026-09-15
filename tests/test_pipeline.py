@@ -34,7 +34,9 @@ def prepare(root):
         )
         targets.append({"image_id": f"SYN_{i}", "source": "SYNTHETIC", "dr_grade": i % 5})
     write_records(root / "images.jsonl", images)
-    (root / "targets.jsonl").write_text("".join(json.dumps(t) + "\n" for t in targets))
+    (root / "targets.jsonl").write_text(
+        "".join(json.dumps(t) + "\n" for t in targets), encoding="utf-8"
+    )
     (root / "train.json").write_text(
         json.dumps(
             {
@@ -45,7 +47,8 @@ def prepare(root):
                 "seed": 42,
                 "loss_weights": {"primary": 1, "lesions": 0, "qc": 0},
             }
-        )
+        ),
+        encoding="utf-8",
     )
     return root / "images.jsonl"
 
@@ -86,9 +89,9 @@ def test_synthetic_extract_train_resume_evaluate(tmp_path):
     assert all(p.dr is not None and not p.objects and p.evidence for p in predictions)
     # Corrupted feature provenance must refuse inference.
     index = tmp_path / "features/index.json"
-    rows = json.loads(index.read_text())
+    rows = json.loads(index.read_text(encoding="utf-8"))
     rows[-1]["metadata"]["image_sha256"] = "f" * 64
-    index.write_text(json.dumps(rows))
+    index.write_text(json.dumps(rows), encoding="utf-8")
     with pytest.raises(ValueError, match="provenance"):
         infer(manifest, tmp_path / "features", tmp_path / "run/best.pt", tmp_path / "bad", "TEST")
 
@@ -111,10 +114,12 @@ def test_cloud_zone_cannot_skip_manifest_gate(tmp_path, monkeypatch):
 def test_binary_pipeline_keeps_scores_out_of_ordinal_contract(tmp_path):
     manifest = prepare(tmp_path)
     targets = [{"image_id": f"SYN_{i}", "source": "SYNTHETIC", "binary_dr": i % 2} for i in range(6)]
-    (tmp_path / "targets.jsonl").write_text("".join(json.dumps(t) + "\n" for t in targets))
-    cfg = json.loads((tmp_path / "train.json").read_text())
+    (tmp_path / "targets.jsonl").write_text(
+        "".join(json.dumps(t) + "\n" for t in targets), encoding="utf-8"
+    )
+    cfg = json.loads((tmp_path / "train.json").read_text(encoding="utf-8"))
     cfg["task"] = "binary"
-    (tmp_path / "train.json").write_text(json.dumps(cfg))
+    (tmp_path / "train.json").write_text(json.dumps(cfg), encoding="utf-8")
     extract(
         manifest,
         tmp_path,
@@ -140,5 +145,6 @@ def test_binary_pipeline_keeps_scores_out_of_ordinal_contract(tmp_path):
     assert report["task"] == "binary" and len(report["confusion_matrix"]) == 2
     assert all(p.dr is None for p in read_records(tmp_path / "eval/predictions.jsonl"))
     assert all(
-        0 <= r["binary_dr_probability"] <= 1 for r in json.loads((tmp_path / "eval/scores.json").read_text())
+        0 <= r["binary_dr_probability"] <= 1
+        for r in json.loads((tmp_path / "eval/scores.json").read_text(encoding="utf-8"))
     )

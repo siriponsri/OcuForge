@@ -20,7 +20,7 @@ def state_hash(model):
 
 
 def extract(manifest, data_root, out, config_path, dataset_path=None, cloud=False):
-    config = json.loads(Path(config_path).read_text())
+    config = json.loads(Path(config_path).read_text(encoding="utf-8"))
     images, dataset = load_images(manifest, dataset_path, cloud)
     device = config.get("device", "cpu")
     if device == "cuda" and not torch.cuda.is_available():
@@ -96,10 +96,10 @@ def extract(manifest, data_root, out, config_path, dataset_path=None, cloud=Fals
         rows.append({"image_id": im.image_id, "key": key, "metadata": meta})
         # Progress checkpoint contains metadata only, enabling diagnosis of interrupted extraction.
         tmp = out / "index.partial.json"
-        tmp.write_text(json.dumps(rows, indent=2))
-    (out / "index.json").write_text(json.dumps(rows, indent=2))
+        tmp.write_text(json.dumps(rows, indent=2), encoding="utf-8")
+    (out / "index.json").write_text(json.dumps(rows, indent=2), encoding="utf-8")
     (out / "index.partial.json").unlink(missing_ok=True)
-    (out / "extraction_config.json").write_text(json.dumps(config, indent=2))
+    (out / "extraction_config.json").write_text(json.dumps(config, indent=2), encoding="utf-8")
     return {
         "images": len(rows),
         "encoder": encoder.encoder_id,

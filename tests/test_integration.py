@@ -15,7 +15,7 @@ def test_track_separation():
         ("eyes-detected-contracts", {"eyes_detected", "labeler_bridge", "torch"}),
     ]:
         for p in (ROOT / folder / "src").rglob("*.py"):
-            for node in ast.walk(ast.parse(p.read_text())):
+            for node in ast.walk(ast.parse(p.read_text(encoding="utf-8"))):
                 if isinstance(node, ast.Import):
                     assert not {x.name.split(".")[0] for x in node.names} & forbidden
                 if isinstance(node, ast.ImportFrom):
@@ -37,7 +37,9 @@ def test_cpu_smoke(tmp_path):
 
 def test_schema_drift():
     for version, cls in TYPES.items():
-        schema = json.loads((ROOT / "eyes-detected-contracts/schemas" / f"{version}.schema.json").read_text())
+        schema = json.loads(
+            (ROOT / "eyes-detected-contracts/schemas" / f"{version}.schema.json").read_text(encoding="utf-8")
+        )
         assert schema == cls.model_json_schema()
 
 

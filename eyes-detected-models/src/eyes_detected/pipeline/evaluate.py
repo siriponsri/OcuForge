@@ -83,7 +83,7 @@ def infer(
     )
     write_records(out / "model_manifest.json", [manifest_record])
     write_records(out / "predictions.jsonl", predictions)
-    (out / "scores.json").write_text(json.dumps(rows, indent=2))
+    (out / "scores.json").write_text(json.dumps(rows, indent=2), encoding="utf-8")
     report = {
         "model_manifest_id": model_id,
         "checkpoint_sha256": sha256(checkpoint),
@@ -116,5 +116,5 @@ def infer(
             confusion_matrix=matrix.tolist(),
             qwk=qwk(a, b) if nclasses == 5 else None,
         )
-    (out / "evaluation.json").write_text(json.dumps(report, indent=2))
+    (out / "evaluation.json").write_text(json.dumps(report, indent=2), encoding="utf-8")
     return report

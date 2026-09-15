@@ -84,7 +84,7 @@ def test_dino_unavailable(tmp_path):
 
 
 def test_dino_hash_failure(tmp_path):
-    (tmp_path / "hubconf.py").write_text("# test only")
+    (tmp_path / "hubconf.py").write_text("# test only", encoding="utf-8")
     (tmp_path / "weights").write_bytes(b"not model")
     with pytest.raises(RuntimeError, match="SHA256 mismatch"):
         DINOv3Adapter(tmp_path, tmp_path / "weights", "0" * 64, True)

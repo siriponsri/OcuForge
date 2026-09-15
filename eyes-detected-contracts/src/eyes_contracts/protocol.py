@@ -4,7 +4,7 @@ from .models import ProtocolRef
 
 
 def load_protocol(path):
-    data = json.loads(Path(path).read_text())
+    data = json.loads(Path(path).read_text(encoding="utf-8"))
     if sorted(x["value"] for x in data["grades"]) != list(range(5)):
         raise ValueError("Starter CORAL requires exactly grades 0..4; other scales require migration")
     if (

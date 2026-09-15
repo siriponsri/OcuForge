@@ -267,10 +267,10 @@ class Workflow:
         location = self.root / batch_id / document_hash([a.model_dump(mode="json") for a in annotations])
         location.mkdir(parents=True, exist_ok=True)
         write_records(location / "annotations.reviewed.jsonl", annotations)
-        (location / "cvat_export.json").write_text(json.dumps(payload, indent=2))
-        (location / "decision_journal.json").write_text(json.dumps(decisions, indent=2))
+        (location / "cvat_export.json").write_text(json.dumps(payload, indent=2), encoding="utf-8")
+        (location / "decision_journal.json").write_text(json.dumps(decisions, indent=2), encoding="utf-8")
         summary = session_summary(annotations, active_seconds)
-        (location / "session_summary.json").write_text(json.dumps(summary, indent=2))
+        (location / "session_summary.json").write_text(json.dumps(summary, indent=2), encoding="utf-8")
         body["reviewed_annotations"] = [a.model_dump(mode="json") for a in annotations]
         body["status"] = "REVIEWED"
         body["export_path"] = str(location)
@@ -294,9 +294,10 @@ class Workflow:
                 a = transition(a, "LOCK", actor)
             annotations.append(a)
         self.store.save_annotations(annotations)
-        final_path = Path(body["export_path"]) / (
-            "final-" + document_hash([a.model_dump(mode="json") for a in annotations]) + ".jsonl"
+        final_hash = document_hash(
+        [a.model_dump(mode="json") for a in annotations]
         )
+        final_path = self.root / batch_id / "final" / f"{final_hash}.jsonl"
         write_records(final_path, annotations)
         body["final_path"] = str(final_path)
         body["status"] = "LOCKED" if lock else "ADJUDICATED"

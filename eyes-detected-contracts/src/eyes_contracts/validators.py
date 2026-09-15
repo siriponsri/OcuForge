@@ -14,7 +14,7 @@ def validate(record):
 
 def read_records(path):
     p = Path(path)
-    text = p.read_text()
+    text = p.read_text(encoding="utf-8")
     raw = (
         [json.loads(x) for x in text.splitlines() if x.strip()] if p.suffix == ".jsonl" else json.loads(text)
     )
@@ -30,7 +30,8 @@ def write_records(path, records):
     p.write_text(
         "".join(json.dumps(x, allow_nan=False) + "\n" for x in rows)
         if p.suffix == ".jsonl"
-        else json.dumps(rows[0] if len(rows) == 1 else rows, indent=2, allow_nan=False) + "\n"
+        else json.dumps(rows[0] if len(rows) == 1 else rows, indent=2, allow_nan=False) + "\n",
+        encoding="utf-8",
     )
 
 
