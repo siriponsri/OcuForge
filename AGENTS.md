@@ -10,6 +10,10 @@ OcuForge is a research and clinician-review foundation for retinal imaging workf
 
 Keep the contracts-first boundary: models and labeler may depend on contracts, but models and labeler must not depend on each other.
 
+Before cross-package or cross-runtime work, read `docs/CTR_MODULE_CONTRACT.md`. Respect module ownership, dependency direction,
+and data/runtime boundaries. Phases define execution order; modules define architectural ownership. Use `docs/PROJECT_MAP.md`
+for human/team navigation.
+
 ## Source of Truth and Scope Discipline
 
 Before editing, inspect the relevant code, tests, configuration, and nearby documentation. Do not infer behavior from filenames alone.

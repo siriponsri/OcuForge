@@ -8,13 +8,31 @@ Eye Detected connects model experiments to reviewable annotations through versio
 
 Target code source of truth: [siriponsri/OcuForge](https://github.com/siriponsri/OcuForge). The repository is live on GitHub. Start with [คู่มือเริ่มต้นภาษาไทย](docs/START_HERE_TH.md). Read the [delivery report](validation/FINAL_DELIVERY_REPORT.md) for measured validation status and external checks.
 
-## Workspace
+## Module Map
 
-| Package | Responsibility | Executable starter |
-|---|---|---|
-| `eyes-detected-models` | Model research | Deterministic patches, feature store, Attention MIL, CORAL, QC and lesion heads, diversity selection |
-| `eyes-detected-labeler` | CVAT integration | Geometry conversion, explicit correction journal, annotation export and session summary |
-| `eyes-detected-contracts` | Shared interface | Seven versioned schemas, semantic validation, split checks and ICO protocol identity |
+| ID | Module | Responsibility | Primary location / runtime |
+|---|---|---|---|
+| CTR | Contracts | Schemas, protocols, provenance, validation, shared interfaces | `eyes-detected-contracts/` |
+| MDL | Models | Encoders, training, inference, evaluation, model evidence | `eyes-detected-models/` |
+| LBL | Labeler | CVAT integration, clinician review, correction, adjudication | `eyes-detected-labeler/` |
+| DAT | Local Data | Mongo metadata, immutable image objects, revisions, release/backup | `labeler_bridge/storage.py`, `deploy/onprem/` |
+| RUN | Runtime / Deployment | Bootstrap, Docker/Compose, environment and execution boundaries | `bootstrap.cmd`, `scripts/`, `deploy/` |
+| RSC | Research Control | Experiments, leakage controls, metrics, reproducibility, evidence claims | `docs/`, `validation/` |
+
+Modules define architectural ownership. Phases define execution order and current project progress. See the
+[normative module contract](docs/CTR_MODULE_CONTRACT.md) and the [human project map](docs/PROJECT_MAP.md).
+
+## Project Status
+
+| Work item | Status |
+|---|---|
+| Phase 0 - Repository foundation | PASS |
+| Phase 1 - Baseline / portability | PASS |
+| Machine bootstrap | PASS |
+| Phase 2A - Docker-independent local data foundation | PASS |
+| Phase 2B - Live MongoDB acceptance | PENDING / NOT RUN |
+
+Phase 2A passing does not mean that Phase 2 overall has passed.
 
 ## Workflow
 
