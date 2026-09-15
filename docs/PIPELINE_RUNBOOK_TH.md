@@ -1,6 +1,20 @@
-# ชุดคำสั่ง model pipeline และ Vast.ai
+# ชุดคำสั่ง model pipeline และ public GPU
 
-คำสั่งทั้งหมดรันด้วยข้อมูลที่เตรียมบนเครื่องแล้ว ไม่มี dataset/model downloader, uploader หรือ provision GPU อัตโนมัติ Hospital images/labels/features/checkpoints อยู่ on-premises เท่านั้น
+คำสั่งทั้งหมดใช้ path ที่ผู้รันกำหนดเอง ไม่มี dataset/model downloader, uploader หรือ provision GPU อัตโนมัติ
+Hospital images/labels/features/checkpoints อยู่ on-premises เท่านั้น
+
+สำหรับ R1 public-data GPU ให้ตั้ง storage roots ก่อน:
+
+```bash
+export OCUFORGE_DATA_ROOT=/workspace/data
+export OCUFORGE_MODEL_ROOT=/workspace/models
+export OCUFORGE_CACHE_ROOT=/workspace/cache
+export OCUFORGE_ARTIFACT_ROOT=/workspace/artifacts
+```
+
+RunPod Network Volume เป็นตัวเลือก persistent storage ที่แนะนำ แต่ไม่ใช่ dependency; root เดียวกันใช้กับ
+filesystem อื่นได้ด้วย layout `data/mmrdr`, `data/idrid`, `data/manifests`, `models/dinov3`,
+`cache/features`, `artifacts/experiments`. Git เก็บเฉพาะ code, safe manifests, hashes และ metadata.
 
 ติดตั้ง packages ตาม README แล้วใช้ `eyes-pipeline --help` รองรับ audit, extract, train, evaluate, predict; คำสั่ง smoke/active-learning เดิมยังอยู่ใน `eyes-models --help`
 
@@ -28,11 +42,18 @@ MIL attention เป็น model evidence; predictions.jsonl ไม่สร้�
 
 1. ตรวจ dataset/model เป็น public จริง พร้อม license ที่อนุญาตงานและ cloud_eligible ทั้ง dataset/image manifests; config ที่เขียนว่า reviewed เป็นการบันทึกผลตรวจ ไม่ใช่ตัวตรวจ license อัตโนมัติ
 2. เตรียม GPU instance เองตามงบและสิทธิ์ที่อนุมัติ ไม่มีสคริปต์เช่าเครื่องหรือส่งภาพโรงพยาบาล
-3. ถ้าเป็น Docker host ที่มี NVIDIA Container Toolkit: ตั้ง PUBLIC_DATA_ROOT, PUBLIC_MODEL_ROOT, PUBLIC_RUN_ROOT ให้ชี้เฉพาะ public/synthetic แล้ว `docker compose -f deploy/vast/compose.yaml build` และ `docker compose -f deploy/vast/compose.yaml run --rm models <subcommand และ args>`
+3. ถ้าเป็น Docker host ที่มี NVIDIA Container Toolkit: ตั้ง `OCUFORGE_DATA_ROOT`, `OCUFORGE_MODEL_ROOT`,
+   `OCUFORGE_CACHE_ROOT`, `OCUFORGE_ARTIFACT_ROOT` ให้ชี้เฉพาะ public/synthetic แล้ว
+   `docker compose -f deploy/vast/compose.yaml build` และ
+   `docker compose -f deploy/vast/compose.yaml run --rm models <subcommand และ args>`
 4. Vast instance หลายรูปแบบเป็น container อยู่แล้ว ไม่ถือว่ามี Docker daemon หรือ nested Docker ให้ติดตั้ง packages ใน container ที่เตรียมแล้วและใช้ `bash deploy/vast/run-public.sh <subcommand และ args>` แทน ทั้งสองทางตั้ง PUBLIC_CLOUD ทำให้ data gate ทำงานแม้ไม่ระบุ --cloud
 5. ไม่มี network ระหว่าง Compose training; model checkout ต้องไม่ดาวน์โหลดตอน torch.hub local load และต้องตรวจ dependency ที่ official model ต้องการก่อน build image ใช้ nvidia-smi/CUDA probe บน target host; หากไม่มี GPU จะ fail ไม่ fallback
 6. บันทึก image digest, commit SHA, license decision และ run config ก่อนใช้จริง Docker build/GPU/DINO/live service ยังเป็น external acceptance gate ของรุ่นนี้
 
-RunPod ใช้ Dockerfile/launcher เดียวกันบน container ที่ผู้ใช้จัดเตรียม ไม่สมมติว่ามี connected plugin ส่วน Vercel ใช้ได้เฉพาะเอกสารหรือ synthetic demo; clinical UI/API/database ไม่ deploy ที่นั่น
+RunPod ใช้ Dockerfile/launcher เดียวกันบน container ที่ผู้ใช้จัดเตรียม ไม่สมมติว่ามี connected plugin และ
+ไม่บังคับให้ใช้ RunPod. สำหรับ R1 B1 ใช้คำสั่งใน
+`eyes-detected-models/configs/research/r1-global-b1.json`; ต้อง mount manifest/data/model roots เอง,
+ตรวจ hash/สิทธิ์ก่อนรัน และยังไม่ provision หรือ download dataset ขนาดใหญ่ใน gate ปัจจุบัน. Vercel ใช้ได้เฉพาะ
+เอกสารหรือ synthetic demo; clinical UI/API/database ไม่ deploy ที่นั่น
 
 [Vast SSH connection](https://docs.vast.ai/guides/instances/connect/ssh)

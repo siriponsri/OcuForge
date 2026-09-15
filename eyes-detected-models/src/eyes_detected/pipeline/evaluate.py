@@ -25,7 +25,7 @@ def infer(
     ckpt = torch.load(checkpoint, map_location="cpu", weights_only=True)
     if list(identity) != ckpt["feature_identity"]:
         raise ValueError("Checkpoint encoder/preprocessing mismatch")
-    model = ResearchMIL(ckpt["dim"], ckpt["task"])
+    model = ResearchMIL(ckpt["dim"], ckpt["task"], ckpt.get("pooling", "attention_mil"))
     model.load_state_dict(ckpt["state_dict"])
     model.eval()
     model_id = "MIL_" + sha256(checkpoint)[:32]
@@ -61,7 +61,11 @@ def infer(
                     }
                     if ckpt["task"] == "ordinal"
                     else None,
-                    evidence={"patch_scores": r["attention"][0].tolist()},
+                    evidence=(
+                        {"patch_scores": r["attention"][0].tolist()}
+                        if "attention" in r
+                        else None
+                    ),
                 )
             )
     out = Path(out)
@@ -70,12 +74,26 @@ def infer(
         model_manifest_id=model_id,
         name="Frozen encoder MIL research pipeline",
         version="0.2.0",
-        architecture="AttentionMIL-CORAL" if ckpt["task"] == "ordinal" else "AttentionMIL-binary",
+        architecture=(
+            "GlobalAveragePooling-CORAL"
+            if ckpt.get("pooling") == "global_average" and ckpt["task"] == "ordinal"
+            else "GlobalAveragePooling-binary"
+            if ckpt.get("pooling") == "global_average"
+            else "AttentionMIL-CORAL"
+            if ckpt["task"] == "ordinal"
+            else "AttentionMIL-binary"
+        ),
         encoder=identity[0],
         weight_hash=sha256(checkpoint),
         training_run_id="RUN_" + ckpt["fingerprint"][:32],
         training_dataset_ids=ckpt["training_dataset_ids"],
-        known_limitations=["RESEARCH_ONLY", "NO_CLINICAL_VALIDATION", "NO_TRAINED_LOCALIZER", "UNCALIBRATED"],
+        known_limitations=[
+            "RESEARCH_ONLY",
+            "NO_CLINICAL_VALIDATION",
+            "NO_TRAINED_LOCALIZER",
+            "UNCALIBRATED",
+        ]
+        + (["NO_PATCH_ATTENTION_EVIDENCE"] if ckpt.get("pooling") == "global_average" else []),
         intended_research_use="Offline research evaluation; binary and ordinal tasks remain separate",
         calibration_version=None,
         ood_method=None,

@@ -210,19 +210,10 @@ Do not assume the same architecture that works for global DR must be optimal for
 
 ## 5. Lesion Taxonomy — Freeze Before Training
 
-The owner is considering **approximately seven lesion categories** for the POC.
-
-Do not freeze seven classes only because seven sounds convenient.
-
-The final taxonomy must be based on:
-
-- actual annotations available;
-- label definitions;
-- class counts;
-- inter-dataset semantic compatibility;
-- clinical usefulness;
-- visual separability;
-- expected POC value.
+R0 has frozen the dataset-backed taxonomy in
+[`RSC_R0_DATASET_TAXONOMY_FREEZE_v0.1.json`](RSC_R0_DATASET_TAXONOMY_FREEZE_v0.1.json).
+The selected global source is MMRDR UWF (Figshare record version 2); IDRiD is the selected ROI source but
+remains blocked from public GPU use until its local terms, inventory, and checksums are audited.
 
 ### Currently supported by supplied project evidence
 
@@ -239,30 +230,33 @@ and its IDRiD-oriented multi-class detector additionally reports:
 
 Therefore the POC taxonomy should **not** automatically treat optic disc as one of the lesion classes.
 
-### Candidate POC taxonomy structure
+### Frozen taxonomy structure
 
-Target:
-
-```text
-UP_TO_7_LESION_CLASSES
-+
-NO_SUPPORTED_LESION_IN_ROI
-```
-
-The exact 7 lesion classes are **TAXONOMY_PENDING_AUDIT**.
-
-Initial high-priority classes to validate first:
+Global image-level presence classes from MMRDR:
 
 ```text
 MICROANEURYSM
-HEMORRHAGE
 HARD_EXUDATE
-SOFT_EXUDATE / COTTON_WOOL_SPOT
+INTRARETINAL_HEMORRHAGE
+VENOUS_BEADING_OR_IRMA
+NEOVASCULARIZATION
+VITREOUS_HEMORRHAGE
+RETINAL_DETACHMENT
 ```
 
-Additional classes must be admitted only after source/dataset audit confirms usable supervision.
+ROI classifier classes supported by IDRiD:
 
-Potential additional clinically relevant candidates may be considered later, but must not be committed to the contract until verified.
+```text
+MICROANEURYSM
+INTRARETINAL_HEMORRHAGE
+HARD_EXUDATE
+SOFT_EXUDATE
+NO_SUPPORTED_LESION_IN_ROI
+```
+
+Optic disc is structural, not a lesion; DME remains a separate OCT axis. MMRDR `HE` maps to hard exudate and
+IDRiD `HE` maps to hemorrhage. Unannotated ROIs are weak/unknown, not confirmed negatives, unless exhaustive
+localized annotation is verified.
 
 ### `No lesion` semantics
 
@@ -676,26 +670,28 @@ Any change to shared result/ROI/label contracts must be coordinated across both 
 
 ## 16. Immediate Roadmap
 
-### P0 — Direction / Taxonomy Freeze
+### P0 — Direction / Taxonomy Freeze — COMPLETE
 
 Deliver:
 
 - this plan;
 - repo docs aligned;
-- dataset candidates reviewed;
-- lesion taxonomy decision;
-- `No lesion` semantics frozen;
-- split policy;
-- primary metrics.
+- dataset candidates reviewed in the [R0 freeze](RSC_R0_DATASET_TAXONOMY_FREEZE_v0.1.json);
+- lesion taxonomy decision and `No lesion` semantics frozen;
+- split policy and primary metrics frozen;
+- no dataset bytes downloaded in the R0 gate.
 
-### P1 — Global Baseline
+### P1 — Global Baseline — READY / NOT EXECUTED
 
 Deliver:
 
-- public-data global DR baseline;
-- real DINOv3 runtime;
-- held-out metrics;
-- packaged model.
+- public-data MMRDR global DR baseline;
+- real DINOv3 runtime with locally approved checkout, weights, hash, and license decision;
+- held-out TEST metrics and evidence report;
+- packaged research model and metadata.
+
+R1 B1 is frozen as DINOv3 ViT-B/16 patch features with global-average pooling and an ordinal CORAL head.
+Use `eyes-detected-models/configs/research/r1-global-b1.json` for the commands and storage-root contract.
 
 ### P2 — ROI Dataset + Lesion Baseline
 
@@ -746,6 +742,20 @@ No live-HIS compatibility claim without actual acceptance testing.
 ---
 
 ## 17. Public Data / GPU Policy
+
+Persistent public research storage is provider-neutral. RunPod Network Volume is the preferred current option,
+but RunPod is not a hard dependency. Configure:
+
+```text
+OCUFORGE_DATA_ROOT
+OCUFORGE_MODEL_ROOT
+OCUFORGE_CACHE_ROOT
+OCUFORGE_ARTIFACT_ROOT
+```
+
+The expected RunPod layout is `data/mmrdr`, `data/idrid`, `data/manifests`, `models/dinov3`, `cache/features`,
+and `artifacts/experiments`. The same relative layout must work on another filesystem. Dataset/model/cache/
+artifact bytes are runtime inputs or outputs, never Git content.
 
 Before GPU training:
 
@@ -845,15 +855,15 @@ Retain prior validated infrastructure.
 
 ## 21. Acceptance State for the Planning Pivot
 
-The planning pivot is complete when repository documentation consistently states:
+The planning pivot and R0 gate are complete when repository documentation consistently states:
 
 ```text
 POC_PRIMARY=MODEL_INTERACTIVE_GUI
 MODEL_TRAINING_PRIORITY=HIGH
 GLOBAL_MODEL=PRIMARY
 ROI_LESION_CLASSIFIER=PRIMARY_POC_FEATURE
-LESION_TAXONOMY=FREEZE_BEFORE_TRAINING
-TARGET_LESION_COUNT=APPROXIMATELY_7_PENDING_AUDIT
+LESION_TAXONOMY=R0_FROZEN
+TARGET_LESION_COUNT=7_GLOBAL_PRESENCE_5_ROI_CLASSES
 NO_LESION=NO_SUPPORTED_LESION_IN_ROI
 LABEL_STUDIO_COMMUNITY=INTERNAL_ROI_QA_WORKBENCH
 CUSTOM_GUI=CUSTOMER_FACING
@@ -871,23 +881,15 @@ No large GPU run should be launched in the same planning commit.
 
 ## 22. First Implementation Objective After This Pivot
 
-The next technical objective should be:
+The next technical objective is:
 
-> **R0 / MDL — Dataset + Lesion Taxonomy Freeze**
+> **R1 / B1 — Global MMRDR baseline**
 
 Required outputs:
 
-1. selected public datasets;
-2. exact lesion annotations available from each source;
-3. verified class counts;
-4. class-name mapping;
-5. proposed final lesion taxonomy;
-6. definition of `NO_SUPPORTED_LESION_IN_ROI`;
-7. negative-sampling validity assessment;
-8. patient/image split policy;
-9. baseline model ladder;
-10. metrics;
-11. compute estimate;
-12. exact first training experiment.
+1. local DINOv3 checkout and approved weights with SHA-256/license record;
+2. MMRDR manifest/data audit and preserved released split;
+3. frozen feature cache metadata and B1 training artifacts;
+4. held-out TEST evaluation and `r1_report.py` evidence report.
 
-Only after R0 passes should the first real lesion-model training run begin.
+Only after R1 evidence and the IDRiD local audit should the first real ROI lesion-model training run begin.

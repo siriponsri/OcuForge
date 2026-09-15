@@ -148,3 +148,38 @@ def test_binary_pipeline_keeps_scores_out_of_ordinal_contract(tmp_path):
         0 <= r["binary_dr_probability"] <= 1
         for r in json.loads((tmp_path / "eval/scores.json").read_text(encoding="utf-8"))
     )
+
+
+def test_global_average_b1_synthetic_path(tmp_path):
+    manifest = prepare(tmp_path)
+    config = json.loads((tmp_path / "train.json").read_text(encoding="utf-8"))
+    config["pooling"] = "global_average"
+    (tmp_path / "train.json").write_text(json.dumps(config), encoding="utf-8")
+    extract(
+        manifest,
+        tmp_path,
+        tmp_path / "features",
+        ROOT / "eyes-detected-models/configs/pipeline/extract-tiny.json",
+    )
+    args = [
+        manifest,
+        tmp_path / "targets.jsonl",
+        tmp_path / "features",
+        tmp_path / "run",
+        tmp_path / "train.json",
+        ROOT / "eyes-detected-contracts/protocols/ico_2017_dr.v0.1.json",
+    ]
+    result = train(*args)
+    assert result["status"] == "COMPLETED" and result["pooling"] == "global_average"
+    report = infer(
+        manifest,
+        tmp_path / "features",
+        tmp_path / "run/best.pt",
+        tmp_path / "eval",
+        "TEST",
+        tmp_path / "targets.jsonl",
+    )
+    model_manifest = read_records(tmp_path / "eval/model_manifest.json")[0]
+    assert report["qwk"] is not None
+    assert model_manifest.architecture == "GlobalAveragePooling-CORAL"
+    assert all(p.evidence is None for p in read_records(tmp_path / "eval/predictions.jsonl"))

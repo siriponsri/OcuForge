@@ -1,11 +1,16 @@
 # DINOv3 setup
 
-Status: **REQUIRES_MODEL_WEIGHTS**. Primary target: official `dinov3_vitb16`, ViT-B/16. No successful external-model inference is claimed.
+Status: **R1 B1 READY / REQUIRES_MODEL_WEIGHTS**. Primary target: official `dinov3_vitb16`, ViT-B/16.
+No successful external-model inference is claimed.
 
 1. Review [official repository](https://github.com/facebookresearch/dinov3) and [official model card](https://huggingface.co/facebook/dinov3-vitb16-pretrain-lvd1689m). Accept applicable access/license terms yourself.
-2. Obtain an official checkout at an immutable commit and approved local weights. Do not bundle or redistribute them with this repository.
+2. Obtain an official checkout at an immutable commit and approved local weights. Store them below
+   `OCUFORGE_MODEL_ROOT` (for example `dinov3/`) or another configured model root. Do not bundle or
+   redistribute them with this repository.
 3. Install the upstream requirements in a separate research environment after inspecting its pinned Python/PyTorch requirements. The starter's CPU torch pin is tested for TinyTestEncoder, not certified for every upstream DINOv3 revision.
-4. Record commit, weight SHA-256, preprocessing hash and runtime. Set local paths and hash explicitly:
+4. Record commit, weight SHA-256, preprocessing hash and runtime. For R1 B1, set `DINOV3_REPO`,
+   `DINOV3_WEIGHTS`, `DINOV3_SHA256`, `DINOV3_LICENSE_REVIEWED=true`, and `EYES_DOCKER_IMAGE` in the
+   execution environment. The checked-in B1 config resolves these values from environment variables:
 
 ```python
 from eyes_detected.encoders.dinov3_adapter import DINOv3Adapter

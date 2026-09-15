@@ -8,16 +8,23 @@ from torch import nn
 from eyes_detected.pipeline.data import load_images, load_targets
 from eyes_detected.features.store import NPZFeatureStore, digest
 from eyes_detected.mil.attention import AttentionMIL
+from eyes_detected.mil.global_average import GlobalAveragePooling
 from eyes_detected.ordinal.coral import loss as coral_loss
 from eyes_contracts.protocol import load_protocol
 
 
 class ResearchMIL(nn.Module):
-    def __init__(self, dim, task):
+    def __init__(self, dim, task, pooling="attention_mil"):
         super().__init__()
-        self.core = AttentionMIL(dim)
+        if pooling == "attention_mil":
+            self.core = AttentionMIL(dim)
+        elif pooling == "global_average":
+            self.core = GlobalAveragePooling(dim)
+        else:
+            raise ValueError("Unknown pooling strategy")
         self.binary = nn.Linear(dim, 1)
         self.task = task
+        self.pooling = pooling
 
     def forward(self, x, mask):
         r = self.core(x, mask)
@@ -116,6 +123,9 @@ def train(
     task = config.get("task", "ordinal")
     if task not in ["ordinal", "binary"]:
         raise ValueError("task must be ordinal or binary")
+    pooling = config.get("pooling", "attention_mil")
+    if pooling not in ["attention_mil", "global_average"]:
+        raise ValueError("pooling must be attention_mil or global_average")
     images, dataset = load_images(manifest, dataset_path, cloud)
     targets = load_targets(targets_path, images)
     features, identity = load_features(features_dir, images)
@@ -159,7 +169,7 @@ def train(
             "feature_identity": identity,
         }
     )
-    model = ResearchMIL(identity[-1], task).to(device)
+    model = ResearchMIL(identity[-1], task, pooling).to(device)
     optimizer = torch.optim.AdamW(
         model.parameters(),
         lr=config.get("learning_rate", 0.001),
@@ -184,6 +194,7 @@ def train(
     run = {
         "status": "RUNNING",
         "task": task,
+        "pooling": pooling,
         "fingerprint": fingerprint,
         "feature_identity": list(identity),
         "protocol": protocol.model_dump(),
@@ -233,6 +244,7 @@ def train(
                 "history": history,
                 "fingerprint": fingerprint,
                 "task": task,
+                "pooling": pooling,
                 "dim": identity[-1],
                 "feature_identity": list(identity),
                 "protocol": protocol.model_dump(),

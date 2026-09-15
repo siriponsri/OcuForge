@@ -4,6 +4,10 @@ import yaml
 from eyes_contracts.models import DatasetManifest
 from eyes_contracts.protocol import load_protocol
 from eyes_detected.tiling.grid import PatchConfig
+try:
+    from scripts.validate_r0_r1 import validate
+except ModuleNotFoundError:
+    from validate_r0_r1 import validate
 
 ROOT = Path(__file__).resolve().parents[1]
 
@@ -40,6 +44,8 @@ def main():
         assert data["labels"]
         assert len({x["name"] for x in data["labels"]}) == len(data["labels"])
         count += 1
+    validate(ROOT)
+    count += 2
     print(f"PASS: {count} configuration files; Docker syntax parsing is separate from live Docker validation")
 
 

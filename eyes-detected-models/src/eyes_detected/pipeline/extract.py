@@ -1,4 +1,4 @@
-import json, subprocess
+import json, os, subprocess
 from pathlib import Path
 from datetime import datetime, timezone
 from dataclasses import asdict
@@ -7,6 +7,29 @@ from PIL import Image
 from eyes_detected.pipeline.data import load_images, safe_path, sha256
 from eyes_detected.tiling.grid import PatchConfig, tile, normalize
 from eyes_detected.features.store import NPZFeatureStore, digest
+
+
+def configured_value(config, key):
+    env_key = config.get(f"{key}_env")
+    if env_key:
+        value = os.environ.get(env_key)
+        if not value:
+            raise RuntimeError(f"Missing required environment variable: {env_key}")
+        return value
+    if key not in config:
+        raise ValueError(f"Missing encoder configuration: {key}")
+    return config[key]
+
+
+def configured_bool(config, key):
+    value = configured_value(config, key)
+    if isinstance(value, bool):
+        return value
+    if str(value).lower() in ["1", "true", "yes"]:
+        return True
+    if str(value).lower() in ["0", "false", "no"]:
+        return False
+    raise ValueError(f"Boolean configuration required: {key}")
 
 
 def state_hash(model):
@@ -39,15 +62,20 @@ def extract(manifest, data_root, out, config_path, dataset_path=None, cloud=Fals
         from eyes_detected.encoders.dinov3_adapter import DINOv3Adapter
 
         encoder = DINOv3Adapter(
-            config["repo_path"],
-            config["weights_path"],
-            config["weights_sha256"],
-            config.get("license_reviewed", False),
+            configured_value(config, "repo_path"),
+            configured_value(config, "weights_path"),
+            configured_value(config, "weights_sha256"),
+            configured_bool(config, "license_reviewed"),
         )
         weight_hash = encoder.weight_hash
     else:
         raise ValueError("Unknown encoder; no fallback")
     encoder = encoder.to(device).eval().requires_grad_(False)
+    docker_image = (
+        configured_value(config, "docker_image")
+        if "docker_image_env" in config or "docker_image" in config
+        else "UNSPECIFIED"
+    )
     patch_cfg = PatchConfig(**config.get("patch", {}))
     batch_size = config.get("patch_batch_size", 8)
     if not isinstance(batch_size, int) or batch_size < 1:
@@ -90,7 +118,7 @@ def extract(manifest, data_root, out, config_path, dataset_path=None, cloud=Fals
             "feature_dtype": str(features.dtype),
             "extraction_time": datetime.now(timezone.utc).isoformat(),
             "git_sha": git_sha,
-            "docker_image": config.get("docker_image", "UNSPECIFIED"),
+            "docker_image": docker_image,
         }
         key = store.put(features, meta)
         rows.append({"image_id": im.image_id, "key": key, "metadata": meta})

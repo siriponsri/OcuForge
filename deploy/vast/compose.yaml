@@ -7,6 +7,15 @@ services:
     image: ocuforge-models:0.2.0
     environment:
       OCUFORGE_EXECUTION_ZONE: PUBLIC_CLOUD
+      OCUFORGE_DATA_ROOT: /workspace/data
+      OCUFORGE_MODEL_ROOT: /workspace/models
+      OCUFORGE_CACHE_ROOT: /workspace/cache
+      OCUFORGE_ARTIFACT_ROOT: /workspace/artifacts
+      DINOV3_REPO: /workspace/models/dinov3
+      DINOV3_WEIGHTS: /workspace/models/dinov3_vitb16.pth
+      DINOV3_SHA256: ${DINOV3_SHA256:?Verified DINOv3 SHA-256 required}
+      DINOV3_LICENSE_REVIEWED: ${DINOV3_LICENSE_REVIEWED:?Reviewed DINOv3 terms required}
+      EYES_DOCKER_IMAGE: ${EYES_DOCKER_IMAGE:?Record immutable image digest/tag}
       HF_HUB_OFFLINE: "1"
       HF_HUB_DISABLE_TELEMETRY: "1"
       WANDB_MODE: disabled
@@ -14,9 +23,10 @@ services:
     gpus: all
     shm_size: 2gb
     volumes:
-      - ${PUBLIC_DATA_ROOT:?Reviewed public or synthetic dataset only}:/data:ro
-      - ${PUBLIC_MODEL_ROOT:?Verified public model files only}:/models:ro
-      - ${PUBLIC_RUN_ROOT:?Public or synthetic run output directory}:/runs
+      - ${OCUFORGE_DATA_ROOT:?Reviewed public or synthetic dataset only}:/workspace/data:ro
+      - ${OCUFORGE_MODEL_ROOT:?Verified public model files only}:/workspace/models:ro
+      - ${OCUFORGE_CACHE_ROOT:?Public or synthetic feature cache directory}:/workspace/cache
+      - ${OCUFORGE_ARTIFACT_ROOT:?Public or synthetic run output directory}:/workspace/artifacts
     working_dir: /app
     entrypoint: [eyes-pipeline]
     command: [--help]

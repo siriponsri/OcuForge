@@ -8,6 +8,7 @@ label_scope:
   lesions: IMAGE_LEVEL_MULTILABEL
   pixel_masks: false
 split_unit: PATIENT
-license_status: NOT_REVIEWED
-data_root_env: MMRDR_UWF_V1_ROOT
-cloud_eligible: false
+license_status: REVIEWED
+data_root_env: OCUFORGE_DATA_ROOT
+cloud_eligible: true
+source_url: https://figshare.com/articles/dataset/MMRDR/29423747

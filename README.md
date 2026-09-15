@@ -33,12 +33,16 @@ The customer-facing flow is:
 retinal image -> global model result -> user-selected ROI -> lesion suggestion -> confirm / change / reject
 ```
 
-The global model and ROI lesion classifier are separate capabilities. The final lesion taxonomy remains
-`TAXONOMY_PENDING_AUDIT`; the target is approximately seven classes, and
-`NO_SUPPORTED_LESION_IN_ROI` is an ROI-local semantic rather than a claim that the eye is normal. Label Studio
-Community is the internal ROI labeling/QA workbench. The custom GUI is customer-facing,
-while CVAT is retained as optional advanced annotation infrastructure. SAM refinement,
-DICOM, model monitoring, and HL7/FHIR remain deferred until after the model + GUI milestone.
+The global model and ROI lesion classifier are separate capabilities. R0 is now frozen: MMRDR UWF (Figshare
+record version 2, DOI `10.6084/m9.figshare.29423747.v2`) is the reviewed global dataset, and IDRiD is the
+localized-ROI source pending a local terms, inventory, and checksum audit. The frozen taxonomy and split rules
+are recorded in [the R0 freeze](docs/RSC_R0_DATASET_TAXONOMY_FREEZE_v0.1.json).
+
+R1 B1 is ready but not executed: frozen DINOv3 ViT-B/16 patch features, global-average pooling, and a genuine
+ordinal CORAL head on MMRDR. `NO_SUPPORTED_LESION_IN_ROI` remains an ROI-local semantic rather than a claim
+that the eye is normal. Label Studio Community is the internal ROI labeling/QA workbench. The custom GUI is
+customer-facing, while CVAT is retained as optional advanced annotation infrastructure. SAM refinement, DICOM,
+model monitoring, and HL7/FHIR remain deferred until after the model + GUI milestone.
 
 ## Project Status
 
@@ -49,6 +53,8 @@ DICOM, model monitoring, and HL7/FHIR remain deferred until after the model + GU
 | Machine bootstrap | PASS |
 | Phase 2A - Docker-independent local data foundation | PASS |
 | Phase 2B - Live MongoDB acceptance | PENDING / NOT RUN |
+| R0 / MDL - Dataset + lesion taxonomy freeze | PASS |
+| R1 / B1 - Global public baseline | READY; NOT EXECUTED |
 
 Phase 2A passing does not mean that Phase 2 overall has passed.
 
@@ -135,7 +141,8 @@ AI predictions, evidence maps and candidate lesions are research outputs. DME is
 | Docker / GPU image | Configuration supplied; runtime verification reported separately |
 | Vast.ai / RunPod | Docker/Compose and public-only pipeline launcher supplied; GPU runtime unverified |
 | FiftyOne | Optional adapter; external integration unverified |
-| Global baseline, ROI lesion classifier, interactive model GUI | **PLANNED; R0 / MDL audit first** |
+| Global B1 baseline | **READY; requires local DINOv3 checkout, weights, SHA-256 and license decision** |
+| ROI lesion classifier, interactive model GUI | **PLANNED after R1 evidence and IDRiD audit** |
 
 ## On-premises storage and expanded pipelines
 
@@ -148,7 +155,26 @@ Hospital images, labels, features, predictions, checkpoints and backups stay on 
   immutable revisions and expert finalization. Existing CVAT workflow is retained; Label Studio
   Community and the custom GUI are planned for the model-first POC.
 
-Vast.ai/RunPod runners accept only reviewed public or synthetic manifests. No automatic transfer or provisioning is implemented. Vercel is reserved for synthetic demos/documentation; the clinical application is not deployed there. MongoDB/CVAT/GPU live deployment remains a target-host acceptance gate; see the measured report.
+Public GPU work uses configurable storage roots so the same commands can run on RunPod Network Volume or another
+approved filesystem:
+
+```text
+OCUFORGE_DATA_ROOT=/workspace/data
+OCUFORGE_MODEL_ROOT=/workspace/models
+OCUFORGE_CACHE_ROOT=/workspace/cache
+OCUFORGE_ARTIFACT_ROOT=/workspace/artifacts
+```
+
+The preferred RunPod layout is `data/mmrdr`, `data/idrid`, `data/manifests`, `models/dinov3`,
+`cache/features`, and `artifacts/experiments`. RunPod is optional, not a code dependency. Dataset bytes, model
+weights, feature caches, checkpoints, and predictions stay outside Git; GitHub stores code, safe manifests,
+hashes, and metadata only. Download reviewed public data directly to the mounted volume when a future GPU gate
+authorizes it. Do not provision a provider or download a large dataset in the current R0/R1-ready goal.
+
+Vast.ai/RunPod runners accept only reviewed public or synthetic manifests and public model assets. No automatic
+transfer or provisioning is implemented. Hospital data and derived artifacts remain on-premises. Vercel is
+reserved for synthetic demos/documentation; the clinical application is not deployed there. MongoDB/CVAT/GPU
+live deployment remains a target-host acceptance gate; see the measured report.
 
 ## Documentation
 
@@ -157,6 +183,8 @@ Vast.ai/RunPod runners accept only reviewed public or synthetic manifests. No au
 - [ICO grading and version changes](docs/GRADING_PROTOCOL_TH.md)
 - [Local setup](docs/LOCAL_SETUP_TH.md) · [GPU execution](docs/GPU_EXECUTION_TH.md)
 - [Data and source limitations](eyes-detected-models/docs/DATASETS.md)
+- [R0 dataset and taxonomy freeze](docs/RSC_R0_DATASET_TAXONOMY_FREEZE_v0.1.json)
+- [R1 B1 baseline configuration](eyes-detected-models/configs/research/r1-global-b1.json)
 - [Safety and scope](docs/SAFETY_AND_SCOPE.md)
 - [Implementation status](docs/IMPLEMENTATION_STATUS.md) · [Next steps](docs/NEXT_STEPS.md)
 

@@ -66,7 +66,7 @@ may silently upload private data or provision cloud resources.
 | Machine bootstrap | PASS |
 | Phase 2A - Docker-independent local data foundation | PASS |
 | Phase 2B - Live MongoDB acceptance | PENDING / NOT RUN |
-| Model-first interactive lesion POC | PLANNING PIVOT ACCEPTED; R0 / MDL PENDING |
+| Model-first interactive lesion POC | R0 / MDL PASS; R1 / B1 READY, NOT EXECUTED |
 
 Phase 2A passing does not mean that Phase 2 overall has passed.
 
@@ -100,9 +100,8 @@ Run these commands from the repository root:
 
 ## Current Next Action
 
-The next POC action is **R0 / MDL — Dataset + Lesion Taxonomy Freeze**. Produce the dataset audit,
-supported annotations and counts, taxonomy mapping, negative-sampling assessment, identity-aware split policy,
-metrics, compute estimate, and first experiment before training. The separate Phase 2B live-Mongo gate remains
-pending and can be run on a Docker-capable machine; it is not a prerequisite to inventing
-a lesion taxonomy, and it
+The next POC action is **R1 / B1 — Global MMRDR baseline**. Use the frozen dataset/taxonomy record and
+provider-neutral storage roots; preserve the released split and report held-out evidence before starting ROI
+model work. The separate Phase 2B live-Mongo gate remains
+pending and can be run on a Docker-capable machine; it is independent of the public-data model gate and
 must use synthetic fixtures only.

@@ -34,9 +34,9 @@ HL7_FHIR=PLANNED_AFTER_MODEL_GUI
 PUBLIC_GPU_PRIVATE_DATA=FORBIDDEN
 ```
 
-This is a planning pivot only. Do not start the next implementation phase,
-launch a large GPU run, or freeze the final lesion class list until the R0 /
-MDL dataset and taxonomy audit passes.
+R0 / MDL dataset and taxonomy freeze has passed. The next implementation phase is R1 / B1, which is ready but
+not executed. Do not launch a large GPU run, provision RunPod, or download a large dataset in the current
+documentation gate; use provider-neutral configurable storage roots for the future public-data run.
 
 Before cross-package or cross-runtime work, read `docs/CTR_MODULE_CONTRACT.md`. Respect module ownership, dependency direction,
 and data/runtime boundaries. Phases define execution order; modules define architectural ownership. Use `docs/PROJECT_MAP.md`

@@ -1,0 +1,16 @@
+{
+  "encoder": "dinov3_vitb16",
+  "device": "cuda",
+  "seed": 42,
+  "patch_batch_size": 8,
+  "repo_path_env": "DINOV3_REPO",
+  "weights_path_env": "DINOV3_WEIGHTS",
+  "weights_sha256_env": "DINOV3_SHA256",
+  "license_reviewed_env": "DINOV3_LICENSE_REVIEWED",
+  "docker_image_env": "EYES_DOCKER_IMAGE",
+  "patch": {
+    "canvas": 1024,
+    "grid": 5,
+    "patch": 224
+  }
+}

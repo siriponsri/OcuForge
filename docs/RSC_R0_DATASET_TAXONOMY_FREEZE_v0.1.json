@@ -1,0 +1,206 @@
+{
+  "schema_version": "r0_dataset_taxonomy.v0.1",
+  "status": "R0_DATASET_TAXONOMY=PASS",
+  "audit_date": "2026-09-15",
+  "decision_scope": "Public-data model-first POC planning; no dataset bytes downloaded",
+  "selected_datasets": [
+    {
+      "role": "GLOBAL_DR",
+      "dataset_id": "mmrdr_uwf_v1",
+      "source_name": "MMRDR",
+      "source_version": "Figshare record version 2",
+      "source_url": "https://figshare.com/articles/dataset/MMRDR/29423747",
+      "source_doi": "https://doi.org/10.6084/m9.figshare.29423747.v2",
+      "published_source": "https://doi.org/10.1038/s41597-026-07005-9",
+      "access_status": "PUBLIC_RECORD_AND_DIRECT_DOWNLOAD_METADATA_VERIFIED",
+      "license_status": "CC_BY_4.0",
+      "cloud_eligible": true,
+      "modality": "UWF",
+      "image_count": 10404,
+      "label_type": "IMAGE_LEVEL_ORDINAL_DR_PLUS_IMAGE_LEVEL_MULTILABEL_LESION_PRESENCE",
+      "lesion_annotation_format": "UWF.csv 7-element binary lesion list; no pixel masks",
+      "identifiers": "tr######/ts###### image names and lr laterality field; released UWF split documented as patient-level",
+      "limitations": [
+        "No row-level patient identifier is documented in the published UWF CSV description; preserve the released patient split.",
+        "Lesion labels are image-level presence and cannot create ROI geometry.",
+        "The release is large and is not bundled or downloaded by this repository."
+      ],
+      "checksums": {
+        "status": "RECORDED_FROM_FIGSHARE_FILE_METADATA",
+        "algorithm": "MD5",
+        "scope": "Nine multipart archive files and README; no combined archive hash is claimed",
+        "files": [
+          {"name": "MMRDR.zip.001", "figshare_file_id": 55763483, "size_bytes": 2097152000, "md5": "fec69a984299e6042915ea2f52370053"},
+          {"name": "MMRDR.zip.002", "figshare_file_id": 55763486, "size_bytes": 2097152000, "md5": "a092f668fc2986d1851cd33c1d7f1906"},
+          {"name": "MMRDR.zip.003", "figshare_file_id": 55763489, "size_bytes": 2097152000, "md5": "776130e3eb381f0e0cb6d3cca5f48757"},
+          {"name": "MMRDR.zip.004", "figshare_file_id": 55763492, "size_bytes": 2097152000, "md5": "9ae81f9f49c6a1a996cceb6a3bd28718"},
+          {"name": "MMRDR.zip.005", "figshare_file_id": 55763495, "size_bytes": 2097152000, "md5": "3c67b4b115ffa3bc89ca1ec91e9007dc"},
+          {"name": "MMRDR.zip.006", "figshare_file_id": 55763474, "size_bytes": 2097152000, "md5": "504f4165437791163d02891aa11b382f"},
+          {"name": "MMRDR.zip.007", "figshare_file_id": 55763480, "size_bytes": 2097152000, "md5": "cd282dc54d85deb28cb413bad753c3ec"},
+          {"name": "MMRDR.zip.008", "figshare_file_id": 55763477, "size_bytes": 2097152000, "md5": "a7faacbc22e2c35e92195c0bbe580d45"},
+          {"name": "MMRDR.zip.009", "figshare_file_id": 55763465, "size_bytes": 1833101731, "md5": "f7a67d113081e2b69e526c1a28c465d3"},
+          {"name": "README.md", "figshare_file_id": 55763186, "size_bytes": 2459, "md5": "d524d3de74771c04c3e29e6daa7311b5"}
+        ]
+      }
+    },
+    {
+      "role": "ROI_LESION_CLASSIFIER",
+      "dataset_id": "idrid_v1",
+      "source_name": "IDRiD",
+      "source_version": "IEEE DataPort record DOI 10.21227/H25W98; created 2018-04-24; updated 2026-01-12",
+      "source_url": "https://idrid.grand-challenge.org/",
+      "access_url": "https://ieee-dataport.org/open-access/indian-diabetic-retinopathy-image-dataset-idrid",
+      "source_doi": "https://doi.org/10.21227/H25W98",
+      "data_descriptor": "https://doi.org/10.3390/data3030025",
+      "access_status": "PUBLIC_RESEARCH_ACCESS_VIA_IEEE_DATAPORT; ACCOUNT_OR_INSTITUTIONAL_ACCESS_MAY_BE_REQUIRED",
+      "license_status": "TERMS_NOT_EXPLICITLY_VERIFIED",
+      "cloud_eligible": false,
+      "modality": "CFP",
+      "image_count": 516,
+      "released_split": "413 train images and 103 test images",
+      "label_type": "IMAGE_LEVEL_ORDINAL_DR_AND_DME_PLUS_LOCALIZED_LESION_SEGMENTATION",
+      "lesion_annotation_format": "JPG images, TIFF masks and CSV labels; MA, hemorrhage, hard exudate and soft exudate masks",
+      "identifiers": "Image identifiers are documented; patient and eye grouping identifiers are not documented in the official challenge metadata",
+      "limitations": [
+        "Conventional 50-degree CFP is not UWF and is not a local-domain validation set.",
+        "Only the localized lesion subset is eligible for ROI positives; exact mask coverage must be checked after download.",
+        "No public-cloud use until license terms, file inventory and SHA-256 checksums are verified locally."
+      ],
+      "checksums": {
+        "status": "NOT_COMPUTED_NO_DOWNLOAD",
+        "algorithm": "SHA256",
+        "scope": "Downloaded archive and extracted files"
+      }
+    }
+  ],
+  "candidate_disposition": [
+    {
+      "dataset": "DDR / OIA-DDR",
+      "decision": "NOT_SELECTED",
+      "reason": "Potential CFP lesion localization and DR grading, but exact subtask files, access and license were not verified; redundant for the smallest R0 set."
+    },
+    {
+      "dataset": "DeepDRiD",
+      "decision": "NOT_SELECTED",
+      "reason": "Useful DR grading and image-quality benchmark, but no verified localized lesion supervision; defer to external robustness work."
+    },
+    {
+      "dataset": "EyePACS / Kaggle diabetic retinopathy detection",
+      "decision": "NOT_SELECTED",
+      "reason": "Image-level CFP grading only with competition access terms; redundant for the first global baseline and unsuitable for ROI lesions."
+    },
+    {
+      "dataset": "Messidor-2",
+      "decision": "NOT_SELECTED",
+      "reason": "Official source provides paired CFP examinations but no official DR ground truth; research/education use is restricted and download requires a form."
+    },
+    {
+      "dataset": "local_binary_experience_v1",
+      "decision": "REJECTED_FOR_PUBLIC_R0",
+      "reason": "Private binary DR/no-DR experience labels; not ordinal grading, not lesion supervision and never public-cloud eligible."
+    }
+  ],
+  "taxonomy": {
+    "canonical_mapping": {
+      "MICROANEURYSM": "MMRDR MA; IDRiD MA",
+      "HARD_EXUDATE": "MMRDR HE; IDRiD EX",
+      "INTRARETINAL_HEMORRHAGE": "MMRDR IH; IDRiD HE",
+      "SOFT_EXUDATE": "IDRiD SE; customer wording may include cotton-wool spot only after clinical wording review"
+    },
+    "global_image_level_presence": [
+      "MICROANEURYSM",
+      "HARD_EXUDATE",
+      "INTRARETINAL_HEMORRHAGE",
+      "VENOUS_BEADING_OR_IRMA",
+      "NEOVASCULARIZATION",
+      "VITREOUS_HEMORRHAGE",
+      "RETINAL_DETACHMENT"
+    ],
+    "roi_classifier": {
+      "admitted": [
+        "MICROANEURYSM",
+        "INTRARETINAL_HEMORRHAGE",
+        "HARD_EXUDATE",
+        "SOFT_EXUDATE",
+        "NO_SUPPORTED_LESION_IN_ROI"
+      ],
+      "rejected_or_deferred": {
+        "VENOUS_BEADING_OR_IRMA": "MMRDR image-level presence only; no ROI geometry",
+        "NEOVASCULARIZATION": "MMRDR image-level presence only; no NVD/NVE geometry",
+        "VITREOUS_HEMORRHAGE": "MMRDR image-level presence only; no ROI geometry",
+        "RETINAL_DETACHMENT": "MMRDR image-level presence only; no ROI geometry",
+        "OPTIC_DISC": "Structural class, not a lesion",
+        "DME": "Separate OCT axis; not a fundus lesion class",
+        "LASER_SCAR": "No verified localized supervision in the selected set"
+      }
+    },
+    "no_lesion_semantics": {
+      "canonical_label": "NO_SUPPORTED_LESION_IN_ROI",
+      "display_label": "No lesion detected",
+      "meaning": "No supported lesion class was identified inside the selected ROI at the configured threshold",
+      "not_meaning": [
+        "The eye is normal",
+        "The patient has no DR",
+        "No pathology exists outside the selected ROI"
+      ]
+    }
+  },
+  "negative_roi_policy": {
+    "unannotated_roi_is_true_negative": false,
+    "hard_negative_requires": [
+      "Localized annotation protocol is confirmed exhaustive for every admitted ROI class",
+      "ROI/image identity and annotation revision are recorded",
+      "No supported annotation overlaps the ROI under the frozen geometry rule"
+    ],
+    "weak_negative_action": "Keep as weak or unknown; exclude from hard-negative training and do not count as a confirmed absent lesion",
+    "overlap_rule": "Use the source geometry and a versioned overlap threshold; do not infer negatives from missing labels alone"
+  },
+  "split_policy": {
+    "order": ["PATIENT", "EYE", "VISIT", "IMAGE"],
+    "split_before_roi_generation": true,
+    "derived_patch_random_split": false,
+    "roi_generation_rule": "Assign source images to TRAIN/VAL/TEST or SENTINEL first, then generate ROI examples within each split",
+    "mmrdr_uwf_rule": "Preserve the released patient-level UWF train/test split; create validation only within released training data after identity audit",
+    "idrid_rule": "Use the released image-level split unless a verified patient/eye mapping is obtained; do not claim patient-level separation without it"
+  },
+  "metrics": {
+    "global_dr": ["QWK for genuine ordinal grades", "AUROC where defined", "macro F1", "accuracy", "confusion matrix", "per-grade sensitivity/specificity"],
+    "roi_lesion": ["macro F1", "per-class precision", "per-class recall", "balanced accuracy", "confusion matrix", "calibration", "class support", "inference latency"],
+    "claim_ceiling": "Research engineering and benchmark evidence only; no diagnosis or clinical utility claim"
+  },
+  "r1_boundary": {
+    "status": "R1_GLOBAL_BASELINE=READY_NOT_EXECUTED",
+    "baseline": "B1 frozen DINOv3 ViT-B/16 patch features with global average pooling and ordinal head",
+    "dataset": "mmrdr_uwf_v1 only",
+    "tiny_test_encoder": "TEST_ONLY",
+    "real_execution": "Requires approved local DINOv3 checkout, weights, SHA-256 and license decision",
+    "gpu_policy": "Public or synthetic data only; no provisioning or spending in this commit"
+  },
+  "evidence": [
+    {
+      "source": "MMRDR Figshare API metadata",
+      "url": "https://api.figshare.com/v2/articles/29423747",
+      "observed": "Public record version 2, CC BY 4.0, 10,404 UWF images, multipart file MD5 values"
+    },
+    {
+      "source": "MMRDR Scientific Data article",
+      "url": "https://doi.org/10.1038/s41597-026-07005-9",
+      "observed": "UWF ordinal grades, seven image-level lesion fields, UWF patient-level release split, lr laterality field"
+    },
+    {
+      "source": "IDRiD Grand Challenge",
+      "url": "https://idrid.grand-challenge.org/",
+      "observed": "Public research access through IEEE DataPort and four-class lesion segmentation challenge"
+    },
+    {
+      "source": "IDRiD IEEE DataPort metadata",
+      "url": "https://ieee-dataport.org/open-access/indian-diabetic-retinopathy-image-dataset-idrid",
+      "observed": "516 images, 413/103 release split, JPG/TIFF/CSV data format, DOI 10.21227/H25W98"
+    },
+    {
+      "source": "Messidor-2 official distributor",
+      "url": "https://www.adcis.net/en/third-party/messidor2/",
+      "observed": "1,748 images, no official DR ground truth, research/education-only terms and download form"
+    }
+  ]
+}
