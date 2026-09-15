@@ -153,6 +153,13 @@ class LocalImageStore:
         suffix = source.suffix.lower()
         if suffix not in [".png", ".jpg", ".jpeg", ".tif", ".tiff"]:
             raise ValueError("Unsupported image extension")
+        if (
+            not isinstance(expected_sha256, str)
+            or len(expected_sha256) != 64
+            or any(char not in "0123456789abcdefABCDEF" for char in expected_sha256)
+        ):
+            raise ValueError("Expected SHA256 must be 64 hexadecimal characters")
+        expected_sha256 = expected_sha256.lower()
         h = hashlib.sha256()
         with source.open("rb") as f:
             for chunk in iter(lambda: f.read(1024 * 1024), b""):

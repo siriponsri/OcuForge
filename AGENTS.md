@@ -101,6 +101,15 @@ Machine bootstrap reconstructs and verifies local developer state. It does not r
 
 If a listed third-party skill is missing, do not invent its contents. Either run the bootstrap with owner approval or continue using this repository's rules without that skill.
 
+## Human Team Handoff Naming
+
+- Keep one canonical human entrypoint per project phase or gate; do not add aliases or parallel setup scripts.
+- Name human phase/gate entrypoints as `<NN>_<phase>_<gate-purpose>.<ext>`: two-digit execution order followed by lowercase `snake_case`, for example `02_phase2_local_data.cmd`.
+- Name platform-specific implementations under `scripts/` as `<NN>_<phase>_<gate-purpose>_<platform>.<ext>`; they are internal, not separate human entrypoints.
+- Keep `bootstrap.cmd` as the fixed Windows machine entrypoint because it is the repository-wide onboarding contract.
+- Each phase README must contain a short handoff index mapping the order, canonical command, prerequisites, expected status output, and next manual action.
+- Handoff commands reconstruct or verify local environment/state only; they must not reset project phase/state or start a later phase.
+
 ## Commit and Handoff Rules
 
 Before claiming completion, report:

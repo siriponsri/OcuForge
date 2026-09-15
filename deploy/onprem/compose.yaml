@@ -41,9 +41,9 @@ services:
     security_opt: [no-new-privileges:true]
     cap_drop: [ALL]
 secrets:
-  mongo_root_password: {file: ./secrets/mongo_root_password}
-  mongo_app_password_init: {file: ./secrets/mongo_app_password_init}
-  mongo_app_password: {file: ./secrets/mongo_app_password}
+  mongo_root_password: {file: "${MONGO_ROOT_PASSWORD_FILE:-./secrets/mongo_root_password}"}
+  mongo_app_password_init: {file: "${MONGO_APP_PASSWORD_INIT_FILE:-./secrets/mongo_app_password_init}"}
+  mongo_app_password: {file: "${MONGO_APP_PASSWORD_FILE:-./secrets/mongo_app_password}"}
 volumes:
   mongo_data:
 networks:

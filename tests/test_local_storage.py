@@ -45,12 +45,35 @@ def test_image_store_hash_and_corruption(tmp_path):
     h = hashlib.sha256(source.read_bytes()).hexdigest()
     s = LocalImageStore(tmp_path / "objects")
     relative = s.ingest(source, h)
+    assert relative == f"{h[:2]}/{h}.png"
+    destination = s.root / relative
+    assert hashlib.sha256(destination.read_bytes()).hexdigest() == h
+    destination_mtime = destination.stat().st_mtime_ns
     assert s.ingest(source, h) == relative
+    assert destination.stat().st_mtime_ns == destination_mtime
     with pytest.raises(ValueError, match="mismatch"):
         s.ingest(source, "a" * 64)
     (s.root / relative).write_bytes(b"corrupted")
     with pytest.raises(ValueError, match="corrupted"):
         s.ingest(source, h)
+
+
+@pytest.mark.parametrize("extension", [".bmp", ".txt"])
+def test_image_store_rejects_unsupported_extension(tmp_path, extension):
+    source = tmp_path / f"input{extension}"
+    source.write_bytes(b"synthetic fixture")
+    expected_sha256 = hashlib.sha256(source.read_bytes()).hexdigest()
+
+    with pytest.raises(ValueError, match="Unsupported image extension"):
+        LocalImageStore(tmp_path / "objects").ingest(source, expected_sha256)
+
+
+def test_image_store_rejects_hash_path_traversal(tmp_path):
+    source = tmp_path / "input.png"
+    source.write_bytes(b"synthetic fixture")
+
+    with pytest.raises(ValueError, match="Expected SHA256"):
+        LocalImageStore(tmp_path / "objects").ingest(source, "../" + "a" * 61)
 
 
 class FakeCVAT:
