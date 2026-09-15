@@ -1,0 +1,41 @@
+{
+  "schema_version": "annotation_batch.v0.1",
+  "batch_id": "SYNTHETIC_R0",
+  "dataset_id": "synthetic_v1",
+  "selection": {
+    "strategy": "coverage_farthest_first_v1",
+    "model_manifest_id": "TINY_TEST_001"
+  },
+  "requested_n": 3,
+  "purpose": "TRAINABLE",
+  "items": [
+    {
+      "image_id": "SYNTH_006",
+      "priority": 1.0,
+      "reasons": [
+        "DIVERSITY",
+        "SITE_CAMERA_COVERAGE"
+      ],
+      "locked_sentinel": false,
+      "split": "TRAIN"
+    },
+    {
+      "image_id": "SYNTH_007",
+      "priority": 0.6666666666666667,
+      "reasons": [
+        "DIVERSITY"
+      ],
+      "locked_sentinel": false,
+      "split": "TRAIN"
+    },
+    {
+      "image_id": "SYNTH_000",
+      "priority": 0.33333333333333337,
+      "reasons": [
+        "DIVERSITY"
+      ],
+      "locked_sentinel": false,
+      "split": "TRAIN"
+    }
+  ]
+}

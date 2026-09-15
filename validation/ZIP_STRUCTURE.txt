@@ -1,0 +1,3 @@
+PASS ZIP validation: 203 text files
+Root: eyes-detected-dual-track-starter-v0.2/
+Checks: CRC, unique paths, no traversal, required files, exact source SHA256 match

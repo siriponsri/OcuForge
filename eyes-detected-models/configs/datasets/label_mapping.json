@@ -1,0 +1,22 @@
+{
+  "mmrdr_uwf_v1": {
+    "MA": "microaneurysm",
+    "HE": "hard_exudate",
+    "IH": "intraretinal_hemorrhage",
+    "VB_IRMA": "vb_irma",
+    "NV": "nv",
+    "VH": "vitreous_hemorrhage",
+    "RD": "retinal_detachment"
+  },
+  "idrid_v1": {
+    "MA": "microaneurysm",
+    "EX": "hard_exudate",
+    "HE": "intraretinal_hemorrhage",
+    "SE": "cotton_wool_spot"
+  },
+  "local_binary_experience_v1": {
+    "DR": "DR",
+    "no-DR": "NO_DR"
+  },
+  "policy": "Dataset-specific aliases only; no binary-to-ordinal conversion; MMRDR NV cannot become NVD/NVE automatically"
+}

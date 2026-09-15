@@ -1,0 +1,22 @@
+{
+  "schema_version": "image_manifest.v0.1",
+  "image_id": "SYNTH_000",
+  "dataset_id": "synthetic_v1",
+  "file_sha256": "cb1341ce051f0ccf61db11ff67edb0ecfca69e32d2cd700572e76c593ca1b958",
+  "relative_uri": "images/SYNTH_000.png",
+  "patient_pseudo_id": "SYNTH_P_0",
+  "eye_id": "SYNTH_E_0",
+  "visit_id": "SYNTH_V_0",
+  "laterality": "UNKNOWN",
+  "modality": "UWF",
+  "camera_make": "UNKNOWN",
+  "camera_model": "UNKNOWN",
+  "width_px": 80,
+  "height_px": 48,
+  "site_id": "SYNTHETIC",
+  "acquisition_time_bucket": null,
+  "split": "TRAIN",
+  "cloud_eligible": true,
+  "source_type": "SYNTHETIC",
+  "binary_assessment": null
+}

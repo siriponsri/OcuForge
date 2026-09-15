@@ -1,0 +1,53 @@
+# Local document storage only. CVAT remains a separately pinned local stack.
+# Keep all volumes on hospital-owned storage. Never use this file on Vast/RunPod.
+services:
+  mongo:
+    image: mongo:7.0.21
+    restart: unless-stopped
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: root_local
+      MONGO_INITDB_ROOT_PASSWORD_FILE: /run/secrets/mongo_root_password
+      MONGO_APP_PASSWORD_FILE: /run/secrets/mongo_app_password_init
+    secrets: [mongo_root_password, mongo_app_password_init]
+    volumes:
+      - mongo_data:/data/db
+      - ./mongo-init.js:/docker-entrypoint-initdb.d/10-app.js:ro
+    networks: [clinical_internal]
+    healthcheck:
+      test: [CMD, mongosh, --quiet, --eval, "quit(db.adminCommand('ping').ok ? 0 : 1)"]
+      interval: 20s
+      timeout: 5s
+      retries: 10
+  operator:
+    build:
+      context: ../..
+      dockerfile: deploy/onprem/Dockerfile
+    profiles: [operator]
+    entrypoint: [python, /app/deploy/onprem/entrypoint.py]
+    command: [eyes-local, health]
+    environment:
+      CVAT_URL: http://cvat_server:8080
+      CVAT_TOKEN: ${CVAT_TOKEN:-}
+    secrets: [mongo_app_password]
+    volumes:
+      - ${LOCAL_DATA_ROOT:?Set local hospital data directory}:/local-data:ro
+      - ${LOCAL_OBJECT_ROOT:?Set local object directory}:/objects
+      - ${LOCAL_EXPORT_ROOT:?Set local export directory}:/exports
+    networks: [clinical_internal, cvat_local]
+    depends_on:
+      mongo: {condition: service_healthy}
+    read_only: true
+    tmpfs: [/tmp]
+    security_opt: [no-new-privileges:true]
+    cap_drop: [ALL]
+secrets:
+  mongo_root_password: {file: ./secrets/mongo_root_password}
+  mongo_app_password_init: {file: ./secrets/mongo_app_password_init}
+  mongo_app_password: {file: ./secrets/mongo_app_password}
+volumes:
+  mongo_data:
+networks:
+  clinical_internal: {internal: true}
+  cvat_local:
+    external: true
+    name: ${CVAT_NETWORK:-cvat_cvat}

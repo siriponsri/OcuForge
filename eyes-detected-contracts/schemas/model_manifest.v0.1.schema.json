@@ -1,0 +1,116 @@
+{
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {
+      "const": "model_manifest.v0.1",
+      "default": "model_manifest.v0.1",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "model_manifest_id": {
+      "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,127}$",
+      "title": "Model Manifest Id",
+      "type": "string"
+    },
+    "name": {
+      "title": "Name",
+      "type": "string"
+    },
+    "version": {
+      "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,127}$",
+      "title": "Version",
+      "type": "string"
+    },
+    "status": {
+      "default": "RESEARCH",
+      "enum": [
+        "RESEARCH",
+        "CANDIDATE",
+        "LOCKED_VALIDATION"
+      ],
+      "title": "Status",
+      "type": "string"
+    },
+    "architecture": {
+      "title": "Architecture",
+      "type": "string"
+    },
+    "encoder": {
+      "title": "Encoder",
+      "type": "string"
+    },
+    "weight_hash": {
+      "pattern": "^[a-f0-9]{64}$",
+      "title": "Weight Hash",
+      "type": "string"
+    },
+    "training_run_id": {
+      "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,127}$",
+      "title": "Training Run Id",
+      "type": "string"
+    },
+    "training_dataset_ids": {
+      "items": {
+        "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,127}$",
+        "type": "string"
+      },
+      "title": "Training Dataset Ids",
+      "type": "array"
+    },
+    "known_limitations": {
+      "items": {
+        "type": "string"
+      },
+      "minItems": 1,
+      "title": "Known Limitations",
+      "type": "array"
+    },
+    "intended_research_use": {
+      "title": "Intended Research Use",
+      "type": "string"
+    },
+    "calibration_version": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "title": "Calibration Version"
+    },
+    "ood_method": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "title": "Ood Method"
+    },
+    "created_at": {
+      "title": "Created At",
+      "type": "string"
+    }
+  },
+  "required": [
+    "model_manifest_id",
+    "name",
+    "version",
+    "architecture",
+    "encoder",
+    "weight_hash",
+    "training_run_id",
+    "training_dataset_ids",
+    "known_limitations",
+    "intended_research_use",
+    "calibration_version",
+    "ood_method",
+    "created_at"
+  ],
+  "title": "ModelManifest",
+  "type": "object"
+}

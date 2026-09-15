@@ -1,0 +1,13 @@
+schema_version: dataset_manifest.v0.1
+dataset_id: messidor2_v1
+modality:
+- CFP
+source_type: PUBLIC
+label_scope:
+  dr_grade: IMAGE_LEVEL_ORDINAL
+  lesions: NONE
+  pixel_masks: false
+split_unit: PATIENT
+license_status: NOT_REVIEWED
+data_root_env: MESSIDOR2_V1_ROOT
+cloud_eligible: false

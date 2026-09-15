@@ -1,0 +1,235 @@
+{
+  "$defs": {
+    "BinaryAssessment": {
+      "additionalProperties": false,
+      "properties": {
+        "value": {
+          "enum": [
+            "DR",
+            "NO_DR"
+          ],
+          "title": "Value",
+          "type": "string"
+        },
+        "source": {
+          "const": "DOCTOR_EXPERIENCE",
+          "default": "DOCTOR_EXPERIENCE",
+          "title": "Source",
+          "type": "string"
+        },
+        "verification": {
+          "const": "USER_REPORTED_NOT_ADJUDICATED",
+          "default": "USER_REPORTED_NOT_ADJUDICATED",
+          "title": "Verification",
+          "type": "string"
+        },
+        "protocol_id": {
+          "anyOf": [
+            {
+              "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,127}$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Protocol Id"
+        },
+        "ordinal_grade_available": {
+          "const": false,
+          "default": false,
+          "title": "Ordinal Grade Available",
+          "type": "boolean"
+        },
+        "localized_labels_available": {
+          "const": false,
+          "default": false,
+          "title": "Localized Labels Available",
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "value"
+      ],
+      "title": "BinaryAssessment",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {
+      "const": "image_manifest.v0.1",
+      "default": "image_manifest.v0.1",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "image_id": {
+      "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,127}$",
+      "title": "Image Id",
+      "type": "string"
+    },
+    "dataset_id": {
+      "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,127}$",
+      "title": "Dataset Id",
+      "type": "string"
+    },
+    "file_sha256": {
+      "pattern": "^[a-f0-9]{64}$",
+      "title": "File Sha256",
+      "type": "string"
+    },
+    "relative_uri": {
+      "title": "Relative Uri",
+      "type": "string"
+    },
+    "patient_pseudo_id": {
+      "anyOf": [
+        {
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,127}$",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Patient Pseudo Id"
+    },
+    "eye_id": {
+      "anyOf": [
+        {
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,127}$",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Eye Id"
+    },
+    "visit_id": {
+      "anyOf": [
+        {
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,127}$",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Visit Id"
+    },
+    "laterality": {
+      "default": "UNKNOWN",
+      "enum": [
+        "OD",
+        "OS",
+        "UNKNOWN"
+      ],
+      "title": "Laterality",
+      "type": "string"
+    },
+    "modality": {
+      "default": "UWF",
+      "enum": [
+        "UWF",
+        "CFP",
+        "OCT",
+        "OTHER"
+      ],
+      "title": "Modality",
+      "type": "string"
+    },
+    "camera_make": {
+      "default": "UNKNOWN",
+      "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,127}$",
+      "title": "Camera Make",
+      "type": "string"
+    },
+    "camera_model": {
+      "default": "UNKNOWN",
+      "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,127}$",
+      "title": "Camera Model",
+      "type": "string"
+    },
+    "width_px": {
+      "exclusiveMinimum": 1,
+      "title": "Width Px",
+      "type": "integer"
+    },
+    "height_px": {
+      "exclusiveMinimum": 1,
+      "title": "Height Px",
+      "type": "integer"
+    },
+    "site_id": {
+      "default": "SYNTHETIC",
+      "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,127}$",
+      "title": "Site Id",
+      "type": "string"
+    },
+    "acquisition_time_bucket": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Acquisition Time Bucket"
+    },
+    "split": {
+      "default": "UNASSIGNED",
+      "enum": [
+        "TRAIN",
+        "VAL",
+        "TEST",
+        "SENTINEL",
+        "UNASSIGNED"
+      ],
+      "title": "Split",
+      "type": "string"
+    },
+    "cloud_eligible": {
+      "default": false,
+      "title": "Cloud Eligible",
+      "type": "boolean"
+    },
+    "source_type": {
+      "default": "LOCAL_PRIVATE",
+      "enum": [
+        "SYNTHETIC",
+        "PUBLIC",
+        "LOCAL_PRIVATE"
+      ],
+      "title": "Source Type",
+      "type": "string"
+    },
+    "binary_assessment": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/BinaryAssessment"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null
+    }
+  },
+  "required": [
+    "image_id",
+    "dataset_id",
+    "file_sha256",
+    "relative_uri",
+    "width_px",
+    "height_px"
+  ],
+  "title": "ImageManifest",
+  "type": "object"
+}

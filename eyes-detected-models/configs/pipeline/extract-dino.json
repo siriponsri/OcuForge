@@ -1,0 +1,1 @@
+{"encoder":"dinov3_vitb16","device":"cuda","seed":42,"patch_batch_size":8,"repo_path":"/models/dinov3","weights_path":"/models/dinov3_vitb16.pth","weights_sha256":"REPLACE_WITH_VERIFIED_SHA256","license_reviewed":false,"docker_image":"RECORD_ACTUAL_IMAGE_DIGEST","patch":{"canvas":1024,"grid":5,"patch":224}}

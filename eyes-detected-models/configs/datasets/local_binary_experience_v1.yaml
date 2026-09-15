@@ -1,0 +1,13 @@
+schema_version: dataset_manifest.v0.1
+dataset_id: local_binary_experience_v1
+modality:
+- UWF
+source_type: LOCAL_PRIVATE
+label_scope:
+  dr_grade: IMAGE_LEVEL_BINARY_EXPERIENCE
+  lesions: NONE
+  pixel_masks: false
+split_unit: PATIENT
+license_status: NOT_REVIEWED
+data_root_env: LOCAL_BINARY_EXPERIENCE_V1_ROOT
+cloud_eligible: false

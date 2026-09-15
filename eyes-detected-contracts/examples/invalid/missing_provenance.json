@@ -1,0 +1,107 @@
+{
+  "schema_version": "annotation.v0.1",
+  "annotation_id": "ANN_PRED_SYNTH_000_TEST_POINT",
+  "image_id": "SYNTH_000",
+  "label": "microaneurysm",
+  "geometry": {
+    "type": "point",
+    "coordinates_norm": [
+      0.4126582278481013,
+      0.6
+    ],
+    "mask_size": null,
+    "mask_rle": null
+  },
+  "parent_prediction_id": "PRED_SYNTH_000",
+  "parent_object_id": "TEST_POINT",
+  "source_model_version": "TINY_TEST_001",
+  "annotator_id_hash": "SYNTHETIC_EXPERT",
+  "review_status": "LOCKED",
+  "clinician_certainty": "NOT_RECORDED",
+  "uncertain": false,
+  "grading_protocol": null,
+  "dr_grade": null,
+  "gradability": "UNKNOWN",
+  "laterality": "UNKNOWN",
+  "referable_by_protocol": null,
+  "referable_protocol_id": null,
+  "confidence_if_ai": 0.5,
+  "created_at": "2026-09-09T09:25:19.140711+00:00",
+  "updated_at": "2026-09-09T09:25:19.141624+00:00",
+  "adjudicator": "SYNTHETIC_EXPERT",
+  "adjudication_timestamp": "2026-09-09T09:25:19.141481+00:00",
+  "history": [
+    {
+      "geometry_snapshot": {
+        "type": "point",
+        "coordinates_norm": [
+          0.4,
+          0.6
+        ],
+        "mask_size": null,
+        "mask_rle": null
+      },
+      "label_snapshot": "microaneurysm",
+      "event_id": "EV_63d4babfb8984276bffcb6c75422bf13",
+      "origin": "AI_SUGGESTED",
+      "review_status": "DRAFT",
+      "actor_id_hash": "AI_SYSTEM",
+      "timestamp": "2026-09-09T09:25:19.140711+00:00",
+      "action": "PROPOSE"
+    },
+    {
+      "geometry_snapshot": {
+        "type": "point",
+        "coordinates_norm": [
+          0.4126582278481013,
+          0.6
+        ],
+        "mask_size": null,
+        "mask_rle": null
+      },
+      "label_snapshot": "microaneurysm",
+      "event_id": "EV_39fe899f51d441df85b87ce867521a9e",
+      "origin": "CLINICIAN_CORRECTED",
+      "review_status": "SUBMITTED",
+      "actor_id_hash": "SYNTHETIC_REVIEWER",
+      "timestamp": "2026-09-09T09:25:19.141403+00:00",
+      "action": "CORRECT"
+    },
+    {
+      "geometry_snapshot": {
+        "type": "point",
+        "coordinates_norm": [
+          0.4126582278481013,
+          0.6
+        ],
+        "mask_size": null,
+        "mask_rle": null
+      },
+      "label_snapshot": "microaneurysm",
+      "event_id": "EV_b1ec8c2ceb9e4a29bc4cb166659d7d59",
+      "origin": "EXPERT_ADJUDICATED",
+      "review_status": "ADJUDICATED",
+      "actor_id_hash": "SYNTHETIC_EXPERT",
+      "timestamp": "2026-09-09T09:25:19.141481+00:00",
+      "action": "ADJUDICATE"
+    },
+    {
+      "geometry_snapshot": {
+        "type": "point",
+        "coordinates_norm": [
+          0.4126582278481013,
+          0.6
+        ],
+        "mask_size": null,
+        "mask_rle": null
+      },
+      "label_snapshot": "microaneurysm",
+      "event_id": "EV_37c5d4455b3e404a9aa5ff8617a2344e",
+      "origin": "EXPERT_ADJUDICATED",
+      "review_status": "LOCKED",
+      "actor_id_hash": "SYNTHETIC_EXPERT",
+      "timestamp": "2026-09-09T09:25:19.141624+00:00",
+      "action": "LOCK"
+    }
+  ]
+}

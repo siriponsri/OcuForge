@@ -1,0 +1,25 @@
+services:
+  cpu-test:
+    build:
+      context: ..
+      dockerfile: eyes-detected-models/Dockerfile
+      target: cpu-test
+    network_mode: none
+    volumes:
+      - ../artifacts:/workspace/artifacts
+  gpu-research:
+    profiles: [gpu]
+    build:
+      context: ..
+      dockerfile: eyes-detected-models/Dockerfile
+      target: gpu-research
+    network_mode: none
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: [gpu]
+    volumes:
+      - ../artifacts:/workspace/artifacts

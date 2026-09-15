@@ -1,0 +1,10 @@
+{
+  "name": "OcuForge CPU development",
+  "build": {
+    "dockerfile": "../Dockerfile",
+    "context": "../..",
+    "target": "dev"
+  },
+  "workspaceFolder": "/workspace",
+  "remoteUser": "root"
+}

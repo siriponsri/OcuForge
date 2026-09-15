@@ -1,0 +1,1 @@
+PASS: 22 configuration files; Docker syntax parsing is separate from live Docker validation

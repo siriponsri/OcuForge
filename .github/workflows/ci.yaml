@@ -1,0 +1,16 @@
+name: starter-validation
+on: [push, pull_request]
+jobs:
+  cpu:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: bash scripts/install_cpu.sh
+      - run: bash scripts/validate_all.sh
+      - run: docker compose -f eyes-detected-models/compose.yaml config --quiet
+      - run: docker compose -f eyes-detected-labeler/compose.yaml config --quiet
+      - run: docker compose -f eyes-detected-models/compose.yaml build cpu-test
+      - run: docker compose -f eyes-detected-models/compose.yaml run --rm cpu-test

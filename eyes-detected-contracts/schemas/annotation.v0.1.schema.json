@@ -1,0 +1,477 @@
+{
+  "$defs": {
+    "Event": {
+      "additionalProperties": false,
+      "properties": {
+        "geometry_snapshot": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Geometry"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "label_snapshot": {
+          "anyOf": [
+            {
+              "enum": [
+                "microaneurysm",
+                "intraretinal_hemorrhage",
+                "hard_exudate",
+                "cotton_wool_spot",
+                "nvd",
+                "nve",
+                "irma",
+                "venous_beading",
+                "vitreous_hemorrhage",
+                "retinal_detachment",
+                "laser_scar",
+                "optic_disc",
+                "fovea",
+                "dr_grade"
+              ],
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Label Snapshot"
+        },
+        "event_id": {
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,127}$",
+          "title": "Event Id",
+          "type": "string"
+        },
+        "origin": {
+          "enum": [
+            "AI_SUGGESTED",
+            "CLINICIAN_CONFIRMED",
+            "CLINICIAN_CORRECTED",
+            "CLINICIAN_ADDED",
+            "EXPERT_ADJUDICATED",
+            "IMPORTED_PUBLIC_GT"
+          ],
+          "title": "Origin",
+          "type": "string"
+        },
+        "review_status": {
+          "enum": [
+            "DRAFT",
+            "SUBMITTED",
+            "NEEDS_REVIEW",
+            "ADJUDICATED",
+            "LOCKED",
+            "REJECTED"
+          ],
+          "title": "Review Status",
+          "type": "string"
+        },
+        "actor_id_hash": {
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,127}$",
+          "title": "Actor Id Hash",
+          "type": "string"
+        },
+        "timestamp": {
+          "title": "Timestamp",
+          "type": "string"
+        },
+        "action": {
+          "enum": [
+            "PROPOSE",
+            "IMPORT",
+            "CONFIRM",
+            "CORRECT",
+            "ADD",
+            "SUBMIT",
+            "REJECT",
+            "ESCALATE",
+            "ADJUDICATE",
+            "LOCK"
+          ],
+          "title": "Action",
+          "type": "string"
+        }
+      },
+      "required": [
+        "event_id",
+        "origin",
+        "review_status",
+        "actor_id_hash",
+        "timestamp",
+        "action"
+      ],
+      "title": "Event",
+      "type": "object"
+    },
+    "Geometry": {
+      "additionalProperties": false,
+      "properties": {
+        "type": {
+          "enum": [
+            "point",
+            "box",
+            "polygon",
+            "polyline",
+            "ellipse",
+            "mask",
+            "image_presence"
+          ],
+          "title": "Type",
+          "type": "string"
+        },
+        "coordinates_norm": {
+          "items": {
+            "maximum": 1,
+            "minimum": 0,
+            "type": "number"
+          },
+          "title": "Coordinates Norm",
+          "type": "array"
+        },
+        "mask_size": {
+          "anyOf": [
+            {
+              "maxItems": 2,
+              "minItems": 2,
+              "prefixItems": [
+                {
+                  "exclusiveMinimum": 0,
+                  "type": "integer"
+                },
+                {
+                  "exclusiveMinimum": 0,
+                  "type": "integer"
+                }
+              ],
+              "type": "array"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Mask Size"
+        },
+        "mask_rle": {
+          "anyOf": [
+            {
+              "items": {
+                "minimum": 0,
+                "type": "integer"
+              },
+              "type": "array"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Mask Rle"
+        }
+      },
+      "required": [
+        "type"
+      ],
+      "title": "Geometry",
+      "type": "object"
+    },
+    "ProtocolRef": {
+      "additionalProperties": false,
+      "properties": {
+        "protocol_id": {
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,127}$",
+          "title": "Protocol Id",
+          "type": "string"
+        },
+        "version": {
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,127}$",
+          "title": "Version",
+          "type": "string"
+        },
+        "config_sha256": {
+          "pattern": "^[a-f0-9]{64}$",
+          "title": "Config Sha256",
+          "type": "string"
+        }
+      },
+      "required": [
+        "protocol_id",
+        "version",
+        "config_sha256"
+      ],
+      "title": "ProtocolRef",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {
+      "const": "annotation.v0.1",
+      "default": "annotation.v0.1",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "annotation_id": {
+      "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,127}$",
+      "title": "Annotation Id",
+      "type": "string"
+    },
+    "image_id": {
+      "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,127}$",
+      "title": "Image Id",
+      "type": "string"
+    },
+    "label": {
+      "enum": [
+        "microaneurysm",
+        "intraretinal_hemorrhage",
+        "hard_exudate",
+        "cotton_wool_spot",
+        "nvd",
+        "nve",
+        "irma",
+        "venous_beading",
+        "vitreous_hemorrhage",
+        "retinal_detachment",
+        "laser_scar",
+        "optic_disc",
+        "fovea",
+        "dr_grade"
+      ],
+      "title": "Label",
+      "type": "string"
+    },
+    "geometry": {
+      "$ref": "#/$defs/Geometry"
+    },
+    "origin": {
+      "enum": [
+        "AI_SUGGESTED",
+        "CLINICIAN_CONFIRMED",
+        "CLINICIAN_CORRECTED",
+        "CLINICIAN_ADDED",
+        "EXPERT_ADJUDICATED",
+        "IMPORTED_PUBLIC_GT"
+      ],
+      "title": "Origin",
+      "type": "string"
+    },
+    "parent_prediction_id": {
+      "anyOf": [
+        {
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,127}$",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Parent Prediction Id"
+    },
+    "parent_object_id": {
+      "anyOf": [
+        {
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,127}$",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Parent Object Id"
+    },
+    "source_model_version": {
+      "anyOf": [
+        {
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,127}$",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Source Model Version"
+    },
+    "annotator_id_hash": {
+      "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,127}$",
+      "title": "Annotator Id Hash",
+      "type": "string"
+    },
+    "review_status": {
+      "enum": [
+        "DRAFT",
+        "SUBMITTED",
+        "NEEDS_REVIEW",
+        "ADJUDICATED",
+        "LOCKED",
+        "REJECTED"
+      ],
+      "title": "Review Status",
+      "type": "string"
+    },
+    "clinician_certainty": {
+      "default": "NOT_RECORDED",
+      "enum": [
+        "HIGH",
+        "MEDIUM",
+        "LOW",
+        "NOT_RECORDED"
+      ],
+      "title": "Clinician Certainty",
+      "type": "string"
+    },
+    "uncertain": {
+      "default": false,
+      "title": "Uncertain",
+      "type": "boolean"
+    },
+    "grading_protocol": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/ProtocolRef"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null
+    },
+    "dr_grade": {
+      "anyOf": [
+        {
+          "maximum": 4,
+          "minimum": 0,
+          "type": "integer"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Dr Grade"
+    },
+    "gradability": {
+      "default": "UNKNOWN",
+      "enum": [
+        "GRADABLE",
+        "PARTIALLY_GRADABLE",
+        "UNGRADABLE",
+        "UNKNOWN"
+      ],
+      "title": "Gradability",
+      "type": "string"
+    },
+    "laterality": {
+      "default": "UNKNOWN",
+      "enum": [
+        "OD",
+        "OS",
+        "UNKNOWN"
+      ],
+      "title": "Laterality",
+      "type": "string"
+    },
+    "referable_by_protocol": {
+      "anyOf": [
+        {
+          "type": "boolean"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Referable By Protocol"
+    },
+    "referable_protocol_id": {
+      "anyOf": [
+        {
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,127}$",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Referable Protocol Id"
+    },
+    "confidence_if_ai": {
+      "anyOf": [
+        {
+          "maximum": 1,
+          "minimum": 0,
+          "type": "number"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Confidence If Ai"
+    },
+    "created_at": {
+      "title": "Created At",
+      "type": "string"
+    },
+    "updated_at": {
+      "title": "Updated At",
+      "type": "string"
+    },
+    "adjudicator": {
+      "anyOf": [
+        {
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,127}$",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Adjudicator"
+    },
+    "adjudication_timestamp": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Adjudication Timestamp"
+    },
+    "history": {
+      "items": {
+        "$ref": "#/$defs/Event"
+      },
+      "minItems": 1,
+      "title": "History",
+      "type": "array"
+    }
+  },
+  "required": [
+    "annotation_id",
+    "image_id",
+    "label",
+    "geometry",
+    "origin",
+    "annotator_id_hash",
+    "review_status",
+    "created_at",
+    "updated_at",
+    "history"
+  ],
+  "title": "Annotation",
+  "type": "object"
+}

@@ -1,0 +1,21 @@
+services:
+  bridge:
+    build:
+      context: ..
+      dockerfile: eyes-detected-labeler/Dockerfile
+    environment:
+      CVAT_URL: ${CVAT_URL:-http://host.docker.internal:8080}
+      CVAT_TOKEN: ${CVAT_TOKEN:-}
+    extra_hosts:
+      - host.docker.internal:host-gateway
+    volumes:
+      - ../artifacts:/workspace/artifacts
+  bridge-offline:
+    profiles: [offline]
+    build:
+      context: ..
+      dockerfile: eyes-detected-labeler/Dockerfile
+    network_mode: none
+    volumes:
+      - ../artifacts:/workspace/artifacts
+    command: [python, -m, labeler_bridge.cli, import-demo-predictions, --smoke-dir, /workspace/artifacts/smoke, --out, /workspace/artifacts/roundtrip]

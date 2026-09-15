@@ -1,0 +1,362 @@
+{
+  "$defs": {
+    "Candidate": {
+      "additionalProperties": false,
+      "properties": {
+        "object_id": {
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,127}$",
+          "title": "Object Id",
+          "type": "string"
+        },
+        "label": {
+          "enum": [
+            "microaneurysm",
+            "intraretinal_hemorrhage",
+            "hard_exudate",
+            "cotton_wool_spot",
+            "nvd",
+            "nve",
+            "irma",
+            "venous_beading",
+            "vitreous_hemorrhage",
+            "retinal_detachment",
+            "laser_scar",
+            "optic_disc",
+            "fovea",
+            "dr_grade"
+          ],
+          "title": "Label",
+          "type": "string"
+        },
+        "geometry": {
+          "$ref": "#/$defs/Geometry"
+        },
+        "confidence": {
+          "maximum": 1,
+          "minimum": 0,
+          "title": "Confidence",
+          "type": "number"
+        },
+        "origin": {
+          "const": "AI_SUGGESTED",
+          "default": "AI_SUGGESTED",
+          "title": "Origin",
+          "type": "string"
+        },
+        "generator_kind": {
+          "enum": [
+            "LOCALIZER",
+            "SYNTHETIC_FIXTURE"
+          ],
+          "title": "Generator Kind",
+          "type": "string"
+        }
+      },
+      "required": [
+        "object_id",
+        "label",
+        "geometry",
+        "confidence",
+        "generator_kind"
+      ],
+      "title": "Candidate",
+      "type": "object"
+    },
+    "DRPrediction": {
+      "additionalProperties": false,
+      "properties": {
+        "grading_protocol": {
+          "$ref": "#/$defs/ProtocolRef"
+        },
+        "grade": {
+          "maximum": 4,
+          "minimum": 0,
+          "title": "Grade",
+          "type": "integer"
+        },
+        "ordinal_probs": {
+          "items": {
+            "maximum": 1,
+            "minimum": 0,
+            "type": "number"
+          },
+          "maxItems": 4,
+          "minItems": 4,
+          "title": "Ordinal Probs",
+          "type": "array"
+        },
+        "confidence": {
+          "maximum": 1,
+          "minimum": 0,
+          "title": "Confidence",
+          "type": "number"
+        }
+      },
+      "required": [
+        "grading_protocol",
+        "grade",
+        "ordinal_probs",
+        "confidence"
+      ],
+      "title": "DRPrediction",
+      "type": "object"
+    },
+    "Evidence": {
+      "additionalProperties": false,
+      "properties": {
+        "type": {
+          "const": "mil_attention",
+          "default": "mil_attention",
+          "title": "Type",
+          "type": "string"
+        },
+        "patch_scores": {
+          "items": {
+            "maximum": 1,
+            "minimum": 0,
+            "type": "number"
+          },
+          "minItems": 1,
+          "title": "Patch Scores",
+          "type": "array"
+        },
+        "disclaimer": {
+          "const": "MODEL_EVIDENCE_NOT_LESION_GROUND_TRUTH",
+          "default": "MODEL_EVIDENCE_NOT_LESION_GROUND_TRUTH",
+          "title": "Disclaimer",
+          "type": "string"
+        }
+      },
+      "required": [
+        "patch_scores"
+      ],
+      "title": "Evidence",
+      "type": "object"
+    },
+    "Geometry": {
+      "additionalProperties": false,
+      "properties": {
+        "type": {
+          "enum": [
+            "point",
+            "box",
+            "polygon",
+            "polyline",
+            "ellipse",
+            "mask",
+            "image_presence"
+          ],
+          "title": "Type",
+          "type": "string"
+        },
+        "coordinates_norm": {
+          "items": {
+            "maximum": 1,
+            "minimum": 0,
+            "type": "number"
+          },
+          "title": "Coordinates Norm",
+          "type": "array"
+        },
+        "mask_size": {
+          "anyOf": [
+            {
+              "maxItems": 2,
+              "minItems": 2,
+              "prefixItems": [
+                {
+                  "exclusiveMinimum": 0,
+                  "type": "integer"
+                },
+                {
+                  "exclusiveMinimum": 0,
+                  "type": "integer"
+                }
+              ],
+              "type": "array"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Mask Size"
+        },
+        "mask_rle": {
+          "anyOf": [
+            {
+              "items": {
+                "minimum": 0,
+                "type": "integer"
+              },
+              "type": "array"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Mask Rle"
+        }
+      },
+      "required": [
+        "type"
+      ],
+      "title": "Geometry",
+      "type": "object"
+    },
+    "OOD": {
+      "additionalProperties": false,
+      "properties": {
+        "method": {
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,127}$",
+          "title": "Method",
+          "type": "string"
+        },
+        "score": {
+          "minimum": 0,
+          "title": "Score",
+          "type": "number"
+        },
+        "abstain_recommended": {
+          "title": "Abstain Recommended",
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "method",
+        "score",
+        "abstain_recommended"
+      ],
+      "title": "OOD",
+      "type": "object"
+    },
+    "ProtocolRef": {
+      "additionalProperties": false,
+      "properties": {
+        "protocol_id": {
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,127}$",
+          "title": "Protocol Id",
+          "type": "string"
+        },
+        "version": {
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,127}$",
+          "title": "Version",
+          "type": "string"
+        },
+        "config_sha256": {
+          "pattern": "^[a-f0-9]{64}$",
+          "title": "Config Sha256",
+          "type": "string"
+        }
+      },
+      "required": [
+        "protocol_id",
+        "version",
+        "config_sha256"
+      ],
+      "title": "ProtocolRef",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {
+      "const": "prediction.v0.1",
+      "default": "prediction.v0.1",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "prediction_id": {
+      "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,127}$",
+      "title": "Prediction Id",
+      "type": "string"
+    },
+    "image_id": {
+      "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,127}$",
+      "title": "Image Id",
+      "type": "string"
+    },
+    "model_manifest_id": {
+      "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,127}$",
+      "title": "Model Manifest Id",
+      "type": "string"
+    },
+    "dr": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/DRPrediction"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null
+    },
+    "lesion_presence": {
+      "additionalProperties": {
+        "maximum": 1,
+        "minimum": 0,
+        "type": "number"
+      },
+      "title": "Lesion Presence",
+      "type": "object"
+    },
+    "objects": {
+      "items": {
+        "$ref": "#/$defs/Candidate"
+      },
+      "title": "Objects",
+      "type": "array"
+    },
+    "evidence": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/Evidence"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null
+    },
+    "ood": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/OOD"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null
+    },
+    "gradability_probability": {
+      "anyOf": [
+        {
+          "maximum": 1,
+          "minimum": 0,
+          "type": "number"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Gradability Probability"
+    },
+    "research_only": {
+      "const": true,
+      "default": true,
+      "title": "Research Only",
+      "type": "boolean"
+    }
+  },
+  "required": [
+    "prediction_id",
+    "image_id",
+    "model_manifest_id"
+  ],
+  "title": "Prediction",
+  "type": "object"
+}

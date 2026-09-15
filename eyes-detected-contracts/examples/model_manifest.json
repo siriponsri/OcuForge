@@ -1,0 +1,23 @@
+{
+  "schema_version": "model_manifest.v0.1",
+  "model_manifest_id": "TINY_TEST_001",
+  "name": "Synthetic Attention MIL CORAL",
+  "version": "0.1.0",
+  "status": "RESEARCH",
+  "architecture": "TinyTestEncoder + AttentionMIL + CORAL + 7 lesion + QC heads",
+  "encoder": "TinyTestEncoder-test-only",
+  "weight_hash": "bb22ce550d2d52de72b853bc9d71ff3bfd8a39554ec92bc35dfb7e8b8834840e",
+  "training_run_id": "SYNTHETIC_CPU_001",
+  "training_dataset_ids": [
+    "synthetic_v1"
+  ],
+  "known_limitations": [
+    "Random synthetic labels; no clinical validity",
+    "No trained lesion localizer",
+    "No DINOv3 inference"
+  ],
+  "intended_research_use": "Offline engineering smoke only",
+  "calibration_version": null,
+  "ood_method": "prototype_distance_uncalibrated",
+  "created_at": "2026-09-09T09:25:18.516392+00:00"
+}

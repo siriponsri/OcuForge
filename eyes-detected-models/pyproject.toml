@@ -1,0 +1,13 @@
+[build-system]
+requires = ["setuptools==80.9.0"]
+build-backend = "setuptools.build_meta"
+[project]
+name = "eyes-detected-models"
+version = "0.2.0"
+requires-python = ">=3.11"
+dependencies = ["eyes-detected-contracts==0.1.0", "numpy==2.3.5", "Pillow==12.3.0", "PyYAML==6.0.3", "torch==2.5.1"]
+[project.scripts]
+eyes-pipeline = "eyes_detected.pipeline.cli:main"
+eyes-models = "eyes_detected.cli:main"
+[tool.setuptools.packages.find]
+where = ["src"]

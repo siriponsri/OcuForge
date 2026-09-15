@@ -1,0 +1,6 @@
+run_id: SYNTHETIC_CPU_001
+encoder: TinyTestEncoder
+seed: 42
+steps: 5
+scientific_result_eligible: false
+allow_external_data: false

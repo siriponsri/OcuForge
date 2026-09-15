@@ -1,0 +1,131 @@
+{
+  "$defs": {
+    "LabelScope": {
+      "additionalProperties": false,
+      "properties": {
+        "dr_grade": {
+          "enum": [
+            "NONE",
+            "IMAGE_LEVEL_ORDINAL",
+            "IMAGE_LEVEL_BINARY_EXPERIENCE"
+          ],
+          "title": "Dr Grade",
+          "type": "string"
+        },
+        "lesions": {
+          "enum": [
+            "NONE",
+            "IMAGE_LEVEL_MULTILABEL",
+            "LOCALIZED"
+          ],
+          "title": "Lesions",
+          "type": "string"
+        },
+        "pixel_masks": {
+          "title": "Pixel Masks",
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "dr_grade",
+        "lesions",
+        "pixel_masks"
+      ],
+      "title": "LabelScope",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {
+      "const": "dataset_manifest.v0.1",
+      "default": "dataset_manifest.v0.1",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "dataset_id": {
+      "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,127}$",
+      "title": "Dataset Id",
+      "type": "string"
+    },
+    "modality": {
+      "items": {
+        "enum": [
+          "UWF",
+          "CFP",
+          "OCT",
+          "OTHER"
+        ],
+        "type": "string"
+      },
+      "minItems": 1,
+      "title": "Modality",
+      "type": "array"
+    },
+    "source_type": {
+      "enum": [
+        "SYNTHETIC",
+        "PUBLIC",
+        "LOCAL_PRIVATE"
+      ],
+      "title": "Source Type",
+      "type": "string"
+    },
+    "label_scope": {
+      "$ref": "#/$defs/LabelScope"
+    },
+    "split_unit": {
+      "enum": [
+        "PATIENT",
+        "EYE",
+        "VISIT",
+        "IMAGE"
+      ],
+      "title": "Split Unit",
+      "type": "string"
+    },
+    "license_status": {
+      "enum": [
+        "NOT_REVIEWED",
+        "REVIEWED",
+        "RESTRICTED",
+        "SYNTHETIC"
+      ],
+      "title": "License Status",
+      "type": "string"
+    },
+    "data_root_env": {
+      "pattern": "^[A-Z][A-Z0-9_]+$",
+      "title": "Data Root Env",
+      "type": "string"
+    },
+    "cloud_eligible": {
+      "default": false,
+      "title": "Cloud Eligible",
+      "type": "boolean"
+    },
+    "source_url": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Source Url"
+    }
+  },
+  "required": [
+    "dataset_id",
+    "modality",
+    "source_type",
+    "label_scope",
+    "split_unit",
+    "license_status",
+    "data_root_env"
+  ],
+  "title": "DatasetManifest",
+  "type": "object"
+}

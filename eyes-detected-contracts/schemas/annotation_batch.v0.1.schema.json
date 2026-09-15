@@ -1,0 +1,127 @@
+{
+  "$defs": {
+    "BatchItem": {
+      "additionalProperties": false,
+      "properties": {
+        "image_id": {
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,127}$",
+          "title": "Image Id",
+          "type": "string"
+        },
+        "priority": {
+          "maximum": 1,
+          "minimum": 0,
+          "title": "Priority",
+          "type": "number"
+        },
+        "reasons": {
+          "items": {
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,127}$",
+            "type": "string"
+          },
+          "minItems": 1,
+          "title": "Reasons",
+          "type": "array"
+        },
+        "locked_sentinel": {
+          "default": false,
+          "title": "Locked Sentinel",
+          "type": "boolean"
+        },
+        "split": {
+          "default": "UNASSIGNED",
+          "enum": [
+            "TRAIN",
+            "VAL",
+            "TEST",
+            "SENTINEL",
+            "UNASSIGNED"
+          ],
+          "title": "Split",
+          "type": "string"
+        }
+      },
+      "required": [
+        "image_id",
+        "priority",
+        "reasons"
+      ],
+      "title": "BatchItem",
+      "type": "object"
+    },
+    "Selection": {
+      "additionalProperties": false,
+      "properties": {
+        "strategy": {
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,127}$",
+          "title": "Strategy",
+          "type": "string"
+        },
+        "model_manifest_id": {
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,127}$",
+          "title": "Model Manifest Id",
+          "type": "string"
+        }
+      },
+      "required": [
+        "strategy",
+        "model_manifest_id"
+      ],
+      "title": "Selection",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {
+      "const": "annotation_batch.v0.1",
+      "default": "annotation_batch.v0.1",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "batch_id": {
+      "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,127}$",
+      "title": "Batch Id",
+      "type": "string"
+    },
+    "dataset_id": {
+      "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,127}$",
+      "title": "Dataset Id",
+      "type": "string"
+    },
+    "selection": {
+      "$ref": "#/$defs/Selection"
+    },
+    "requested_n": {
+      "exclusiveMinimum": 0,
+      "title": "Requested N",
+      "type": "integer"
+    },
+    "purpose": {
+      "default": "TRAINABLE",
+      "enum": [
+        "TRAINABLE",
+        "SENTINEL_EVALUATION"
+      ],
+      "title": "Purpose",
+      "type": "string"
+    },
+    "items": {
+      "items": {
+        "$ref": "#/$defs/BatchItem"
+      },
+      "minItems": 1,
+      "title": "Items",
+      "type": "array"
+    }
+  },
+  "required": [
+    "batch_id",
+    "dataset_id",
+    "selection",
+    "requested_n",
+    "items"
+  ],
+  "title": "AnnotationBatch",
+  "type": "object"
+}

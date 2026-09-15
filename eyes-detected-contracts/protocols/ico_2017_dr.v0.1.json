@@ -1,0 +1,50 @@
+{
+  "protocol_id": "ICO_2017_DR",
+  "version": "0.1.0",
+  "source_title": "ICO Guidelines for Diabetic Eye Care, Updated 2017",
+  "source_sha256": "08c66454bcfa3dbdf03adb66b9de1cac6c7dde6b7a541819f5b858673bb64725",
+  "source_pdf_page": 7,
+  "source_printed_page": "2",
+  "source_table": "Table 1",
+  "status": "ENGINEERING_DRAFT_LOCAL_WORKFLOW_REVIEW_REQUIRED",
+  "grading_mode": "CLINICIAN_ASSIGNED",
+  "grades": [
+    {
+      "value": 0,
+      "name": "No apparent DR",
+      "criteria_th": "ไม่พบความผิดปกติของ DR"
+    },
+    {
+      "value": 1,
+      "name": "Mild nonproliferative DR",
+      "criteria_th": "พบ microaneurysms เท่านั้น"
+    },
+    {
+      "value": 2,
+      "name": "Moderate nonproliferative DR",
+      "criteria_th": "พบ microaneurysms ร่วมกับอาการแสดงอื่น เช่น จุดเลือดออก hard exudates หรือ cotton-wool spots แต่ยังไม่ถึงระดับ severe"
+    },
+    {
+      "value": 3,
+      "name": "Severe nonproliferative DR",
+      "criteria_th": "มีลักษณะ moderate ร่วมกับอย่างน้อยหนึ่งข้อ: intraretinal hemorrhages ตั้งแต่ 20 จุดในแต่ละ quadrant ครบ 4 quadrants; definite venous beading ใน 2 quadrants; IRMA ใน 1 quadrant และไม่มีอาการแสดง proliferative retinopathy"
+    },
+    {
+      "value": 4,
+      "name": "Proliferative DR",
+      "criteria_th": "ตาราง ICO ระบุ severe NPDR ร่วมกับอย่างน้อยหนึ่งข้อ: neovascularization หรือ vitreous/preretinal hemorrhage; แพทย์เป็นผู้ตัดสินระดับ ไม่ใช้การนับรอยโรค AI ตัดสินแทน"
+    }
+  ],
+  "severe_reference": {
+    "hemorrhages_per_quadrant_at_least": 20,
+    "hemorrhage_quadrants": 4,
+    "venous_beading_quadrants": 2,
+    "irma_quadrants": 1,
+    "no_proliferative_signs": true
+  },
+  "ungradable_is_grade": false,
+  "dme_separate_axis": true,
+  "automatic_referral_enabled": false,
+  "automatic_grade_from_lesions": false,
+  "credit": "Adapted for non-commercial local research use; credit International Council of Ophthalmology, January 2017."
+}

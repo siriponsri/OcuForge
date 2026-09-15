@@ -1,0 +1,13 @@
+architecture: attention_mil_coral
+grades: 5
+lesion_outputs: 7
+qc_outputs: 1
+patch:
+  canvas: 1024
+  grid: 5
+  patch: 224
+  resize_policy: letterbox
+loss_weights:
+  dr: 1.0
+  lesions: 0.2
+  qc: 0.1

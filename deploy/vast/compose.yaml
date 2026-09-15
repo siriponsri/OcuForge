@@ -1,0 +1,26 @@
+# Only reviewed PUBLIC or SYNTHETIC input. No hospital mounts, tokens or automatic uploads.
+services:
+  models:
+    build:
+      context: ../..
+      dockerfile: deploy/vast/Dockerfile
+    image: ocuforge-models:0.2.0
+    environment:
+      OCUFORGE_EXECUTION_ZONE: PUBLIC_CLOUD
+      HF_HUB_OFFLINE: "1"
+      HF_HUB_DISABLE_TELEMETRY: "1"
+      WANDB_MODE: disabled
+    network_mode: none
+    gpus: all
+    shm_size: 2gb
+    volumes:
+      - ${PUBLIC_DATA_ROOT:?Reviewed public or synthetic dataset only}:/data:ro
+      - ${PUBLIC_MODEL_ROOT:?Verified public model files only}:/models:ro
+      - ${PUBLIC_RUN_ROOT:?Public or synthetic run output directory}:/runs
+    working_dir: /app
+    entrypoint: [eyes-pipeline]
+    command: [--help]
+    security_opt: [no-new-privileges:true]
+    cap_drop: [ALL]
+    read_only: true
+    tmpfs: [/tmp]

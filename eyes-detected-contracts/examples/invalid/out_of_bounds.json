@@ -1,0 +1,86 @@
+{
+  "schema_version": "prediction.v0.1",
+  "prediction_id": "PRED_SYNTH_000",
+  "image_id": "SYNTH_000",
+  "model_manifest_id": "TINY_TEST_001",
+  "dr": {
+    "grading_protocol": {
+      "protocol_id": "ICO_2017_DR",
+      "version": "0.1.0",
+      "config_sha256": "bfc38c5d7ea78af0a000185057b935a50a51fadf03f02c436bdd0957616d114c"
+    },
+    "grade": 2,
+    "ordinal_probs": [
+      0.726069450378418,
+      0.5640660524368286,
+      0.38708674907684326,
+      0.2355823814868927
+    ],
+    "confidence": 0.17697930335998535
+  },
+  "lesion_presence": {
+    "microaneurysm": 0.5812190771102905,
+    "hard_exudate": 0.6000893115997314,
+    "intraretinal_hemorrhage": 0.4606081247329712,
+    "vb_irma": 0.5013043880462646,
+    "nv": 0.461877703666687,
+    "vitreous_hemorrhage": 0.47191712260246277,
+    "retinal_detachment": 0.6059802174568176
+  },
+  "objects": [
+    {
+      "object_id": "TEST_POINT",
+      "label": "microaneurysm",
+      "geometry": {
+        "type": "point",
+        "coordinates_norm": [
+          2,
+          0
+        ],
+        "mask_size": null,
+        "mask_rle": null
+      },
+      "confidence": 0.5,
+      "origin": "AI_SUGGESTED",
+      "generator_kind": "SYNTHETIC_FIXTURE"
+    }
+  ],
+  "evidence": {
+    "type": "mil_attention",
+    "patch_scores": [
+      0.046651650220155716,
+      0.04644938185811043,
+      0.04671822115778923,
+      0.04646223783493042,
+      0.046456918120384216,
+      0.03609706833958626,
+      0.035617005079984665,
+      0.03619450330734253,
+      0.0359073169529438,
+      0.03573170676827431,
+      0.0354631133377552,
+      0.03512262925505638,
+      0.03521018847823143,
+      0.035170722752809525,
+      0.0350995697081089,
+      0.035825423896312714,
+      0.03595302999019623,
+      0.036170344799757004,
+      0.03585464134812355,
+      0.035680174827575684,
+      0.04642898589372635,
+      0.04642345756292343,
+      0.04635186493396759,
+      0.046492960304021835,
+      0.04646686464548111
+    ],
+    "disclaimer": "MODEL_EVIDENCE_NOT_LESION_GROUND_TRUTH"
+  },
+  "ood": {
+    "method": "prototype_distance_uncalibrated",
+    "score": 0.0,
+    "abstain_recommended": false
+  },
+  "gradability_probability": 0.4368230402469635,
+  "research_only": true
+}

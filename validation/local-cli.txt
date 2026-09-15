@@ -1,0 +1,13 @@
+usage: local_cli.py [-h] [--database DATABASE] [--exports EXPORTS]
+                    {health,list-batches,ingest,backup,restore,register,create-task,attach-task,attach-share,sync,import-predictions,export,finalize}
+                    ...
+
+On-premise document store and CVAT workflow
+
+positional arguments:
+  {health,list-batches,ingest,backup,restore,register,create-task,attach-task,attach-share,sync,import-predictions,export,finalize}
+
+options:
+  -h, --help            show this help message and exit
+  --database DATABASE
+  --exports EXPORTS

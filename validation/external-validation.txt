@@ -1,0 +1,6 @@
+Docker executable: None
+MongoDB live: NOT RUN; mongomock repository tests only
+CVAT live: NOT RUN; API-shaped fake tests only
+GPU/DINO weights: NOT RUN
+GitHub create_file: HTTP 403 Resource not accessible by integration; no remote changes
+Vast/RunPod/Vercel provisioning/deployment: NOT RUN

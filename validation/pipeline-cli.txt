@@ -1,0 +1,9 @@
+usage: cli.py [-h] {audit,extract,train,evaluate,predict} ...
+
+Local/offline feature → MIL training → held-out evaluation
+
+positional arguments:
+  {audit,extract,train,evaluate,predict}
+
+options:
+  -h, --help            show this help message and exit

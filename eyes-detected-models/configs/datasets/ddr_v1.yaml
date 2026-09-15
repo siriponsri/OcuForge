@@ -1,0 +1,13 @@
+schema_version: dataset_manifest.v0.1
+dataset_id: ddr_v1
+modality:
+- CFP
+source_type: PUBLIC
+label_scope:
+  dr_grade: IMAGE_LEVEL_ORDINAL
+  lesions: LOCALIZED
+  pixel_masks: true
+split_unit: PATIENT
+license_status: NOT_REVIEWED
+data_root_env: DDR_V1_ROOT
+cloud_eligible: false

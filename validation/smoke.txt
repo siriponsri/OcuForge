@@ -1,0 +1,20 @@
+{
+  "encoder": "TinyTestEncoder-test-only",
+  "steps": 5,
+  "losses": [
+    0.8576623201370239,
+    0.8324645161628723,
+    0.8149734735488892,
+    0.8014665842056274,
+    0.7920304536819458
+  ],
+  "weights_updated": true,
+  "scientific_result_eligible": false,
+  "images": 10,
+  "predictions": 10,
+  "selected": 3
+}
+Synthetic correction + adjudication + lock exported; no live CVAT called
+VALID: 1 record(s)
+Eligible: 1
+VALID batch SYNTHETIC_R0: 3

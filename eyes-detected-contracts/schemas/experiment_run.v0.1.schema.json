@@ -1,0 +1,117 @@
+{
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {
+      "const": "experiment_run.v0.1",
+      "default": "experiment_run.v0.1",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "run_id": {
+      "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,127}$",
+      "title": "Run Id",
+      "type": "string"
+    },
+    "timestamp": {
+      "title": "Timestamp",
+      "type": "string"
+    },
+    "git_sha": {
+      "title": "Git Sha",
+      "type": "string"
+    },
+    "docker_image": {
+      "title": "Docker Image",
+      "type": "string"
+    },
+    "config_hash": {
+      "pattern": "^[a-f0-9]{64}$",
+      "title": "Config Hash",
+      "type": "string"
+    },
+    "dataset_manifest_ids": {
+      "items": {
+        "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,127}$",
+        "type": "string"
+      },
+      "title": "Dataset Manifest Ids",
+      "type": "array"
+    },
+    "model_manifest_parent": {
+      "anyOf": [
+        {
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,127}$",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "title": "Model Manifest Parent"
+    },
+    "random_seed": {
+      "title": "Random Seed",
+      "type": "integer"
+    },
+    "gpu_name": {
+      "title": "Gpu Name",
+      "type": "string"
+    },
+    "cuda_version": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "title": "Cuda Version"
+    },
+    "framework_version": {
+      "title": "Framework Version",
+      "type": "string"
+    },
+    "metrics_path": {
+      "title": "Metrics Path",
+      "type": "string"
+    },
+    "artifact_path": {
+      "title": "Artifact Path",
+      "type": "string"
+    },
+    "status": {
+      "enum": [
+        "RUNNING",
+        "COMPLETED",
+        "FAILED"
+      ],
+      "title": "Status",
+      "type": "string"
+    },
+    "scientific_result_eligible": {
+      "const": false,
+      "default": false,
+      "title": "Scientific Result Eligible",
+      "type": "boolean"
+    }
+  },
+  "required": [
+    "run_id",
+    "timestamp",
+    "git_sha",
+    "docker_image",
+    "config_hash",
+    "dataset_manifest_ids",
+    "model_manifest_parent",
+    "random_seed",
+    "gpu_name",
+    "cuda_version",
+    "framework_version",
+    "metrics_path",
+    "artifact_path",
+    "status"
+  ],
+  "title": "ExperimentRun",
+  "type": "object"
+}

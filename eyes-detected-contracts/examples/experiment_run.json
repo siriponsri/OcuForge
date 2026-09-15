@@ -1,0 +1,20 @@
+{
+  "schema_version": "experiment_run.v0.1",
+  "run_id": "SYNTHETIC_CPU_001",
+  "timestamp": "2026-09-09T09:25:18.516392+00:00",
+  "git_sha": "UNCOMMITTED_STARTER",
+  "docker_image": "NOT_CONTAINERIZED",
+  "config_hash": "e4c477ebbebae3656bde0155b1263a80eaaaea76eb03e24b41d68e6259ee96cd",
+  "dataset_manifest_ids": [
+    "synthetic_v1"
+  ],
+  "model_manifest_parent": null,
+  "random_seed": 42,
+  "gpu_name": "CPU",
+  "cuda_version": null,
+  "framework_version": "2.5.1+cpu",
+  "metrics_path": "smoke_metrics.json",
+  "artifact_path": ".",
+  "status": "COMPLETED",
+  "scientific_result_eligible": false
+}

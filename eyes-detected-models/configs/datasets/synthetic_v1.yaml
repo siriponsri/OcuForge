@@ -1,0 +1,13 @@
+schema_version: dataset_manifest.v0.1
+dataset_id: synthetic_v1
+modality:
+- UWF
+source_type: SYNTHETIC
+label_scope:
+  dr_grade: IMAGE_LEVEL_ORDINAL
+  lesions: LOCALIZED
+  pixel_masks: true
+split_unit: PATIENT
+license_status: SYNTHETIC
+data_root_env: SYNTHETIC_V1_ROOT
+cloud_eligible: true
