@@ -13,7 +13,7 @@ R0 V3 pre-execution candidate register:
 
 MMRDR lesion presence never becomes ROI geometry. DDR, DeepDRiD, EyePACS, and Messidor-2 remain deferred or
 not selected for the first audit set. No registry entry downloads data; a future GPU run must download directly
-from the official/public source to the configured data root only after the relevant gate passes. R0 has not passed
+from the official/public source to the configured data root only after the relevant gate passes. R0 is blocked
 after the V3 supervision/taxonomy/pretraining-overlap re-audit.
 
 Local source: DR/no-DR experience-based assessment, no ordinal grades, masks or points. A future local importer must use de-identified IDs, exact file hashes and metadata; preserve UNKNOWN values where grouping/camera information is unavailable. Do not infer patient grouping from a filename without a verified mapping.

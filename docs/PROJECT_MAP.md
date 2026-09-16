@@ -4,7 +4,8 @@
 **Authority:** [`POC_MASTER_PLAN.md`](POC_MASTER_PLAN.md)
 
 OcuForge is a research and clinician-review foundation, not a diagnostic product. The current gate is R0 V3
-`READY_TO_EXECUTE / NOT_YET_PASSED`; R1 is `READY_NOT_EXECUTED` with no champion.
+`COMPLETE / BLOCKED`; R1 is `READY_NOT_EXECUTED` with no champion. Resolve the blockers in the machine-readable R0
+freeze record before any R1 execution.
 
 ## Ownership
 
@@ -25,7 +26,7 @@ on-premise. Public GPU accepts reviewed public/synthetic data only.
 | Order | Canonical artifact | Gate | Next manual action |
 |---|---|---|---|
 | 01 | `docs/POC_MASTER_PLAN.md` | V3 direction | owner/architect review |
-| 02 | `docs/R0_DATASET_SUPERVISION_FREEZE.md` | R0 V3 | execute only after review |
+| 02 | `docs/R0_DATASET_SUPERVISION_FREEZE.md` | R0 V3 | complete / blocked; resolve frozen evidence blockers |
 | 03 | `docs/R1_GLOBAL_MODEL_SELECTION.md` | C0/C1/C2 | run one candidate at a time after R0 |
 | 04 | `docs/GUI_POC_INTEGRATION.md` | R4/R5 | integrate existing `templates/` through contracts |
 | 05 | `docs/GPU_EXECUTION_TH.md` | public/synthetic runtime | verify host only when authorized |

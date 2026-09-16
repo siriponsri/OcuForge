@@ -3,7 +3,7 @@
 **Status:** ACTIVE SUPPORTING RUNTIME GUIDE
 **Authority:** [`POC_MASTER_PLAN.md`](POC_MASTER_PLAN.md)
 
-The current gate is `R0_V3=READY_TO_EXECUTE / NOT_YET_PASSED`; R1 C0/C1/C2 is `READY_NOT_EXECUTED`. This document
+The current gate is `R0_V3=COMPLETE / R0_DATASET_TAXONOMY=BLOCKED`; R1 C0/C1/C2 is `READY_NOT_EXECUTED`. This document
 does not authorize R0/R1 execution, dataset download, training, or provider provisioning.
 
 ## Allowed zones

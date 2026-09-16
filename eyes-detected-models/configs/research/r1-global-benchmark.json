@@ -31,23 +31,25 @@
       "name": "compact_supervised_transfer_control",
       "architecture_family": "CONVNEXT_V2_TINY",
       "backbone": "convnextv2_tiny",
-      "asset_identifier": "ConvNeXt V2 Tiny pretrained weights",
-      "asset_revision": null,
+      "asset_identifier": "ConvNeXt V2 Tiny ImageNet-22K 384px EMA checkpoint",
+      "asset_revision": "https://dl.fbaipublicfiles.com/convnext/convnextv2/im22k/convnextv2_tiny_22k_384_ema.pt",
       "adaptation_mode": "SUPERVISED_TRANSFER",
       "input_preprocessing_contract": {
         "target_size_px": 384,
         "color_space": "RGB",
-        "normalization": "BACKBONE_ASSET_CARD_REQUIRED",
-        "revision": null
+        "normalization": "IMAGENET_MEAN_STD",
+        "revision": "ConvNeXt-V2 official model table"
       },
       "aggregation": "GLOBAL_IMAGE",
       "head": "MULTICLASS_LINEAR",
       "loss": "CE",
       "target_type": "GENUINE_ORDINAL_0_TO_4_AS_5_CLASS_CE",
       "license_access": {
-        "status": "REQUIRES_ASSET_AND_LICENSE_REVIEW",
-        "source": "UPSTREAM_ASSET_CARD_REQUIRED",
-        "weight_hash": null
+        "status": "CC_BY_NC_4.0_REVIEW_REQUIRED_BEFORE_USE",
+        "source": "https://github.com/facebookresearch/ConvNeXt-V2",
+        "weight_hash": null,
+        "pretraining_corpus": "ImageNet-22K",
+        "overlap_status_with_mmrdr_uwf": "UNKNOWN"
       },
       "execution_status": "READY_NOT_EXECUTED",
       "metrics_artifact_path": null,
@@ -59,23 +61,26 @@
       "name": "retina_specialist_foundation_representation",
       "architecture_family": "FLAIR_IMAGE_ENCODER",
       "backbone": "flair_image_encoder",
-      "asset_identifier": "FLAIR retinal image encoder",
-      "asset_revision": null,
+      "asset_identifier": "FLAIR retinal image encoder (jusiro2/FLAIR)",
+      "asset_revision": "5f6bdd0a068353dc41a896ba3abdd7c0f6d35938",
       "adaptation_mode": "FROZEN_ENCODER_LIGHTWEIGHT_HEAD_FIRST",
       "input_preprocessing_contract": {
-        "target_size_px": null,
+        "target_size_px": 512,
         "color_space": "ASSET_CARD_REQUIRED",
         "normalization": "ASSET_CARD_REQUIRED",
-        "revision": null
+        "revision": "FLAIR Hub config at 5f6bdd0a068353dc41a896ba3abdd7c0f6d35938"
       },
       "aggregation": "GLOBAL_IMAGE",
       "head": "MULTICLASS_LINEAR",
       "loss": "CE",
       "target_type": "GENUINE_ORDINAL_0_TO_4_AS_5_CLASS_CE",
       "license_access": {
-        "status": "REQUIRES_ASSET_API_AND_LICENSE_REVIEW",
-        "source": "FLAIR_OFFICIAL_ASSET_SOURCE_REQUIRED",
-        "weight_hash": null
+        "status": "APACHE_2.0_OVERLAP_REVIEW_REQUIRED_BEFORE_USE",
+        "source": "https://huggingface.co/jusiro2/FLAIR",
+        "weight_hash": null,
+        "pretraining_corpus": "Official FLAIR assembly includes IDRiD, OIA-DDR, EyePACS and additional retinal datasets",
+        "overlap_status_with_mmrdr_uwf": "UNKNOWN",
+        "secondary_overlap_status": "CONFIRMED_OR_POTENTIAL"
       },
       "execution_status": "READY_NOT_EXECUTED",
       "metrics_artifact_path": null,
@@ -87,24 +92,26 @@
       "name": "high_resolution_local_detail_hypothesis",
       "architecture_family": "DINOV3_VIT_B16_PATCH_ATTENTION_MIL",
       "backbone": "dinov3_vitb16",
-      "asset_identifier": "DINOv3 ViT-B/16 pretrained weights",
-      "asset_revision": null,
+      "asset_identifier": "DINOv3 ViT-B/16 LVD-1689M pretrained weights",
+      "asset_revision": "5931719e67bbdb9737e363e781fb0c67687896bc",
       "adaptation_mode": "FROZEN_ENCODER_PATCH_MIL_FIRST",
       "input_preprocessing_contract": {
         "canvas_px": 1024,
         "grid": 5,
         "patch_px": 224,
         "resize_policy": "LETTERBOX",
-        "revision": null
+        "revision": "facebook/dinov3-vitb16-pretrain-lvd1689m"
       },
       "aggregation": "LEARNED_ATTENTION_MIL",
       "head": "MULTICLASS_LINEAR",
       "loss": "CE",
       "target_type": "GENUINE_ORDINAL_0_TO_4_AS_5_CLASS_CE",
       "license_access": {
-        "status": "REQUIRES_ASSET_AND_LICENSE_REVIEW",
-        "source": "DINOV3_OFFICIAL_ASSET_SOURCE_REQUIRED",
-        "weight_hash": null
+        "status": "GATED_DINOV3_LICENSE_AND_OVERLAP_REVIEW_REQUIRED_BEFORE_USE",
+        "source": "https://huggingface.co/facebook/dinov3-vitb16-pretrain-lvd1689m",
+        "weight_hash": null,
+        "pretraining_corpus": "LVD-1689M web image corpus",
+        "overlap_status_with_mmrdr_uwf": "UNKNOWN"
       },
       "execution_status": "READY_NOT_EXECUTED",
       "metrics_artifact_path": null,

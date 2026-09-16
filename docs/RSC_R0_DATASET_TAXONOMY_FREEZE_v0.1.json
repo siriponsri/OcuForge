@@ -1,11 +1,20 @@
 {
   "schema_version": "r0_dataset_supervision_audit.v0.2",
-  "record_type": "R0_V3_PRE_EXECUTION_AUDIT_RECORD",
-  "status": "R0_V3=READY_TO_EXECUTE",
+  "record_type": "R0_V3_FREEZE_RECORD",
+  "status": "R0_DATASET_TAXONOMY=BLOCKED",
   "audit_date": "2026-09-16",
-  "decision_scope": "R0 V2 pre-execution audit; candidate records only; no dataset bytes downloaded",
+  "decision_scope": "R0 V3 evidence freeze completed; no dataset bytes or model weights downloaded",
   "authority": "docs/POC_MASTER_PLAN.md and docs/R0_DATASET_SUPERVISION_FREEZE.md",
   "supersedes_status": "R0_V2_RECORD_RETIRED_BY_V3_REPLAN",
+  "r1_status": "R1_GLOBAL_BENCHMARK=READY_NOT_EXECUTED",
+  "current_r1_champion": "NONE",
+  "freeze_scope": [
+    "MMRDR-UWF global ordinal DR candidate",
+    "IDRiD spatial ROI candidate",
+    "DDR/OIA-DDR secondary audit",
+    "C0 ConvNeXt V2-Tiny, C1 FLAIR, and C2 DINOv3 asset audit",
+    "taxonomy, negative ROI, split, provenance, and future download manifest"
+  ],
   "candidate_datasets": [
     {
       "role": "GLOBAL_DR",
@@ -41,27 +50,27 @@
         "Lesion labels are image-level presence and cannot create ROI geometry.",
         "The release is large and is not bundled or downloaded by this repository."
       ],
-      "checksum_or_source_hash": "Figshare multipart MD5 metadata recorded in checksums",
+      "checksum_or_source_hash": "NOT_VERIFIED; current Figshare API response exposed file IDs and sizes but no MD5 values",
       "limitations": [
         "No row-level patient identifier is documented in the published UWF CSV description; preserve the released patient split.",
         "Lesion labels are image-level presence and cannot create ROI geometry.",
         "The release is large and is not bundled or downloaded by this repository."
       ],
       "checksums": {
-        "status": "RECORDED_FROM_FIGSHARE_FILE_METADATA",
+        "status": "FILE_METADATA_RECORDED_HASH_NOT_EXPOSED_BY_CURRENT_API",
         "algorithm": "MD5",
         "scope": "Nine multipart archive files and README; no combined archive hash is claimed",
         "files": [
-          {"name": "MMRDR.zip.001", "figshare_file_id": 55763483, "size_bytes": 2097152000, "md5": "fec69a984299e6042915ea2f52370053"},
-          {"name": "MMRDR.zip.002", "figshare_file_id": 55763486, "size_bytes": 2097152000, "md5": "a092f668fc2986d1851cd33c1d7f1906"},
-          {"name": "MMRDR.zip.003", "figshare_file_id": 55763489, "size_bytes": 2097152000, "md5": "776130e3eb381f0e0cb6d3cca5f48757"},
-          {"name": "MMRDR.zip.004", "figshare_file_id": 55763492, "size_bytes": 2097152000, "md5": "9ae81f9f49c6a1a996cceb6a3bd28718"},
-          {"name": "MMRDR.zip.005", "figshare_file_id": 55763495, "size_bytes": 2097152000, "md5": "3c67b4b115ffa3bc89ca1ec91e9007dc"},
-          {"name": "MMRDR.zip.006", "figshare_file_id": 55763474, "size_bytes": 2097152000, "md5": "504f4165437791163d02891aa11b382f"},
-          {"name": "MMRDR.zip.007", "figshare_file_id": 55763480, "size_bytes": 2097152000, "md5": "cd282dc54d85deb28cb413bad753c3ec"},
-          {"name": "MMRDR.zip.008", "figshare_file_id": 55763477, "size_bytes": 2097152000, "md5": "a7faacbc22e2c35e92195c0bbe580d45"},
-          {"name": "MMRDR.zip.009", "figshare_file_id": 55763465, "size_bytes": 1833101731, "md5": "f7a67d113081e2b69e526c1a28c465d3"},
-          {"name": "README.md", "figshare_file_id": 55763186, "size_bytes": 2459, "md5": "d524d3de74771c04c3e29e6daa7311b5"}
+          {"name": "MMRDR.zip.001", "figshare_file_id": 55763483, "size_bytes": 2097152000, "md5": null, "download_url": "https://ndownloader.figshare.com/files/55763483"},
+          {"name": "MMRDR.zip.002", "figshare_file_id": 55763486, "size_bytes": 2097152000, "md5": null, "download_url": "https://ndownloader.figshare.com/files/55763486"},
+          {"name": "MMRDR.zip.003", "figshare_file_id": 55763489, "size_bytes": 2097152000, "md5": null, "download_url": "https://ndownloader.figshare.com/files/55763489"},
+          {"name": "MMRDR.zip.004", "figshare_file_id": 55763492, "size_bytes": 2097152000, "md5": null, "download_url": "https://ndownloader.figshare.com/files/55763492"},
+          {"name": "MMRDR.zip.005", "figshare_file_id": 55763495, "size_bytes": 2097152000, "md5": null, "download_url": "https://ndownloader.figshare.com/files/55763495"},
+          {"name": "MMRDR.zip.006", "figshare_file_id": 55763474, "size_bytes": 2097152000, "md5": null, "download_url": "https://ndownloader.figshare.com/files/55763474"},
+          {"name": "MMRDR.zip.007", "figshare_file_id": 55763480, "size_bytes": 2097152000, "md5": null, "download_url": "https://ndownloader.figshare.com/files/55763480"},
+          {"name": "MMRDR.zip.008", "figshare_file_id": 55763477, "size_bytes": 2097152000, "md5": null, "download_url": "https://ndownloader.figshare.com/files/55763477"},
+          {"name": "MMRDR.zip.009", "figshare_file_id": 55763465, "size_bytes": 1833101731, "md5": null, "download_url": "https://ndownloader.figshare.com/files/55763465"},
+          {"name": "README.md", "figshare_file_id": 55763186, "size_bytes": 2459, "md5": null, "download_url": "https://ndownloader.figshare.com/files/55763186"}
         ]
       }
     },
@@ -77,7 +86,7 @@
       "source_doi": "https://doi.org/10.21227/H25W98",
       "data_descriptor": "https://doi.org/10.3390/data3030025",
       "access_status": "PUBLIC_RESEARCH_ACCESS_VIA_IEEE_DATAPORT; ACCOUNT_OR_INSTITUTIONAL_ACCESS_MAY_BE_REQUIRED",
-      "license_status": "TERMS_NOT_EXPLICITLY_VERIFIED",
+      "license_status": "CC_BY_4.0_DISPLAYED_ON_OFFICIAL_IDRID_DATA_PAGE; IEEE_FILE_TERMS_AND_CHECKSUMS_PENDING",
       "cloud_eligible": false,
       "modality": "CFP",
       "image_count": 516,
@@ -101,7 +110,7 @@
         "Only the localized lesion subset is eligible for ROI positives; exact mask coverage must be checked after download.",
         "No public-cloud use until license terms, file inventory and SHA-256 checksums are verified locally."
       ],
-      "checksum_or_source_hash": "NOT_COMPUTED_NO_DOWNLOAD",
+      "checksum_or_source_hash": "NOT_VERIFIED_NO_DOWNLOAD",
       "limitations": [
         "Conventional 50-degree CFP is not UWF and is not a local-domain validation set.",
         "Only the localized lesion subset is eligible for ROI positives; exact mask coverage must be checked after download.",
@@ -112,6 +121,140 @@
         "algorithm": "SHA256",
         "scope": "Downloaded archive and extracted files"
       }
+    }
+  ],
+  "dataset_decisions": {
+    "R1_GLOBAL_DR": {
+      "dataset": "mmrdr_uwf_v1",
+      "decision": "BLOCKED_PENDING_EVIDENCE",
+      "reason": "Ordinal UWF labels and released split are documented, but current checksum/provenance, row-level identity audit, and license-scope reconciliation are incomplete."
+    },
+    "R2_R3_SPATIAL_ROI": {
+      "dataset": "idrid_v1",
+      "decision": "PRIMARY_CANDIDATE_NOT_EXECUTION_READY",
+      "reason": "Official page verifies the four lesion mask families and CC BY 4.0 display, but exact archive terms, file inventory, checksums, and exhaustive-negative semantics remain unverified."
+    },
+    "DDR_OIA_DDR": {
+      "dataset": "DDR / OIA-DDR",
+      "decision": "NOT_ADMITTED",
+      "reason": "Official repository exposes download links and a repository MIT license but no dataset-use terms, archive checksums, released split files, or exact annotation inventory."
+    }
+  },
+  "secondary_dataset_audits": [
+    {
+      "dataset_id": "ddr_oia_ddr_unverified",
+      "source": "https://github.com/nkicsl/DDR-dataset",
+      "source_version": "Official repository default branch as observed 2026-09-16; archive revision not exposed",
+      "official_paper": "https://doi.org/10.1016/j.ins.2019.06.011",
+      "access_status": "PUBLIC_REPOSITORY_LINKS_TO_GOOGLE_DRIVE_AND_BAIDU; DATA_ACCESS_TERMS_NOT_FOUND",
+      "license_status": "REPOSITORY_MIT_ONLY; DATASET_LICENSE_UNKNOWN",
+      "modality": "CFP",
+      "image_count": 13673,
+      "patient_id_available": "UNKNOWN",
+      "eye_id_available": "UNKNOWN",
+      "image_id_available": "UNKNOWN",
+      "global_labels": ["FIVE_GRADABLE_DR_CLASSES", "UNGRADABLE_OR_POOR_QUALITY_REPORTED_IN_PAPER"],
+      "ordinal_labels": ["NO_DR", "MILD", "MODERATE", "SEVERE", "PROLIFERATIVE"],
+      "lesion_labels": ["MICROANEURYSM", "HEMORRHAGE", "HARD_EXUDATE", "SOFT_EXUDATE"],
+      "lesion_supervision": {"type": "unknown", "exhaustive": "unknown", "reported_by_paper": "pixel_and_box_localization_for_757_images"},
+      "split_source": "UNKNOWN; exact released split files were not exposed by the official repository",
+      "known_limitations": [
+        "Repository MIT license does not establish license rights for medical-image archive bytes.",
+        "Google Drive/Baidu multipart archive, checksums, file inventory, and annotation revision were not verified.",
+        "FLAIR documentation lists OIA-DDR in its retinal assembly; C1 clean external evaluation is not available."
+      ],
+      "taxonomy_eligibility": "NOT_ADMITTED",
+      "negative_roi_policy": "UNKNOWN; do not create hard negatives from unannotated regions",
+      "checksum_or_source_hash": "NOT_AVAILABLE_WITHOUT_AUTHORIZED_ARCHIVE_ACCESS",
+      "future_action": "Re-audit only after exact archive access terms, revision, file inventory, split identity, annotations, and checksums are authorized and available."
+    }
+  ],
+  "blockers": [
+    "MMRDR Figshare metadata exposes the ten future-download file IDs and sizes, but the current API response exposes no MD5 values and no SHA-256 values; the exact archive provenance is therefore not frozen.",
+    "MMRDR data-record licensing reports CC BY 4.0 while the associated Scientific Data article page carries CC BY-NC-ND 4.0 article copyright; the scope of the data license and cloud-use terms must be reconciled before execution.",
+    "MMRDR UWF split is described as patient-level, but the published CSV description does not provide row-level patient IDs; the train/validation identity audit cannot be completed from checked evidence.",
+    "IDRiD's official page displays CC BY 4.0 and verifies the 516-image grading set plus the four lesion mask families, but the exact IEEE archive/file inventory and SHA-256 provenance have not been obtained.",
+    "IDRiD mask coverage is class-dependent (MA 81, EX 81, HE 80, SE 40) and the official evidence does not establish exhaustive absence semantics; clean negative ROI eligibility therefore remains unresolved.",
+    "C0 has an exact upstream checkpoint URL but no locally verified weight hash or execution-time asset card; C1 has a fixed Hub revision but no local weight hash and documented pretraining overlap with IDRiD, OIA-DDR, and EyePACS; C2 has gated access, no local weight hash, and unresolved source-image overlap in the LVD-1689M web corpus."
+  ],
+  "future_download_manifest": {
+    "manifest_version": "r0_future_download_manifest.v1",
+    "download_now": false,
+    "data_roots": {
+      "mmrdr": "OCUFORGE_DATA_ROOT/mmrdr/uwf",
+      "idrid": "OCUFORGE_DATA_ROOT/idrid/spatial",
+      "models": "OCUFORGE_MODEL_ROOT/r1_global"
+    },
+    "datasets": [
+      {
+        "dataset_id": "mmrdr_uwf_v1",
+        "source": "https://api.figshare.com/v2/articles/29423747",
+        "access": "Download all nine MMRDR.zip.001 through MMRDR.zip.009 parts plus README.md; the multipart archive must be combined before extraction because the release is not UWF-only.",
+        "files": "The ten file records and direct URLs are frozen under candidate_datasets[GLOBAL_DR].checksums.files.",
+        "extract": ["MMRDR-UWF/img/*.jpg", "MMRDR-UWF/UWF.csv"],
+        "verify_before_use": ["recorded file size", "SHA-256 computed locally", "archive integrity", "UWF.csv schema", "released train/test membership", "identity and laterality rules"]
+      },
+      {
+        "dataset_id": "idrid_v1",
+        "source": "https://ieee-dataport.org/open-access/indian-diabetic-retinopathy-image-dataset-idrid",
+        "access": "IEEE DataPort account or institutional access may be required; do not use a mirror as the source.",
+        "files": [
+          "A. Segmentation/1. Original Images/a. Training Set/*.jpg and b. Testing Set/*.jpg (81 images)",
+          "A. Segmentation/2. All Segmentation Groundtruths/{a. Training Set,b. Testing Set}/{1. Microaneurysms,2. Haemorrhages,3. Hard Exudates,4. Soft Exudates}/*.tif",
+          "B. Disease Grading/2. Groundtruths/*Labels.csv only when grade provenance is needed for an explicitly separate analysis"
+        ],
+        "verify_before_use": ["archive/file inventory", "SHA-256 for every downloaded file", "mask-to-image identity", "class-specific coverage", "negative policy", "released train/test membership"]
+      }
+    ],
+    "model_assets": [
+      {"candidate_id": "C0", "source": "https://dl.fbaipublicfiles.com/convnext/convnextv2/im22k/convnextv2_tiny_22k_384_ema.pt", "revision": "ConvNeXt-V2 repository default branch inspected 2026-09-16; URL is the upstream asset identifier", "verify_before_use": ["download terms", "SHA-256", "checkpoint load", "ImageNet normalization"]},
+      {"candidate_id": "C1", "source": "https://huggingface.co/jusiro2/FLAIR", "revision": "5f6bdd0a068353dc41a896ba3abdd7c0f6d35938", "verify_before_use": ["model.safetensors SHA-256", "Apache-2.0 terms", "512px preprocessing", "pretraining overlap disclosure"]},
+      {"candidate_id": "C2", "source": "https://huggingface.co/facebook/dinov3-vitb16-pretrain-lvd1689m", "revision": "5931719e67bbdb9737e363e781fb0c67687896bc", "verify_before_use": ["gated access", "DINOv3 license acceptance", "model.safetensors SHA-256", "ImageNet normalization", "LVD-1689M overlap disclosure"]}
+    ]
+  },
+  "model_asset_audit": [
+    {
+      "candidate_id": "C0",
+      "asset": "ConvNeXt V2 Tiny ImageNet-22K 384px EMA checkpoint",
+      "source": "https://github.com/facebookresearch/ConvNeXt-V2 and https://dl.fbaipublicfiles.com/convnext/convnextv2/im22k/convnextv2_tiny_22k_384_ema.pt",
+      "asset_revision": "Upstream URL identifier; repository default branch inspected 2026-09-16",
+      "access_status": "PUBLIC_URL_NOT_DOWNLOADED",
+      "license_status": "CC_BY_NC_4.0_FOR_IMAGENET_PRETRAINED_AND_FINETUNED_MODELS",
+      "preprocessing": "384x384 RGB; ImageNet mean/std pending exact loader card",
+      "pretraining_corpus": "ImageNet-22K",
+      "overlap_with_r1_mmrdr": "UNKNOWN",
+      "overlap_status": "UNKNOWN",
+      "weight_sha256": null,
+      "claim_consequence": "No execution or clean external claim until the local asset hash and terms are recorded."
+    },
+    {
+      "candidate_id": "C1",
+      "asset": "FLAIR retinal image encoder",
+      "source": "https://huggingface.co/jusiro2/FLAIR and https://github.com/jusiro/FLAIR",
+      "asset_revision": "5f6bdd0a068353dc41a896ba3abdd7c0f6d35938",
+      "access_status": "PUBLIC_HUGGING_FACE_RECORD_NOT_DOWNLOADED",
+      "license_status": "APACHE_2.0",
+      "preprocessing": "512px image input from the model config; exact transfer transform must be frozen with the asset",
+      "pretraining_corpus": "Official FLAIR assembly lists EyePACS, Messidor, IDRiD, RFMiD, OIA-DDR, and additional retinal datasets",
+      "overlap_with_r1_mmrdr": "UNKNOWN",
+      "overlap_status": "UNKNOWN",
+      "secondary_dataset_overlap": "CONFIRMED_OR_POTENTIAL_FOR_IDRID_OIA_DDR_EYEPACS",
+      "weight_sha256": null,
+      "claim_consequence": "C1 cannot support a clean external claim on documented overlapping retinal datasets; MMRDR overlap remains unresolved."
+    },
+    {
+      "candidate_id": "C2",
+      "asset": "DINOv3 ViT-B/16 pretrained on LVD-1689M",
+      "source": "https://huggingface.co/facebook/dinov3-vitb16-pretrain-lvd1689m and https://github.com/facebookresearch/dinov3",
+      "asset_revision": "5931719e67bbdb9737e363e781fb0c67687896bc",
+      "access_status": "GATED_HUGGING_FACE_RECORD_NOT_DOWNLOADED",
+      "license_status": "DINOv3_LICENSE_AGREEMENT",
+      "preprocessing": "224x224 RGB patch input with ImageNet mean/std; high-resolution canvas/patch geometry remains the checked-in C2 contract",
+      "pretraining_corpus": "LVD-1689M web image corpus collected from a larger public-post pool; source-image membership is not enumerated",
+      "overlap_with_r1_mmrdr": "UNKNOWN",
+      "overlap_status": "UNKNOWN",
+      "weight_sha256": null,
+      "claim_consequence": "Do not describe any retinal evaluation as uncontaminated without source-membership evidence."
     }
   ],
   "candidate_disposition": [
@@ -220,24 +363,24 @@
   "foundation_model_overlap_audit": [
     {
       "candidate_id": "C1",
-      "pretraining_corpus_description": "FLAIR retinal image encoder pretraining corpus must be recorded from the official asset documentation before R1.",
-      "known_included_public_datasets": [],
+      "pretraining_corpus_description": "FLAIR official assembly table lists EyePACS, Messidor, IDRiD, RFMiD, OIA-DDR and additional retinal datasets; the selected Hub model revision is 5f6bdd0a068353dc41a896ba3abdd7c0f6d35938.",
+      "known_included_public_datasets": ["EyePACS", "Messidor", "IDRiD", "RFMiD", "OIA-DDR", "APTOS", "ODIR-5K", "LAG", "AGAR300", "G1020", "HEI-MED", "AIROGS", "ScarDat", "ACRIMA", "DeepDRiD"],
       "overlap_status": "UNKNOWN",
-      "claim_consequence": "No clean external-generalization claim is permitted until corpus overlap is resolved."
+      "claim_consequence": "MMRDR-UWF membership is not identified in the documented assembly, but the corpus/weights are not independently exhaustive; no clean external-generalization claim is permitted. Overlap with IDRiD, OIA-DDR and EyePACS is confirmed or potential where those datasets are used."
     },
     {
       "candidate_id": "C2",
-      "pretraining_corpus_description": "DINOv3 generic visual pretraining corpus and revision must be recorded from the official asset documentation before R1.",
-      "known_included_public_datasets": [],
+      "pretraining_corpus_description": "DINOv3 ViT-B/16 LVD-1689M model revision 5931719e67bbdb9737e363e781fb0c67687896bc; LVD-1689M is a large web-image corpus and individual source-image membership is not enumerated.",
+      "known_included_public_datasets": ["LVD-1689M web corpus; source membership not enumerated"],
       "overlap_status": "UNKNOWN",
-      "claim_consequence": "Retinal dataset evaluation must disclose any known or potential pretraining contamination."
+      "claim_consequence": "MMRDR-UWF and IDRiD source-image overlap cannot be excluded from the web corpus; retinal evaluation must disclose this as unknown rather than clean external evidence."
     }
   ],
   "evidence": [
     {
       "source": "MMRDR Figshare API metadata",
       "url": "https://api.figshare.com/v2/articles/29423747",
-      "observed": "Public record version 2, CC BY 4.0, 10,404 UWF images, multipart file MD5 values"
+      "observed": "Public record version 2, CC BY 4.0, 10,404 UWF images, ten multipart file IDs and sizes; current API response did not expose MD5 values"
     },
     {
       "source": "MMRDR Scientific Data article",
@@ -247,12 +390,27 @@
     {
       "source": "IDRiD Grand Challenge",
       "url": "https://idrid.grand-challenge.org/",
-      "observed": "Public research access through IEEE DataPort and four-class lesion segmentation challenge"
+      "observed": "Public research access through IEEE DataPort, CC BY 4.0 statement, and four-class lesion segmentation challenge"
     },
     {
       "source": "IDRiD IEEE DataPort metadata",
       "url": "https://ieee-dataport.org/open-access/indian-diabetic-retinopathy-image-dataset-idrid",
-      "observed": "516 images, 413/103 release split, JPG/TIFF/CSV data format, DOI 10.21227/H25W98"
+      "observed": "516 images, 413/103 release split, JPG/TIFF/CSV data format, DOI 10.21227/H25W98; archive checksums were not available without download"
+    },
+    {
+      "source": "DDR/OIA-DDR official repository",
+      "url": "https://github.com/nkicsl/DDR-dataset",
+      "observed": "Official repository provides multipart Google Drive/Baidu links and an MIT repository license, but no dataset-use terms or checksums"
+    },
+    {
+      "source": "FLAIR official repository and model record",
+      "url": "https://github.com/jusiro/FLAIR",
+      "observed": "Apache 2.0 code/model statement; official assembly table lists IDRiD, OIA-DDR, EyePACS and other retinal sources"
+    },
+    {
+      "source": "DINOv3 official repository and model record",
+      "url": "https://github.com/facebookresearch/dinov3",
+      "observed": "ViT-B/16 LVD-1689M model identifier, gated model access, DINOv3 license, and non-enumerated web-corpus membership"
     },
     {
       "source": "Messidor-2 official distributor",

@@ -7,7 +7,7 @@ label_scope:
   dr_grade: IMAGE_LEVEL_ORDINAL
   lesions: LOCALIZED
   pixel_masks: true
-split_unit: PATIENT
+split_unit: IMAGE
 license_status: NOT_REVIEWED
 data_root_env: IDRID_V1_ROOT
 cloud_eligible: false

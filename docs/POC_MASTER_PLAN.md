@@ -2,7 +2,7 @@
 
 <!-- plan_version: 3.0 -->
 
-**Status:** AUTHORITATIVE V3 DIRECTION · IMPLEMENTATION RECONCILIATION COMPLETE / R0 NOT EXECUTED
+**Status:** AUTHORITATIVE V3 DIRECTION · R0 V3 COMPLETE / BLOCKED
 **Scope:** Research and clinician-review foundation; not a diagnostic product.
 
 This is the only active OcuForge roadmap. Historical plans and prior Eye Detected results remain available under
@@ -23,15 +23,17 @@ inference, clinical integration, and all hospital/private data and derived artif
 ## Current status
 
 ```text
-R0_V3=READY_TO_EXECUTE / NOT_YET_PASSED
+R0_V3=BLOCKED
 R1_THREE_CANDIDATE_BENCHMARK=READY_NOT_EXECUTED
 CURRENT_R1_CHAMPION=NONE
 HISTORICAL_PRIOR=AVAILABLE
 PHASE_2B_LIVE_MONGO=UNRESOLVED
 ```
 
-This reconciliation did not download datasets, train models, execute R0/R1, provision RunPod/Vast/Vercel, or claim
-new scientific results. Synthetic smoke output is engineering evidence only.
+R0 V3 evidence review is complete and recorded as `R0_DATASET_TAXONOMY=BLOCKED`; no datasets or model weights were
+downloaded, no model was trained, R1 was not executed, and no cloud provider was provisioned. Synthetic smoke output
+is engineering evidence only. The exact blockers and future manifest are in
+[`RSC_R0_DATASET_TAXONOMY_FREEZE_v0.1.json`](RSC_R0_DATASET_TAXONOMY_FREEZE_v0.1.json).
 
 ## Canonical architecture
 
@@ -63,7 +65,7 @@ GLOBAL MODEL                       ROI LESION MODEL
 Later: R6 DICOM · R7 model diff/drift · R8 HL7/FHIR mapping/demo
 ```
 
-## R0 — data and supervision freeze
+## R0 - data and supervision freeze
 
 R0 is a CPU/document/data-contract gate, not a training phase. It records the exact source/version/access method,
 terms, modality, image characteristics, target semantics, supervision granularity, identity availability, released
@@ -79,7 +81,9 @@ identity-safe split semantics, source/version/access, license compatibility, acc
 access. Its image-level lesion fields are auxiliary presence labels only and cannot become ROI coordinates or masks.
 DDR/IDRiD remain candidates for external anchoring or spatial R2/R3 work only after their own exact audits.
 
-R0 must pass before any public dataset bytes are downloaded or any R1 execution begins.
+R0 V3 ended on 2026-09-16 with `R0_DATASET_TAXONOMY=BLOCKED`. R1 execution remains prohibited until the exact
+blockers in the machine-readable freeze record are resolved and the gate is explicitly re-audited. The blocked result
+is intentional; no assumption or fallback dataset is permitted.
 
 ## R1 — three architecture hypotheses
 
@@ -171,5 +175,7 @@ Document status is tracked in [DOCUMENT_STATUS.md](DOCUMENT_STATUS.md). A docume
 
 ## Execution gate
 
-The next permitted manual action is owner/architect review of this reconciliation. Do not begin R0, download a large
-dataset, train a model, provision a cloud provider, or promote a model until that review authorizes the next goal.
+The next permitted manual action is to resolve the recorded R0 blockers: reconcile dataset license scope, obtain and
+verify archive/file checksums and identity metadata, establish the IDRiD negative policy, and approve/hash the exact
+candidate assets. Do not begin R1, download a large dataset, provision a cloud provider, or promote a model until the
+R0 record is re-audited and passes.

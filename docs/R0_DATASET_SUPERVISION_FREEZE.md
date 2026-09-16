@@ -1,6 +1,6 @@
 # R0 Dataset, Supervision, Split, and Asset Freeze
 
-**Status:** ACTIVE SUPPORTING PROTOCOL · `R0_V3=READY_TO_EXECUTE / NOT_YET_PASSED`
+**Status:** ACTIVE SUPPORTING PROTOCOL · `R0_V3=COMPLETE / R0_DATASET_TAXONOMY=BLOCKED`
 **Authority:** [`POC_MASTER_PLAN.md`](POC_MASTER_PLAN.md)
 
 R0 is a CPU/document/data-contract gate. It must finish before dataset download, model training, or R1 execution.
@@ -63,12 +63,26 @@ record the limitation, and do not claim patient-level independence.
 
 ## Current machine-readable record
 
-[`RSC_R0_DATASET_TAXONOMY_FREEZE_v0.1.json`](RSC_R0_DATASET_TAXONOMY_FREEZE_v0.1.json) is a V3 pre-execution audit
-record. It contains candidate MMRDR-UWF and IDRiD records, the admitted taxonomy, negative policy, split policy, and
-the currently unresolved C1/C2 overlap audit. It does not contain downloaded dataset bytes.
+[`RSC_R0_DATASET_TAXONOMY_FREEZE_v0.1.json`](RSC_R0_DATASET_TAXONOMY_FREEZE_v0.1.json) is the completed V3 freeze
+record. It contains the candidate dataset decisions, exact blockers, admitted taxonomy, negative policy, split policy,
+model asset audit, and future download manifest. It does not contain downloaded dataset bytes or model weights.
+
+## R0 V3 outcome
+
+```text
+R0_DATASET_TAXONOMY=BLOCKED
+R1_GLOBAL_BENCHMARK=READY_NOT_EXECUTED
+CURRENT_R1_CHAMPION=NONE
+```
+
+MMRDR-UWF remains the primary R1 hypothesis but is not execution-eligible until checksum/provenance, license scope,
+and the released identity metadata are resolved. IDRiD remains the primary spatial candidate but is not execution-ready
+until archive terms/checksums and evidence-backed negative ROI semantics are resolved. DDR/OIA-DDR is not admitted.
+C0/C1/C2 exact source revisions are recorded, but local hashes and the remaining asset/overlap decisions are not.
+The full blocker list is authoritative in the JSON record.
 
 ## R0 PASS evidence
 
 R0 can pass only when every selected dataset has verified source/version/license/access, supervision type, identity and
-split semantics, limitations, checksums/provenance, taxonomy eligibility, and machine-readable validation. Otherwise
-the exact blocker remains `R0_DATASET_TAXONOMY=BLOCKED`.
+split semantics, limitations, checksums/provenance, taxonomy eligibility, and machine-readable validation. The current
+evidence does not satisfy those conditions, so the exact end-state is `R0_DATASET_TAXONOMY=BLOCKED`.

@@ -13,7 +13,7 @@ result.
 | Repository foundation and CPU contracts | IMPLEMENTED / VERIFIED | Offline tests and synthetic checks cover the reusable foundation. |
 | Phase 2A local data foundation | IMPLEMENTED / VERIFIED | Local adapters and provenance safeguards exist. |
 | Phase 2B live Mongo acceptance | UNKNOWN / NOT RUN | Requires the target service; Phase 2 overall is not PASS. |
-| R0 V3 data/supervision/asset freeze | READY_TO_EXECUTE / NOT_YET_PASSED | No dataset bytes were downloaded by this reconciliation. |
+| R0 V3 data/supervision/asset freeze | COMPLETE / BLOCKED | Evidence audit ended without dataset or model-byte downloads; exact blockers are frozen in the machine-readable record. |
 | R1 C0/C1/C2 benchmark | READY_NOT_EXECUTED | No candidate was trained or selected. |
 | Current R1 champion | NONE | Selection is forbidden before measured evidence. |
 
@@ -26,12 +26,12 @@ result.
 - CORN head contract with target encoding, conditional decoding, shapes, and synthetic unit coverage.
 - Versioned Global→ROI triage policy/input/decision contracts with unset threshold and reviewer override.
 - Existing labeler/CVAT bridge, local storage, and `templates/` customer-facing GUI reference.
-- V3 candidate registry, R0 overlap-audit record, validation tests, editorial SVG/HTML diagrams, and pinned diagram
+- V3 candidate registry, completed R0 overlap/dataset audit record, validation tests, editorial SVG/HTML diagrams, and pinned diagram
   setup metadata.
 
 ## Planned, not executed
 
-- R0 source/license/supervision/split/pretraining-overlap execution.
+- Resolution of the R0 dataset/license/checksum/identity/negative-policy and model-asset blockers.
 - R1 C0, C1, and C2 runs, model comparison, calibration, and winner-only CORN ablation.
 - R2 spatial ROI dataset construction and R3 lesion classifier.
 - R4 Label Studio Community live QA validation and R5 contract/API integration into the existing GUI.
@@ -39,8 +39,9 @@ result.
 
 ## Unknown or external gates
 
-Approved foundation assets, exact revisions and licenses; FLAIR API/asset availability; DINOv3 runtime; public dataset
-overlap; live Mongo/CVAT/Docker/host governance; intended local inference hardware; and any scientific performance.
+Approved foundation asset hashes and final terms; MMRDR license scope/checksums/identity metadata; IDRiD archive
+checksums and negative policy; FLAIR/DINOv3 source-image overlap; live Mongo/CVAT/Docker/host governance; intended
+local inference hardware; and any scientific performance.
 
 ## Prohibited claims
 

@@ -20,7 +20,7 @@ The current planning state is:
 ```text
 POC_PRIMARY=MODEL_INTERACTIVE_GUI
 MODEL_TRAINING_PRIORITY=HIGH
-R0_V3=READY_TO_EXECUTE
+R0_V3=BLOCKED
 GLOBAL_MODEL=EVIDENCE_SELECTED_AFTER_R1
 GLOBAL_MODEL_LEADING_CANDIDATE=NONE_BEFORE_R1
 R1=THREE_CANDIDATE_CE_FIRST_BENCHMARK
@@ -40,13 +40,18 @@ HL7_FHIR=PLANNED_AFTER_MODEL_GUI
 PUBLIC_GPU_PRIVATE_DATA=FORBIDDEN
 ```
 
-R0_V3=READY_TO_EXECUTE and has not passed after the supervision/taxonomy/pretraining-overlap audit. R1 is a three-
-candidate CE-first benchmark and is READY_NOT_EXECUTED. Do not launch a large GPU run, provision RunPod, or download a large dataset
-in this documentation gate; use provider-neutral configurable storage roots for the future public-data run.
+R0_V3 is complete but blocked after the supervision/taxonomy/pretraining-overlap audit. R1 is a three-candidate CE-first
+benchmark and is READY_NOT_EXECUTED. Do not launch a large GPU run, provision RunPod, or download a large dataset in this
+documentation gate; use provider-neutral configurable storage roots for the future public-data run.
 
 Before cross-package or cross-runtime work, read `docs/CTR_MODULE_CONTRACT.md`. Respect module ownership, dependency direction,
 and data/runtime boundaries. Phases define execution order; modules define architectural ownership. Use `docs/PROJECT_MAP.md`
 for human/team navigation.
+
+At the start of every task, read `HANDOFF.md` after this file and the active master plan. Update `HANDOFF.md` when closing a
+phase or gate, or before a machine/session transfer. `HANDOFF.md` is operational state only; it never overrides contracts,
+the master plan, or other authoritative specifications. Never put PHI, credentials, secrets, private data, or machine-local
+secrets in `HANDOFF.md`.
 
 ## Source of Truth and Scope Discipline
 

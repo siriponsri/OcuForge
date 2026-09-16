@@ -37,8 +37,9 @@ def relative_path(value):
 
 
 def validate_freeze(data):
-    if data.get("status") != "R0_V3=READY_TO_EXECUTE":
-        raise ValueError("R0 V3 must be ready to execute, not marked passed")
+    status = data.get("status")
+    if status not in {"R0_V3=PASS", "R0_DATASET_TAXONOMY=BLOCKED"}:
+        raise ValueError("R0 V3 must be PASS or explicitly BLOCKED")
     if data.get("authority") != "docs/POC_MASTER_PLAN.md and docs/R0_DATASET_SUPERVISION_FREEZE.md":
         raise ValueError("R0 audit must name the V3 authority")
     selected = {row["role"]: row for row in data.get("candidate_datasets", [])}
@@ -63,7 +64,7 @@ def validate_freeze(data):
     }
     if any(not required_fields.issubset(row) for row in selected.values()):
         raise ValueError("R0 candidate dataset records are missing supervision audit fields")
-    valid_supervision_types = {"image_level", "point", "box", "polygon", "mask", "none"}
+    valid_supervision_types = {"image_level", "point", "box", "polygon", "mask", "none", "unknown"}
     if any(
         row["lesion_supervision"].get("type") not in valid_supervision_types
         for row in selected.values()
@@ -106,6 +107,33 @@ def validate_freeze(data):
         for row in overlap
     ):
         raise ValueError("Foundation overlap status is not explicit")
+    assets = data.get("model_asset_audit")
+    if not isinstance(assets, list) or {row.get("candidate_id") for row in assets} != {"C0", "C1", "C2"}:
+        raise ValueError("R0 must audit assets and overlap for C0, C1, and C2")
+    required_asset_fields = {
+        "candidate_id",
+        "asset",
+        "source",
+        "asset_revision",
+        "access_status",
+        "license_status",
+        "preprocessing",
+        "pretraining_corpus",
+        "overlap_with_r1_mmrdr",
+        "overlap_status",
+        "weight_sha256",
+        "claim_consequence",
+    }
+    if any(not required_asset_fields.issubset(row) for row in assets):
+        raise ValueError("Model asset audit fields are incomplete")
+    if status == "R0_DATASET_TAXONOMY=BLOCKED":
+        blockers = data.get("blockers")
+        if not isinstance(blockers, list) or not blockers:
+            raise ValueError("Blocked R0 freeze must record exact blockers")
+        if data.get("r1_status") != "R1_GLOBAL_BENCHMARK=READY_NOT_EXECUTED":
+            raise ValueError("Blocked R0 freeze must preserve R1 readiness")
+        if data.get("current_r1_champion") != "NONE":
+            raise ValueError("Blocked R0 freeze cannot claim an R1 champion")
     metrics = data["metrics"]
     for key in ["QWK for genuine ordinal grades", "macro F1", "accuracy"]:
         if key not in metrics["global_dr"]:

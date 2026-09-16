@@ -6,7 +6,7 @@ OcuForge เป็นโครงงานวิจัยและระบบ�
 ## สถานะปัจจุบัน
 
 ```text
-R0_V3 = READY_TO_EXECUTE / NOT_YET_PASSED
+R0_V3 = COMPLETE / BLOCKED
 R1 C0/C1/C2 = READY_NOT_EXECUTED
 CURRENT_R1_CHAMPION = NONE
 ```

@@ -5,13 +5,20 @@
 The current planning authority is [`docs/POC_MASTER_PLAN.md`](../docs/POC_MASTER_PLAN.md). At this gate:
 
 ```text
-R0_V3 = READY_TO_EXECUTE / NOT_YET_PASSED
+R0_V3 = COMPLETE / BLOCKED
 R1 C0/C1/C2 = READY_NOT_EXECUTED
 CURRENT_R1_CHAMPION = NONE
 ```
 
 This report records repository validation only. It does not certify a model, dataset, clinical workflow, deployment,
 or generalization claim.
+
+## R0 freeze outcome
+
+The R0 evidence gate ended as `R0_DATASET_TAXONOMY=BLOCKED`. MMRDR-UWF remains the primary R1 hypothesis, IDRiD
+remains the primary spatial candidate, DDR/OIA-DDR is not admitted, and R1 remains `READY_NOT_EXECUTED` with no
+champion. Exact blockers, asset revisions, overlap findings, and the future download manifest are recorded in the
+[machine-readable freeze](../docs/RSC_R0_DATASET_TAXONOMY_FREEZE_v0.1.json).
 
 ## Reconciliation scope
 
@@ -33,10 +40,10 @@ The final command results are recorded below after the repository checks complet
 
 | Check | Result |
 |---|---|
-| Pytest | PASS - 103 passed |
+| Pytest | PASS - 104 passed |
 | Ruff | PASS |
 | Configuration validation | PASS - 25 files |
-| Package file validation | PASS - 324 reviewed files |
+| Package file validation | PASS - 325 reviewed files |
 | Diagram Design HTML self-check | PASS - 5 HTML files |
 | R0/R1 machine-readable validator | PASS |
 | Synthetic CPU roundtrip | PASS - 10 synthetic images; scientific result eligible: false |

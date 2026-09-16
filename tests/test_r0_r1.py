@@ -35,6 +35,17 @@ def test_r0_freeze_requires_explicit_supervision_fields():
         validate_freeze(mutated)
 
 
+def test_r0_freeze_records_blocked_outcome_with_exact_blockers():
+    freeze = load_json(ROOT / "docs/RSC_R0_DATASET_TAXONOMY_FREEZE_v0.1.json")
+    assert freeze["status"] == "R0_DATASET_TAXONOMY=BLOCKED"
+    assert freeze["blockers"]
+    validate_freeze(freeze)
+    mutated = copy.deepcopy(freeze)
+    mutated.pop("blockers")
+    with pytest.raises(ValueError, match="exact blockers"):
+        validate_freeze(mutated)
+
+
 def test_r1_freeze_requires_provider_neutral_storage():
     config = load_json(ROOT / "eyes-detected-models/configs/research/r1-global-benchmark.json")
     validate_r1(config, ROOT)

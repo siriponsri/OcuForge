@@ -10,13 +10,15 @@ product. The only active direction is [`docs/POC_MASTER_PLAN.md`](docs/POC_MASTE
 ## Current Gate
 
 ```text
-R0_V3 = READY_TO_EXECUTE / NOT_YET_PASSED
+R0_V3 = BLOCKED
 R1 C0/C1/C2 = READY_NOT_EXECUTED
 CURRENT_R1_CHAMPION = NONE
 ```
 
-This documentation gate does not download data, train models, provision cloud compute, or claim scientific
-performance. The next action is owner and architect review of the V3 direction.
+R0 evidence review is complete but blocked on exact dataset terms/checksums/identity evidence, IDRiD negative ROI
+semantics, and candidate asset hash/overlap evidence. No data or weights were downloaded, no model was trained, and
+no cloud compute was provisioned. The exact blockers and future download manifest are in the
+[`R0 freeze record`](docs/RSC_R0_DATASET_TAXONOMY_FREEZE_v0.1.json).
 
 ## New Direction
 
