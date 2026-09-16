@@ -102,10 +102,18 @@ Required companions:
 - calibration;
 - class support;
 - AUROC/AUPRC where task semantics justify;
-- latency;
+- CPU inference latency;
+- peak RAM;
+- serialized model size;
+- preprocessing latency;
+- GPU training cost;
 - VRAM / runtime.
 
 Do not select a champion from accuracy alone.
+
+Deployment practicality is a required selection axis for R1 and the later R3 ROI benchmark. Measure shortlisted
+models on the intended local/on-premise inference environment where possible. The numerically strongest scientific
+model is not the POC deployment champion when local inference is impractical.
 
 ## External/generalization gate
 
@@ -136,6 +144,7 @@ Never reuse a cache across incompatible preprocessing/model revisions.
 - baseline comparison;
 - selected architecture and rationale;
 - artifact/model metadata;
+- deployment-practicality measurements and selection rationale;
 - exact reproducible config/command;
 - no leakage finding.
 

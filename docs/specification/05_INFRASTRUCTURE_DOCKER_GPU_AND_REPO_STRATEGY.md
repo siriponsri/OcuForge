@@ -8,7 +8,8 @@ Use the right tool for each job:
 Git repository = source of truth
 Docker         = reproducible runtime
 Local server   = clinical data + annotation
-GPU provider   = burst research compute
+GPU provider   = burst public/synthetic research compute
+Local/on-prem  = authoritative inference and clinical integration
 Artifact store = checkpoints / features / reports
 ```
 
@@ -109,7 +110,10 @@ Candidate providers:
 - institutional GPU;
 - on-prem workstation.
 
-Public datasets may use cheapest suitable compute.
+Public/synthetic model training, temporary feature extraction, and temporary experiment compute may use the cheapest
+suitable provider. A persistent cloud volume is optional training workspace/cache only; it is not authoritative
+deployment infrastructure or production storage. The local/on-premise environment remains authoritative for inference,
+model archives, clinical integrations, and all hospital/private data and derived artifacts.
 
 Local hospital images:
 - local-only by default;
@@ -146,6 +150,9 @@ Every run records:
 - seed;
 - GPU model;
 - runtime versions.
+
+Deployment evaluation also records CPU inference latency, peak RAM, serialized model size, preprocessing latency, and
+GPU training cost. Scientific accuracy alone does not select the deployment champion.
 
 ---
 
@@ -184,11 +191,20 @@ Artifact store:
 - large logs;
 - exports.
 
+Public cloud volumes may hold temporary public/synthetic research artifacts during an approved run. Champion weights and
+model archives are downloaded from training infrastructure and retained locally/on-premise for authoritative inference.
+GitHub stores code, configs, safe manifests, model metadata, hashes, and appropriate metrics/reports, but not large
+weights, DINOv3 base weights, feature caches, or scientific checkpoints. Any future public/private artifact hosting
+requires upstream license compliance and explicit approval.
+
 Potential stores:
 - local NAS;
 - S3-compatible MinIO;
 - approved object storage;
 - Hugging Face repositories for eligible public artifacts.
+
+Any external artifact host is optional and requires explicit approval plus upstream license review; it is never the
+authoritative store for hospital/private artifacts.
 
 Raw local medical data should not be placed on public model/dataset hubs.
 

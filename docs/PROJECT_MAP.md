@@ -54,8 +54,11 @@ references. Hospital images, clinical labels, patient linkage, hospital-derived 
 predictions, annotation revisions, hospital-trained checkpoints, backups, and credentials remain local/on-premises.
 
 `PUBLIC_GPU` (Vast/RunPod) may use only explicitly reviewed public datasets, synthetic data, public model weights with
-reviewed terms, and public/synthetic derived artifacts. It is not an extension of the hospital network. No module
-may silently upload private data or provision cloud resources.
+reviewed terms, and public/synthetic derived artifacts for temporary training, feature extraction, and experiments. An
+optional persistent volume is a research workspace/cache, not authoritative deployment or production storage. It is not
+an extension of the hospital network. Local/on-premise is the authoritative inference and clinical integration
+environment. Vercel is a public/synthetic demo frontend target only and may not require PHI or become authoritative
+clinical inference. No module may silently upload private data or provision cloud resources.
 
 ## Current Phase And Gate Status
 

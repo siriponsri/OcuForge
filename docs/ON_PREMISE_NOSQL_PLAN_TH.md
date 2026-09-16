@@ -5,7 +5,7 @@
 
 ## ข้อสรุปที่ใช้พัฒนา
 
-ใช้ MongoDB Community เก็บเอกสาร metadata, สถานะงาน, label และประวัติการแก้ไข ส่วนภาพต้นฉบับเก็บเป็นไฟล์ immutable บนดิสก์/NAS ภายในโรงพยาบาล เชื่อมกันด้วย `image_id`, `relative_uri` และ SHA-256 ภาพและ label รวมถึง feature, prediction, checkpoint ที่สร้างจากข้อมูลโรงพยาบาล **ห้ามส่งออก cloud** แม้เปลี่ยนชื่อผู้ป่วยแล้วก็ตาม GitHub เก็บเฉพาะโค้ด/config/template/synthetic fixture
+ใช้ MongoDB Community เก็บเอกสาร metadata, สถานะงาน, label และประวัติการแก้ไข ส่วนภาพต้นฉบับเก็บเป็นไฟล์ immutable บนดิสก์/NAS ภายในโรงพยาบาล เชื่อมกันด้วย `image_id`, `relative_uri` และ SHA-256 ภาพและ label รวมถึง feature, prediction, checkpoint ที่สร้างจากข้อมูลโรงพยาบาล **ห้ามส่งออก cloud** แม้เปลี่ยนชื่อผู้ป่วยแล้วก็ตาม GitHub เก็บโค้ด/config/safe manifest/model metadata/hash/report ที่เหมาะสมและ synthetic fixture เท่านั้น
 
 การไม่เก็บบน cloud หมายถึงทั้งระบบใช้งานจริง การสำรองข้อมูล log และ telemetry ไม่ใช่เพียงฐานข้อมูลหลัก: ไม่ใช้ MongoDB Atlas, Vercel Blob, S3 หรือ hosted analytics สำหรับงานคลินิก แยก Vast.ai/RunPod เป็นสภาพแวดล้อม public/synthetic เท่านั้น ไม่มี hospital volume หรือ hospital credential ในเครื่องเหล่านั้น
 

@@ -1,4 +1,5 @@
-# Only reviewed PUBLIC or SYNTHETIC input. No hospital mounts, tokens or automatic uploads.
+# Temporary PUBLIC_GPU workspace for reviewed PUBLIC or SYNTHETIC training/extraction/experiments only.
+# Never mount hospital data or treat this volume as authoritative deployment/production storage.
 services:
   models:
     build:

@@ -43,6 +43,19 @@ QA; [templates/](templates/) is the preferred customer-facing GUI reference and 
 adapters. CVAT remains optional advanced annotation infrastructure. DICOM, model monitoring, and HL7/FHIR remain
 deferred.
 
+## Compute and deployment boundary
+
+RunPod and Vast are optional burst-compute environments for public/synthetic model training, temporary feature
+extraction, and experiments. A persistent cloud volume is an optional training workspace/cache, not authoritative
+deployment infrastructure or production storage. Public GPU runs may use only reviewed public/synthetic data and
+eligible public model assets.
+
+Local/on-premise infrastructure is the authoritative inference environment. It archives champion weights and
+model metadata, and it owns the Model API, DR Review Workspace, Label Studio, DICOM, model diff/drift, HL7/FHIR,
+and all hospital/private data and derived artifacts. Vercel is the preferred public/demo frontend target for
+adapters or serverless components using public/synthetic data only; measured CPU inference may be attempted there,
+but Vercel is not the authoritative clinical inference environment.
+
 ## Project Status
 
 | Work item | Status |
@@ -146,7 +159,10 @@ AI predictions, evidence maps and candidate lesions are research outputs. DME is
 
 ## On-premises storage and expanded pipelines
 
-Hospital images, labels, features, predictions, checkpoints and backups stay on hospital-owned infrastructure. MongoDB stores metadata and immutable annotation revisions; local disks/NAS store image objects by SHA-256. CVAT retains its own PostgreSQL and volumes. GitHub stores code/configuration and synthetic fixtures only.
+Hospital images, labels, features, predictions, checkpoints and backups stay on hospital-owned infrastructure. MongoDB
+stores metadata and immutable annotation revisions; local disks/NAS store image objects by SHA-256. CVAT retains its
+own PostgreSQL and volumes. GitHub stores code, configs, safe manifests, model metadata, hashes, appropriate reports,
+and synthetic fixtures only.
 
 - [แผน NoSQL ภายในโรงพยาบาล](docs/ON_PREMISE_NOSQL_PLAN_TH.md): schema, versioning, access boundaries, capacity, backup and restore acceptance.
 - [Local MongoDB Compose](deploy/onprem/README.md): authenticated database with no published port, local image ingestion and trusted operator commands (`eyes-local`).
@@ -166,16 +182,19 @@ OCUFORGE_CACHE_ROOT=/workspace/cache
 OCUFORGE_ARTIFACT_ROOT=/workspace/artifacts
 ```
 
-The preferred RunPod layout is `data/mmrdr`, `data/idrid`, `data/manifests`, `models/dinov3`,
-`cache/features`, and `artifacts/experiments`. RunPod is optional, not a code dependency. Dataset bytes, model
-weights, feature caches, checkpoints, and predictions stay outside Git; GitHub stores code, safe manifests,
-hashes, and metadata only. Download reviewed public data directly to the mounted volume when a future GPU gate
-authorizes it. Do not provision a provider or download a large dataset in the current R0 V2 reconciliation gate.
+The preferred research layout is `data/mmrdr`, `data/idrid`, `data/manifests`, `models/dinov3`, `cache/features`,
+and `artifacts/experiments`. RunPod/Vast are optional, not code dependencies. Dataset bytes, large model weights,
+DINOv3 base weights, feature caches, scientific checkpoints, and predictions stay outside normal Git; GitHub
+stores code, configs, safe manifests, model metadata, hashes, and appropriate metrics/reports only. Download
+reviewed public data directly to the mounted research volume when a future GPU gate authorizes it. Champion
+artifacts are archived locally after training. Do not provision a provider or download a large dataset in the
+current R0 V2 reconciliation gate.
 
 Vast.ai/RunPod runners accept only reviewed public or synthetic manifests and public model assets. No automatic
-transfer or provisioning is implemented. Hospital data and derived artifacts remain on-premises. Vercel is
-reserved for synthetic demos/documentation; the clinical application is not deployed there. MongoDB/CVAT/GPU
-live deployment remains a target-host acceptance gate; see the measured report.
+transfer or provisioning is implemented. Hospital data and derived artifacts remain on-premises. Future model-artifact
+hosting requires upstream license review and explicit approval. Vercel is reserved for the public/synthetic demo
+frontend and adapter/serverless components; it must not require PHI or become authoritative clinical inference or
+production storage. MongoDB/CVAT/GPU live deployment remains a target-host acceptance gate; see the measured report.
 
 ## Documentation
 

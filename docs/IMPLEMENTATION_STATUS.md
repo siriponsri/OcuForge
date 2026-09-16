@@ -20,16 +20,19 @@ Not implemented: execution of the real R1 G0-G5 benchmark, ROI model baseline, L
 customer-facing interactive GUI, enterprise IAM, automatic amendment UI, full clinical
 calibration/metrics/validation, trained lesion localization, adaptation training,
 automatic public dataset downloads or cloud transfers. Existing CVAT workflow remains
-retained infrastructure; it is not deleted or migrated. Vercel clinical deployment is
-excluded by the user's on-premises requirement.
+retained infrastructure; it is not deleted or migrated. The authoritative local Model API and production
+inference integration remain future work. Vercel public/synthetic demo deployment is also future work; it must not become a
+clinical inference or production storage environment.
 
 R0 candidate evidence and decisions are in [RSC_R0_DATASET_TAXONOMY_FREEZE_v0.1.json](RSC_R0_DATASET_TAXONOMY_FREEZE_v0.1.json),
 with the acceptance protocol in [R0_DATASET_SUPERVISION_FREEZE.md](R0_DATASET_SUPERVISION_FREEZE.md). MMRDR is a
 candidate global source; IDRiD remains local-audit-only for now. R1 storage uses configurable
 `OCUFORGE_DATA_ROOT`, `OCUFORGE_MODEL_ROOT`, `OCUFORGE_CACHE_ROOT`, and `OCUFORGE_ARTIFACT_ROOT` values.
-RunPod Network Volume is a possible persistent public-data option, but no provider is required by the code. The
-R1 benchmark definition is [R1_GLOBAL_MODEL_SELECTION.md](R1_GLOBAL_MODEL_SELECTION.md); no candidate is a
-predetermined champion.
+RunPod/Vast are possible temporary public/synthetic training, feature-extraction, and experiment environments; an
+optional persistent volume is a workspace/cache, not authoritative deployment or production storage. No provider is
+required by the code. The R1 benchmark definition is [R1_GLOBAL_MODEL_SELECTION.md](R1_GLOBAL_MODEL_SELECTION.md);
+no candidate is a predetermined champion. R1/R3 selection must include CPU inference latency, peak RAM, model
+size, preprocessing latency, and GPU training cost alongside scientific metrics.
 
 The repository is live at https://github.com/siriponsri/OcuForge. Remote publication and local validation are reported
 separately; live MongoDB, CVAT, Docker, and GPU acceptance remain external gates.

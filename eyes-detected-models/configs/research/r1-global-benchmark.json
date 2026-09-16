@@ -73,16 +73,32 @@
       "calibration",
       "class_support",
       "AUROC_AUPRC_WHERE_MEANINGFUL",
-      "latency",
-      "VRAM"
+      "cpu_inference_latency",
+      "peak_ram",
+      "serialized_model_size",
+      "preprocessing_latency",
+      "gpu_training_cost",
+      "VRAM_RUNTIME"
     ],
     "external_evaluation": "required when a valid independent compatible dataset is available"
+  },
+  "deployment_practicality": {
+    "required_metrics": [
+      "cpu_inference_latency",
+      "peak_ram",
+      "serialized_model_size",
+      "preprocessing_latency",
+      "gpu_training_cost"
+    ],
+    "authoritative_inference_environment": "LOCAL_ON_PREM",
+    "selection_rule": "scientific evidence and deployment practicality are both required; highest metric alone is not sufficient"
   },
   "pass_condition": [
     "real reviewed public data",
     "authorized real DINOv3 weights",
     "held-out evaluation for the benchmark ladder",
     "versioned artifact metadata and reproducible configuration",
+    "deployment-practicality measurements and selection rationale",
     "no leakage finding"
   ],
   "storage_roots": {
@@ -91,6 +107,7 @@
     "cache_env": "OCUFORGE_CACHE_ROOT",
     "artifact_env": "OCUFORGE_ARTIFACT_ROOT",
     "preferred_storage": "provider-neutral persistent public research filesystem",
+    "authoritative_champion_archive": "LOCAL_ON_PREM",
     "provider_required": false,
     "layout": {
       "data": "mmrdr/uwf",

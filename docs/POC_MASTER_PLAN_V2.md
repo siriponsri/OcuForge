@@ -29,7 +29,15 @@ The current GUI package already supports the intended product direction: Overvie
 - Research/POC output is decision support, not diagnosis.
 - Split by patient/eye/image identity **before** generating derived ROIs/patches.
 - Never random-split derived patches across train/test.
-- GitHub contains code/config/safe manifests only; not dataset bytes, public model weights, feature caches, or scientific checkpoints.
+- GitHub contains code/config/safe manifests, model metadata, hashes, and appropriate metrics/reports only. Do not
+  commit dataset bytes, large model weights, DINOv3 base weights, feature caches, or scientific checkpoints.
+- RunPod/Vast are temporary public/synthetic research compute for model training, feature extraction, and
+  experiments; they are not authoritative deployment or production storage.
+- Local/on-premise infrastructure is the authoritative inference and clinical integration environment for model
+  archives, the Model API, DR Review Workspace, Label Studio, DICOM, model diff/drift, and HL7/FHIR.
+- Vercel is a preferred public/demo frontend target only. It may use adapters/serverless components and measured CPU
+  inference with public/synthetic data, but it must never require hospital data or become the authoritative clinical
+  inference environment.
 
 ## 3. Product architecture
 
@@ -127,11 +135,18 @@ Companions:
 - AUROC/AUPRC where meaningful;
 - calibration;
 - class support;
-- inference latency;
-- model size/VRAM;
+- CPU inference latency;
+- peak RAM;
+- serialized model size and GPU VRAM/runtime;
+- preprocessing latency;
+- GPU training cost;
 - external/domain-shift evaluation when a valid independent dataset is available.
 
 Attention visualization is explanatory aggregation evidence only.
+
+Deployment practicality is a required R1/R3 selection axis. Measure the same deployment-relevant quantities for
+shortlisted candidates on the intended local/on-premise inference hardware where possible. The numerically highest
+scientific metric is not automatically the POC deployment champion if local inference is impractical.
 
 R1 becomes `PASS` only after real public data + real authorized DINOv3 weights + held-out results + versioned artifact metadata exist.
 
@@ -198,7 +213,14 @@ Evaluate:
 - calibration;
 - class counts;
 - no-supported-lesion behavior;
-- latency.
+- CPU inference latency;
+- peak RAM;
+- serialized model size;
+- preprocessing latency;
+- GPU training cost.
+
+Deployment practicality is evaluated alongside scientific metrics. A numerically strongest ROI model is not the POC
+deployment champion if its local/on-premise inference cost or latency is impractical.
 
 For microaneurysm and other tiny lesions, preserve sufficient native resolution and evaluate crop/context size rather than relying on aggressively resized full images.
 
@@ -252,6 +274,9 @@ Current intended model endpoints:
 The latter two remain proposed integration targets until implemented.
 
 The browser should depend on an adapter/bridge rather than direct Label Studio credentials or model-internal implementation details.
+The authoritative implementation target for these endpoints is the local/on-premise Model API. A Vercel deployment
+may serve only public/synthetic demo components and may attempt CPU inference only after measured practicality; it is
+not a clinical inference or production storage environment.
 
 ---
 
@@ -301,32 +326,64 @@ The current plan is motivated by the following evidence themes:
 - DDR: public DR data with a spatially annotated lesion subset useful for lesion-focused work, subject to exact source/version/license audit.
 - MMRDR: useful for multimodal/global DR and image-level lesion information, but image-level lesion presence must not be reinterpreted as ROI localization supervision.
 
-## 6. Compute strategy
+## 6. Compute and deployment strategy
+
+### Research compute boundary
+
+RunPod and Vast are optional burst-compute choices for **public/synthetic model training**, temporary feature
+extraction, and temporary experiment execution. A persistent cloud volume may be used as a training workspace or
+cache, but it is not authoritative deployment infrastructure or production storage. Public GPU mounts may contain
+only reviewed public/synthetic inputs and eligible public model assets.
+
+### Authoritative local/on-premise boundary
+
+The authoritative runtime is local/on-premise. Downloaded champion weights and model archives are copied from the
+training environment and retained locally with hashes and metadata. The local/on-premise environment owns the Model
+API, DR Review Workspace, Label Studio, DICOM integration, model diff/drift, HL7/FHIR integration, and all hospital
+or private data and derived artifacts.
+
+### Public/demo frontend boundary
+
+Vercel is the preferred public/demo frontend target. It may host adapters or serverless demo components using only
+public/synthetic data. Optimized CPU inference may be attempted only when measured practical for the demo. Vercel
+must never require hospital images or PHI and must not become the authoritative clinical inference environment.
+
+### Model artifact policy
+
+Normal Git stores code, configs, safe manifests, model metadata, hashes, and appropriate metrics/reports. It does not
+store large model weights, DINOv3 base weights, feature caches, or scientific checkpoints. Champion artifacts are
+downloaded from the training infrastructure and archived locally. Any future public or private model-artifact
+hosting requires upstream license compliance and explicit approval.
 
 Preferred research storage design:
 
 ```text
 GitHub
-  code / config / safe manifests
+  code / config / safe manifests / model metadata / hashes / metrics and reports
 
-RunPod Network Volume (public research only)
+RunPod/Vast persistent volume (optional public research workspace/cache only)
   /workspace/data
   /workspace/models
   /workspace/cache
   /workspace/artifacts
 ```
 
-Storage roots must remain configurable so the same code works on RunPod, Vast, local Linux, and on-prem systems.
+Storage roots must remain configurable so the same code works on RunPod, Vast, local Linux, and on-prem systems;
+provider-mounted research roots are never the authoritative clinical storage roots.
 
 Recommended GPU-spend strategy:
 
 1. R0 on CPU.
-2. Preload reviewed public datasets to persistent volume.
+2. Preload reviewed public datasets to an optional persistent research volume.
 3. Cache frozen DINOv3 features once where scientifically valid.
 4. Compare cheap heads/pooling from the same frozen feature source.
 5. Only after a winner emerges, pay for partial fine-tuning.
 6. Keep ROI and global experiments independently versioned.
 7. Avoid provisioning expensive GPU merely to download/unpack data.
+
+Deployment selection for R1 and R3 must report CPU inference latency, peak RAM, serialized model size,
+preprocessing latency, and GPU training cost alongside scientific metrics. Select the deployment champion from both
+evidence sets; do not promote a numerically best but locally impractical model by default.
 
 ## 7. Change relative to the previous plan
 

@@ -12,7 +12,8 @@ export OCUFORGE_CACHE_ROOT=/workspace/cache
 export OCUFORGE_ARTIFACT_ROOT=/workspace/artifacts
 ```
 
-RunPod Network Volume เป็นตัวเลือก persistent storage ที่แนะนำ แต่ไม่ใช่ dependency; root เดียวกันใช้กับ
+RunPod Network Volume เป็นตัวเลือก workspace/cache สำหรับ public research เท่านั้น ไม่ใช่ authoritative deployment หรือ
+production storage และไม่ใช่ dependency; root เดียวกันใช้กับ
 filesystem อื่นได้ด้วย layout `data/mmrdr`, `data/idrid`, `data/manifests`, `models/dinov3`,
 `cache/features`, `artifacts/experiments`. Git เก็บเฉพาะ code, safe manifests, hashes และ metadata.
 
@@ -53,7 +54,10 @@ MIL attention เป็น model evidence; predictions.jsonl ไม่สร้�
 RunPod ใช้ Dockerfile/launcher เดียวกันบน container ที่ผู้ใช้จัดเตรียม ไม่สมมติว่ามี connected plugin และ
 ไม่บังคับให้ใช้ RunPod. สำหรับ R1 G0-G5 ใช้ benchmark record ใน
 `eyes-detected-models/configs/research/r1-global-benchmark.json`; ต้อง mount manifest/data/model roots เอง,
-ตรวจ hash/สิทธิ์ก่อนรัน และยังไม่ provision หรือ download dataset ขนาดใหญ่ใน current documentation gate. Vercel ใช้ได้เฉพาะ
-เอกสารหรือ synthetic demo; clinical UI/API/database ไม่ deploy ที่นั่น
+ตรวจ hash/สิทธิ์ก่อนรัน และยังไม่ provision หรือ download dataset ขนาดใหญ่ใน current documentation gate. Vercel เป็น
+preferred public/synthetic demo frontend สำหรับ adapter/serverless component และอาจทดลอง CPU inference เมื่อวัดแล้วว่า
+เหมาะสมเท่านั้น; clinical UI/API/database และ authoritative inference ไม่ deploy ที่นั่น. Champion weights ต้อง archive
+ที่ local/on-prem หลัง training. Git เก็บเฉพาะ code/config/safe manifests/model metadata/hashes/metrics ไม่เก็บ large
+weights, DINOv3 base weights, feature cache หรือ scientific checkpoint.
 
 [Vast SSH connection](https://docs.vast.ai/guides/instances/connect/ssh)

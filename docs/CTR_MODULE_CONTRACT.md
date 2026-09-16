@@ -429,6 +429,13 @@ non-private experiment configuration
 
 `Vast.ai` and `RunPod` are `PUBLIC_GPU`, not extensions of the hospital network.
 
+`PUBLIC_GPU` is limited to temporary public/synthetic model training, feature extraction, and experiment compute. A
+persistent provider volume may be used as a workspace/cache, but it is not authoritative deployment or production
+storage. Local/on-premise infrastructure is authoritative for inference, model/champion archives, clinical APIs,
+and integrations, and all hospital/private data and derived artifacts. Vercel may host only public/synthetic demo
+frontend adapters or serverless components and is not an authoritative clinical inference environment. Any future
+model-artifact hosting requires upstream license compliance and explicit approval.
+
 ---
 
 ## 6. File Naming Contract
