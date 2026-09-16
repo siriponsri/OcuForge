@@ -1,9 +1,9 @@
 # R1 Global DR Model Selection Protocol
 
-**Status:** ACTIVE SUPPORTING PROTOCOL · `R1_GLOBAL_BENCHMARK=READY_NOT_EXECUTED`
+**Status:** ACTIVE SUPPORTING PROTOCOL · `R1_P0_ACQUISITION_PREFLIGHT=READY_NOT_EXECUTED` · `R1_GLOBAL_BENCHMARK=READY_NOT_EXECUTED`
 **Authority:** [`POC_MASTER_PLAN.md`](POC_MASTER_PLAN.md)
 
-R1 selects a defensible global ordinal DR architecture after R0 passes. It is not a training instruction for this
+R1 selects a defensible global ordinal DR architecture after R0 and R1-P0 pass. It is not a training instruction for this
 reconciliation and it does not claim a current model result.
 
 ## Target and candidates
@@ -18,6 +18,7 @@ Target: genuine ordinal diabetic-retinopathy grade 0–4. The active registry is
 | C2 | DINOv3 ViT-B/16 + high-resolution patch Attention MIL | Does local detail survive better than global resizing? | CE |
 
 All three records require explicit asset revision, preprocessing, license/access status, and hashes before execution.
+R1-P0 owns local weight hashes, access, preprocessing smoke, and model loading; no candidate may train before P0 passes.
 C1 must not silently become a different foundation model if FLAIR cannot be loaded. C2 attention is model aggregation
 evidence only, never a lesion mask.
 

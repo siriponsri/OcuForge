@@ -5,7 +5,8 @@
 The current planning authority is [`docs/POC_MASTER_PLAN.md`](../docs/POC_MASTER_PLAN.md). At this gate:
 
 ```text
-R0_V3 = COMPLETE / BLOCKED
+R0_V3 = PASS
+R1_P0_ACQUISITION_PREFLIGHT = READY_NOT_EXECUTED
 R1 C0/C1/C2 = READY_NOT_EXECUTED
 CURRENT_R1_CHAMPION = NONE
 ```
@@ -15,9 +16,10 @@ or generalization claim.
 
 ## R0 freeze outcome
 
-The R0 evidence gate ended as `R0_DATASET_TAXONOMY=BLOCKED`. MMRDR-UWF remains the primary R1 hypothesis, IDRiD
+The R0 evidence gate passed as `R0_DATASET_TAXONOMY=PASS`. MMRDR-UWF remains the primary R1 hypothesis, IDRiD
 remains the primary spatial candidate, DDR/OIA-DDR is not admitted, and R1 remains `READY_NOT_EXECUTED` with no
-champion. Exact blockers, asset revisions, overlap findings, and the future download manifest are recorded in the
+champion. Byte-dependent checks are reclassified to R1-P0. Exact findings, asset revisions, overlap limits, and the
+future download manifest are recorded in the
 [machine-readable freeze](../docs/RSC_R0_DATASET_TAXONOMY_FREEZE_v0.1.json).
 
 ## Reconciliation scope
@@ -40,12 +42,12 @@ The final command results are recorded below after the repository checks complet
 
 | Check | Result |
 |---|---|
-| Pytest | PASS - 104 passed |
+| Pytest | PASS - 106 passed |
 | Ruff | PASS |
 | Configuration validation | PASS - 25 files |
-| Package file validation | PASS - 325 reviewed files |
+| Package file validation | PASS - 327 reviewed files |
 | Diagram Design HTML self-check | PASS - 5 HTML files |
-| R0/R1 machine-readable validator | PASS |
+| R0/R1/P0 machine-readable validator | PASS |
 | Synthetic CPU roundtrip | PASS - 10 synthetic images; scientific result eligible: false |
 | `git diff --check` | PASS |
 

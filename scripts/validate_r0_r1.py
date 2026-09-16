@@ -8,6 +8,7 @@ from pathlib import PurePosixPath
 ROOT = Path(__file__).resolve().parents[1]
 FREEZE = ROOT / "docs/RSC_R0_DATASET_TAXONOMY_FREEZE_v0.1.json"
 R1 = ROOT / "eyes-detected-models/configs/research/r1-global-benchmark.json"
+R1_P0 = ROOT / "docs/R1_P0_ACQUISITION_PREFLIGHT.json"
 REQUIRED_ROI = {
     "MICROANEURYSM",
     "INTRARETINAL_HEMORRHAGE",
@@ -126,6 +127,48 @@ def validate_freeze(data):
     }
     if any(not required_asset_fields.issubset(row) for row in assets):
         raise ValueError("Model asset audit fields are incomplete")
+    if any(
+        not isinstance(row.get("source"), str)
+        or not row["source"]
+        or not isinstance(row.get("asset_revision"), str)
+        or not row["asset_revision"]
+        or not isinstance(row.get("license_status"), str)
+        or not row["license_status"]
+        for row in assets
+    ):
+        raise ValueError("R0 model asset source, revision, and license are required")
+    allowed_asset_overlap = {"CONFIRMED", "EXCLUDED", "UNKNOWN", "POTENTIALLY_CONTAMINATED"}
+    if any(row["overlap_status"] not in allowed_asset_overlap for row in assets):
+        raise ValueError("R0 model asset overlap status is not explicit")
+    manifest = data.get("future_download_manifest")
+    if not isinstance(manifest, dict) or manifest.get("download_now") is not False:
+        raise ValueError("R0 must contain a deferred future download manifest")
+    if not manifest.get("datasets") or not manifest.get("model_assets"):
+        raise ValueError("R0 future download manifest must cover datasets and model assets")
+    if status == "R0_V3=PASS":
+        if data.get("r0_taxonomy_status") != "R0_DATASET_TAXONOMY=PASS":
+            raise ValueError("R0 V3 PASS must include a passing R0 taxonomy status")
+        if data.get("blockers"):
+            raise ValueError("R0 PASS cannot retain active blockers")
+        findings = data.get("reclassified_findings")
+        if not isinstance(findings, list) or not findings:
+            raise ValueError("R0 PASS must preserve reclassified acquisition findings")
+        allowed_finding_gates = {
+            "R0_SATISFIED_WITH_SEPARATE_LICENSE_RECORD",
+            "R0_KNOWN_IDENTITY_LIMITATION",
+            "R0_SATISFIED_CONSERVATIVE_NEGATIVE_POLICY",
+            "R1_P0_ACQUISITION_PREFLIGHT",
+        }
+        if any(row.get("gate") not in allowed_finding_gates for row in findings):
+            raise ValueError("R0 findings must use R0 dispositions or R1-P0")
+        if not any(row.get("gate") == "R1_P0_ACQUISITION_PREFLIGHT" for row in findings):
+            raise ValueError("R0 must move byte-dependent checks to R1-P0")
+        if data.get("r1_p0_status") != "R1_P0_ACQUISITION_PREFLIGHT=READY_NOT_EXECUTED":
+            raise ValueError("R0 PASS must establish R1-P0 readiness")
+        if data.get("r1_status") != "R1_GLOBAL_BENCHMARK=READY_NOT_EXECUTED":
+            raise ValueError("R0 PASS must preserve R1 readiness")
+        if data.get("current_r1_champion") != "NONE":
+            raise ValueError("R0 PASS cannot claim an R1 champion")
     if status == "R0_DATASET_TAXONOMY=BLOCKED":
         blockers = data.get("blockers")
         if not isinstance(blockers, list) or not blockers:
@@ -144,6 +187,51 @@ def validate_freeze(data):
     return True
 
 
+def validate_r1_p0(data, root=ROOT):
+    if data.get("status") != "R1_P0_ACQUISITION_PREFLIGHT=READY_NOT_EXECUTED":
+        raise ValueError("R1-P0 must be ready but not executed")
+    if data.get("schema_version") != "r1_p0_acquisition_preflight.v1":
+        raise ValueError("R1-P0 must use the v1 schema")
+    if data.get("authority") != "docs/POC_MASTER_PLAN.md":
+        raise ValueError("R1-P0 must name the canonical V3 plan")
+    if data.get("r0_status") != "R0_DATASET_TAXONOMY=PASS":
+        raise ValueError("R1-P0 requires a passing R0 taxonomy gate")
+    if data.get("r1_status") != "R1_GLOBAL_BENCHMARK=READY_NOT_EXECUTED":
+        raise ValueError("R1-P0 must preserve R1 readiness")
+    if data.get("training_unlock") != "FORBIDDEN_UNTIL_R1_P0_PASS":
+        raise ValueError("R1-P0 must block candidate training until it passes")
+    required_check_fields = {"check_id", "gate", "status", "evidence_required", "failure_action"}
+    checks = data.get("checks")
+    if not isinstance(checks, list) or not checks:
+        raise ValueError("R1-P0 must define acquisition and runtime checks")
+    if any(not required_check_fields.issubset(row) for row in checks):
+        raise ValueError("R1-P0 check record is incomplete")
+    if any(row["status"] != "NOT_EXECUTED" for row in checks):
+        raise ValueError("R1-P0 readiness record cannot claim executed checks")
+    required_gates = {
+        "DATASET_ARCHIVE",
+        "DATASET_SCHEMA_SPLIT",
+        "MODEL_ASSET",
+        "PREPROCESSING",
+        "MODEL_LOADING",
+        "GATED_ACCESS",
+        "STORAGE_RUNTIME",
+    }
+    if {row["gate"] for row in checks} != required_gates:
+        raise ValueError("R1-P0 must cover every required acquisition gate")
+    manifest = data.get("manifest_reference")
+    if manifest != "docs/RSC_R0_DATASET_TAXONOMY_FREEZE_v0.1.json#future_download_manifest":
+        raise ValueError("R1-P0 must use the frozen R0 future download manifest")
+    roots = data.get("storage_roots")
+    if {key: roots.get(key) for key in STORAGE_ENVS} != STORAGE_ENVS:
+        raise ValueError("R1-P0 storage roots must use the four OcuForge root environment variables")
+    for value in roots.get("layout", {}).values():
+        relative_path(value)
+    if data.get("private_data_allowed") or data.get("cloud_provisioning"):
+        raise ValueError("R1-P0 cannot permit private data or cloud provisioning")
+    return True
+
+
 def validate_r1(data, root=ROOT):
     if data.get("status") != "R1_GLOBAL_BENCHMARK=READY_NOT_EXECUTED":
         raise ValueError("R1 benchmark must be ready but not executed")
@@ -151,6 +239,15 @@ def validate_r1(data, root=ROOT):
         raise ValueError("R1 benchmark must use the V3 schema")
     if data.get("authority") != "docs/POC_MASTER_PLAN.md":
         raise ValueError("R1 benchmark must name the canonical V3 plan")
+    if data.get("r0_status") != "R0_DATASET_TAXONOMY=PASS":
+        raise ValueError("R1 benchmark requires a passing R0 taxonomy gate")
+    preflight = data.get("acquisition_preflight")
+    if not isinstance(preflight, dict):
+        raise ValueError("R1 benchmark must reference the acquisition preflight")
+    if preflight.get("status") != "R1_P0_ACQUISITION_PREFLIGHT=READY_NOT_EXECUTED":
+        raise ValueError("R1 benchmark must remain behind an unexecuted R1-P0 gate")
+    if preflight.get("required_before_training") is not True:
+        raise ValueError("R1 benchmark must require R1-P0 before training")
     candidates = data.get("candidates", [])
     candidate_ids = [candidate.get("id") for candidate in candidates]
     if candidate_ids != ["C0", "C1", "C2"]:
@@ -221,11 +318,21 @@ def validate_r1(data, root=ROOT):
 def validate(root=ROOT):
     freeze = load_json(root / FREEZE.relative_to(ROOT))
     r1 = load_json(root / R1.relative_to(ROOT))
+    r1_p0 = load_json(root / R1_P0.relative_to(ROOT))
     validate_freeze(freeze)
     validate_r1(r1, root)
-    return {"r0": freeze["status"], "r1": r1["status"]}
+    validate_r1_p0(r1_p0, root)
+    return {
+        "r0": freeze["status"],
+        "r0_taxonomy": freeze["r0_taxonomy_status"],
+        "r1_p0": r1_p0["status"],
+        "r1": r1["status"],
+    }
 
 
 if __name__ == "__main__":
     result = validate()
-    print(f"PASS: {result['r0']}; {result['r1']}")
+    print(
+        f"PASS: {result['r0']}; {result['r0_taxonomy']}; "
+        f"{result['r1_p0']}; {result['r1']}"
+    )

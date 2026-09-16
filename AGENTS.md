@@ -20,7 +20,8 @@ The current planning state is:
 ```text
 POC_PRIMARY=MODEL_INTERACTIVE_GUI
 MODEL_TRAINING_PRIORITY=HIGH
-R0_V3=BLOCKED
+R0_V3=PASS
+R1_P0_ACQUISITION_PREFLIGHT=READY_NOT_EXECUTED
 GLOBAL_MODEL=EVIDENCE_SELECTED_AFTER_R1
 GLOBAL_MODEL_LEADING_CANDIDATE=NONE_BEFORE_R1
 R1=THREE_CANDIDATE_CE_FIRST_BENCHMARK
@@ -40,9 +41,9 @@ HL7_FHIR=PLANNED_AFTER_MODEL_GUI
 PUBLIC_GPU_PRIVATE_DATA=FORBIDDEN
 ```
 
-R0_V3 is complete but blocked after the supervision/taxonomy/pretraining-overlap audit. R1 is a three-candidate CE-first
-benchmark and is READY_NOT_EXECUTED. Do not launch a large GPU run, provision RunPod, or download a large dataset in this
-documentation gate; use provider-neutral configurable storage roots for the future public-data run.
+R0 V3 is scientifically complete and PASS. R1-P0 acquisition preflight is READY_NOT_EXECUTED; R1 is a three-candidate
+CE-first benchmark and is READY_NOT_EXECUTED. R1-P0 may acquire only the frozen public records and approved assets;
+do not train any candidate until R1-P0 passes or provision cloud compute. Use provider-neutral configurable storage roots.
 
 Before cross-package or cross-runtime work, read `docs/CTR_MODULE_CONTRACT.md`. Respect module ownership, dependency direction,
 and data/runtime boundaries. Phases define execution order; modules define architectural ownership. Use `docs/PROJECT_MAP.md`

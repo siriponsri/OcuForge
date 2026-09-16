@@ -10,14 +10,15 @@ product. The only active direction is [`docs/POC_MASTER_PLAN.md`](docs/POC_MASTE
 ## Current Gate
 
 ```text
-R0_V3 = BLOCKED
+R0_V3 = PASS
+R1_P0_ACQUISITION_PREFLIGHT = READY_NOT_EXECUTED
 R1 C0/C1/C2 = READY_NOT_EXECUTED
 CURRENT_R1_CHAMPION = NONE
 ```
 
-R0 evidence review is complete but blocked on exact dataset terms/checksums/identity evidence, IDRiD negative ROI
-semantics, and candidate asset hash/overlap evidence. No data or weights were downloaded, no model was trained, and
-no cloud compute was provisioned. The exact blockers and future download manifest are in the
+R0 scientific evidence review is complete. No data or weights were downloaded, no model was trained, and no cloud
+compute was provisioned. Byte-dependent integrity, access, loading, and runtime checks are the separate R1-P0 gate.
+The exact findings and future download manifest are in the
 [`R0 freeze record`](docs/RSC_R0_DATASET_TAXONOMY_FREEZE_v0.1.json).
 
 ## New Direction

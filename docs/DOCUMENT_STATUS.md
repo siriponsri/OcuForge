@@ -7,6 +7,7 @@ for current execution guidance.
 |---|---|---|
 | `docs/POC_MASTER_PLAN.md` | AUTHORITATIVE | V3 product/research direction |
 | `docs/R0_DATASET_SUPERVISION_FREEZE.md` | ACTIVE_SUPPORTING | R0 evidence and acceptance protocol |
+| `docs/R1_P0_ACQUISITION_PREFLIGHT.md` and `.json` | ACTIVE_SUPPORTING | post-R0 acquisition, integrity, access, and runtime gate |
 | `docs/R1_GLOBAL_MODEL_SELECTION.md` | ACTIVE_SUPPORTING | C0/C1/C2 benchmark and winner-only CORN ablation |
 | `docs/CTR_MODULE_CONTRACT.md` | AUTHORITATIVE | ownership and dependency boundary |
 | `docs/GUI_POC_INTEGRATION.md` | ACTIVE_SUPPORTING | existing customer-facing workspace integration |

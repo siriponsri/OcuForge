@@ -1,9 +1,10 @@
 # R0 Dataset, Supervision, Split, and Asset Freeze
 
-**Status:** ACTIVE SUPPORTING PROTOCOL · `R0_V3=COMPLETE / R0_DATASET_TAXONOMY=BLOCKED`
+**Status:** ACTIVE SUPPORTING PROTOCOL · `R0_V3=PASS / R0_DATASET_TAXONOMY=PASS`
 **Authority:** [`POC_MASTER_PLAN.md`](POC_MASTER_PLAN.md)
 
 R0 is a CPU/document/data-contract gate. It must finish before dataset download, model training, or R1 execution.
+Post-download integrity and runtime checks belong to R1-P0.
 
 ## Required record for every candidate dataset
 
@@ -64,25 +65,28 @@ record the limitation, and do not claim patient-level independence.
 ## Current machine-readable record
 
 [`RSC_R0_DATASET_TAXONOMY_FREEZE_v0.1.json`](RSC_R0_DATASET_TAXONOMY_FREEZE_v0.1.json) is the completed V3 freeze
-record. It contains the candidate dataset decisions, exact blockers, admitted taxonomy, negative policy, split policy,
-model asset audit, and future download manifest. It does not contain downloaded dataset bytes or model weights.
+record. It contains the candidate dataset decisions, reclassified acquisition findings, admitted taxonomy, negative
+policy, split policy, model asset audit, and future download manifest. It does not contain downloaded dataset bytes or
+model weights.
 
 ## R0 V3 outcome
 
 ```text
-R0_DATASET_TAXONOMY=BLOCKED
+R0_DATASET_TAXONOMY=PASS
+R1_P0_ACQUISITION_PREFLIGHT=READY_NOT_EXECUTED
 R1_GLOBAL_BENCHMARK=READY_NOT_EXECUTED
 CURRENT_R1_CHAMPION=NONE
 ```
 
-MMRDR-UWF remains the primary R1 hypothesis but is not execution-eligible until checksum/provenance, license scope,
-and the released identity metadata are resolved. IDRiD remains the primary spatial candidate but is not execution-ready
-until archive terms/checksums and evidence-backed negative ROI semantics are resolved. DDR/OIA-DDR is not admitted.
-C0/C1/C2 exact source revisions are recorded, but local hashes and the remaining asset/overlap decisions are not.
-The full blocker list is authoritative in the JSON record.
+MMRDR-UWF is eligible for R1-P0 as the primary R1 hypothesis; its released patient-level split and missing row-level
+patient IDs remain a documented limitation. IDRiD is eligible for R1-P0 as the primary spatial candidate; unannotated
+regions remain UNKNOWN/WEAK_NEGATIVE unless stronger evidence is obtained. DDR/OIA-DDR is not admitted. C0/C1/C2
+exact source revisions, licenses, preprocessing, overlap findings, and claim limits are recorded. P0 owns all local
+hash, archive, inventory, access, smoke, and loading checks.
 
 ## R0 PASS evidence
 
-R0 can pass only when every selected dataset has verified source/version/license/access, supervision type, identity and
-split semantics, limitations, checksums/provenance, taxonomy eligibility, and machine-readable validation. The current
-evidence does not satisfy those conditions, so the exact end-state is `R0_DATASET_TAXONOMY=BLOCKED`.
+R0 passes when every selected dataset has verified source/version/license/access sufficient for planned acquisition,
+supervision type, identity and split semantics, leakage limitations, taxonomy eligibility, conservative negative policy,
+foundation overlap status/claim limits, exact future manifest, and exact model asset source/revision. Local file hashes,
+archive integrity, byte inventories, and model loading are R1-P0 evidence rather than R0 requirements.

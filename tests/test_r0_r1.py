@@ -5,7 +5,7 @@ import pytest
 import torch
 
 from eyes_detected.mil.global_average import GlobalAveragePooling
-from scripts.validate_r0_r1 import load_json, validate_freeze, validate_r1
+from scripts.validate_r0_r1 import load_json, validate_freeze, validate_r1, validate_r1_p0
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -35,15 +35,34 @@ def test_r0_freeze_requires_explicit_supervision_fields():
         validate_freeze(mutated)
 
 
-def test_r0_freeze_records_blocked_outcome_with_exact_blockers():
+def test_r0_freeze_records_pass_and_reclassifies_acquisition_checks():
     freeze = load_json(ROOT / "docs/RSC_R0_DATASET_TAXONOMY_FREEZE_v0.1.json")
-    assert freeze["status"] == "R0_DATASET_TAXONOMY=BLOCKED"
-    assert freeze["blockers"]
+    assert freeze["status"] == "R0_V3=PASS"
+    assert freeze["r0_taxonomy_status"] == "R0_DATASET_TAXONOMY=PASS"
+    assert freeze["r1_p0_status"] == "R1_P0_ACQUISITION_PREFLIGHT=READY_NOT_EXECUTED"
+    assert freeze["reclassified_findings"]
     validate_freeze(freeze)
     mutated = copy.deepcopy(freeze)
-    mutated.pop("blockers")
-    with pytest.raises(ValueError, match="exact blockers"):
+    mutated["blockers"] = ["local hash not yet computed"]
+    with pytest.raises(ValueError, match="active blockers"):
         validate_freeze(mutated)
+
+
+def test_r1_p0_blocks_training_and_stays_not_executed():
+    preflight = load_json(ROOT / "docs/R1_P0_ACQUISITION_PREFLIGHT.json")
+    validate_r1_p0(preflight, ROOT)
+    mutated = copy.deepcopy(preflight)
+    mutated["training_unlock"] = "ALLOWED"
+    with pytest.raises(ValueError, match="block candidate training"):
+        validate_r1_p0(mutated, ROOT)
+
+
+def test_r1_registry_requires_r1_p0_before_training():
+    config = load_json(ROOT / "eyes-detected-models/configs/research/r1-global-benchmark.json")
+    mutated = copy.deepcopy(config)
+    mutated["acquisition_preflight"]["required_before_training"] = False
+    with pytest.raises(ValueError, match="require R1-P0 before training"):
+        validate_r1(mutated, ROOT)
 
 
 def test_r1_freeze_requires_provider_neutral_storage():

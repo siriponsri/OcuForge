@@ -1,11 +1,11 @@
 # OcuForge R0 Dataset Comparison & Source Guide
 ## Companion evidence guide for the OcuForge R0 V3 freeze
 
-**Status:** RESEARCH COMPANION — NOT A PASS RECORD; R0 V3 ended `R0_DATASET_TAXONOMY=BLOCKED`  
+**Status:** RESEARCH COMPANION — NOT A PASS RECORD; R0 V3 ended `R0_DATASET_TAXONOMY=PASS`
 **Date prepared:** 2026-09-16  
 **Repository authority remains:** `docs/POC_MASTER_PLAN.md` and `docs/R0_DATASET_SUPERVISION_FREEZE.md`
 
-This document exists to help the implementing agent understand **why each dataset is being considered, what it can and cannot supervise, which source should be treated as authoritative, and what R0 still has to verify**.
+This document exists to help the implementing agent understand **why each dataset is being considered, what it can and cannot supervise, which source should be treated as authoritative, and what R1-P0 still has to verify after acquisition**.
 
 It is not a substitute for the machine-readable R0 freeze record. If this guide conflicts with an official source inspected during R0, the official source wins and the discrepancy must be documented.
 
@@ -17,8 +17,8 @@ The smallest useful dataset strategy for OcuForge is:
 
 | Dataset | Primary role | Current disposition | Why it matters |
 |---|---|---|---|
-| **MMRDR-UWF** | R1 global DR grading | **Primary hypothesis / BLOCKED** | UWF modality, ordinal DR labels, released patient-level train/test split; checksum, identity, and license-scope blockers remain |
-| **IDRiD** | R2/R3 lesion ROI supervision | **Primary spatial candidate / NOT EXECUTION-READY** | Pixel-level masks for MA, hemorrhage, hard exudate, soft exudate; archive/checksum and negative-policy blockers remain |
+| **MMRDR-UWF** | R1 global DR grading | **Primary hypothesis / R0 PASS; R1-P0 pending** | UWF modality, ordinal DR labels, released patient-level train/test split; archive hashes and byte checks move to R1-P0 |
+| **IDRiD** | R2/R3 lesion ROI supervision | **Primary spatial candidate / R0 PASS; R1-P0 pending** | Pixel-level masks for MA, hemorrhage, hard exudate, soft exudate; archive inventory/hashes move to R1-P0 and negatives stay conservative |
 | **DDR / OIA-DDR** | Secondary spatial source + historical global anchor | **NOT ADMITTED** | Reported five-grade fundus set plus lesion-localization subset, but official data terms and archive evidence are missing |
 | **EyePACS/Kaggle DR** | Large conventional-fundus robustness reference | **Deferred** | 0–4 grading, patient left/right naming, very large and restricted by competition terms |
 | **RFMiD** | Historical multi-disease reference | **Historical / not R1 grading source** | Useful for retinal multi-label evidence, not a clean 0–4 DR grading source |
@@ -67,7 +67,7 @@ MMRDR is a multimodal DR dataset with separate CFP, OCT, and UWF subsets.
 
 The Scientific Data descriptor states that each modality is released with train/test partitions. For **UWF and OCT**, the published split is patient-level. The CFP subset originates from OIA-DDR and lacks patient identifiers, so its released split is image-level.
 
-OcuForge's current pre-execution record describes the UWF subset as:
+The completed OcuForge R0 evidence record describes the UWF subset as:
 
 - 10,404 UWF images
 - ordinal DR grade 0–4
@@ -75,7 +75,7 @@ OcuForge's current pre-execution record describes the UWF subset as:
 - released patient-level train/test partition
 - no documented row-level patient identifier in the published CSV description
 
-R0 must re-verify all of these against the exact Figshare record/version used.
+The R0 freeze record verifies the source/version and semantics. R1-P0 must verify the downloaded bytes, schema, and split smoke.
 
 ### Why OcuForge wants it
 
@@ -110,7 +110,7 @@ Only derive TRAIN / VALIDATION / CALIBRATION inside released training identities
 
 Do not reshuffle the released test images back into development.
 
-### R0 blockers confirmed by the freeze
+### R0 findings and R1-P0 checks
 
 - Exact Figshare version/revision?
 - Exact file inventory needed for UWF only?
@@ -209,10 +209,10 @@ The current official IDRiD Grand Challenge data page displays a **CC BY 4.0** st
 The completed OcuForge freeze record records:
 
 ```text
-license_status = CC_BY_4.0_DISPLAYED_ON_OFFICIAL_IDRID_DATA_PAGE; IEEE_FILE_TERMS_AND_CHECKSUMS_PENDING
+license_status = CC_BY_4.0_DISPLAYED_ON_OFFICIAL_IDRID_DATA_PAGE; IEEE_DATAPORT_ACCESS_REQUIRED
 ```
 
-The exact IEEE archive terms, file inventory, and checksums remain a blocker; the field was not silently promoted to a cleared state.
+The source-level access path is sufficient for planned acquisition. R1-P0 verifies authorized access, archive inventory, and local hashes.
 
 ### Split limitation
 
@@ -264,7 +264,7 @@ The official GitHub repository is MIT-licensed as a repository.
 
 **Do not assume that the repository's MIT license automatically grants the same rights over downloaded medical-image data.**
 
-R0 must inspect the data-release terms explicitly.
+DDR/OIA-DDR remains NOT_ADMITTED because its data-release terms are not sufficient for R0 selection; no R1-P0 acquisition is planned.
 
 ### FLAIR contamination warning
 
@@ -470,11 +470,11 @@ DO_NOT_EXPAND_R0_CORE_WITHOUT_OWNER_DECISION
 
 # 5. R1 foundation-model overlap implications
 
-R0 must audit **datasets and pretrained assets together**.
+R0 audited **datasets and pretrained assets together**; R1-P0 later verifies the exact local bytes and access/load evidence.
 
 ## C0 — ConvNeXt V2-Tiny
 
-R0 must record the exact pretrained checkpoint, exact upstream license, preprocessing, source framework, and revision.
+R0 records the exact pretrained checkpoint/source, license, preprocessing contract, source framework, and revision; local hashes and loading are R1-P0 checks.
 
 Do not merely write "ImageNet pretrained" without the exact asset.
 
@@ -542,7 +542,7 @@ Primary candidate:
 MMRDR-UWF
 ```
 
-R0 must decide `ELIGIBLE` or `BLOCKED`.
+R0 decided `ELIGIBLE_FOR_R1_P0` for MMRDR-UWF; R1-P0 must complete before any candidate training.
 
 No automatic fallback should silently replace it.
 
@@ -726,13 +726,13 @@ Then independently verify official evidence and update the authoritative R0 reco
 Do not:
 
 - promote a dataset because this guide calls it "Priority A";
-- silently substitute another dataset when one is blocked;
+- silently substitute another dataset when one is not admitted;
 - use a mirror as authoritative evidence;
 - reinterpret image-level lesion labels as spatial labels;
 - convert binary labels into ordinal labels;
 - call a foundation-model evaluation "external" without overlap audit;
 - download large data merely to make R0 look active.
 
-The correct R0 outcome may be `PASS` or `BLOCKED with exact evidence-backed blockers`.
+The current R0 outcome is `PASS`; if future source-level evidence changes, re-audit R0 rather than weakening R1-P0 or silently substituting inputs.
 
 Both are scientifically valid outcomes.

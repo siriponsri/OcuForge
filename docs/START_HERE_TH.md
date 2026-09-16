@@ -1,17 +1,18 @@
 # OcuForge V3 - จุดเริ่มต้น
 
 OcuForge เป็นโครงงานวิจัยและระบบช่วย review ภาพจอตา ไม่ใช่ผลิตภัณฑ์วินิจฉัยโรค แผนที่ใช้งานอยู่มีเพียง
-[`POC_MASTER_PLAN.md`](POC_MASTER_PLAN.md) และยังไม่ผ่าน R0 หรือรัน R1
+[`POC_MASTER_PLAN.md`](POC_MASTER_PLAN.md) โดย R0 ผ่านแล้ว แต่ R1-P0 และ R1 ยังไม่รัน
 
 ## สถานะปัจจุบัน
 
 ```text
-R0_V3 = COMPLETE / BLOCKED
+R0_V3 = PASS
+R1_P0_ACQUISITION_PREFLIGHT = READY_NOT_EXECUTED
 R1 C0/C1/C2 = READY_NOT_EXECUTED
 CURRENT_R1_CHAMPION = NONE
 ```
 
-การตรวจเอกสารรอบนี้ไม่ download dataset, ไม่ train model และไม่ provision cloud GPU
+การตรวจเอกสารรอบนี้ไม่ download dataset, ไม่ train model และไม่ provision cloud GPU; ขั้นถัดไปคือ R1-P0
 
 ## ลำดับการอ่าน
 
@@ -30,8 +31,8 @@ CURRENT_R1_CHAMPION = NONE
 .\.venv\Scripts\python.exe scripts\package_check.py
 ```
 
-Synthetic smoke ใช้ตรวจ engineering path เท่านั้น ไม่ใช่ผลวิจัยหรือผลทางคลินิก ก่อนรัน R0 ต้องกำหนดแหล่งข้อมูล
-public ให้ครบ ตรวจ license, identity-safe split, supervision semantics และ pretraining overlap ก่อนเสมอ
+Synthetic smoke ใช้ตรวจ engineering path เท่านั้น ไม่ใช่ผลวิจัยหรือผลทางคลินิก ก่อนรัน R1 ต้องให้ R1-P0 ตรวจ
+archive/hash, schema/split, preprocessing, asset loading และ runtime ให้ครบ
 
 ## กฎข้อมูล
 

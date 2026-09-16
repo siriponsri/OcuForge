@@ -2,6 +2,12 @@
   "schema_version": "r1_global_benchmark.v3.0",
   "status": "R1_GLOBAL_BENCHMARK=READY_NOT_EXECUTED",
   "authority": "docs/POC_MASTER_PLAN.md",
+  "r0_status": "R0_DATASET_TAXONOMY=PASS",
+  "acquisition_preflight": {
+    "status": "R1_P0_ACQUISITION_PREFLIGHT=READY_NOT_EXECUTED",
+    "config": "docs/R1_P0_ACQUISITION_PREFLIGHT.json",
+    "required_before_training": true
+  },
   "selection_split": "VAL",
   "held_out_split": "TEST",
   "target": {
@@ -19,7 +25,7 @@
   "dataset": {
     "dataset_id": "mmrdr_uwf_v1",
     "role": "PRIMARY_R1_DOMAIN_HYPOTHESIS",
-    "eligibility": "R0_MUST_VERIFY_BEFORE_EXECUTION",
+    "eligibility": "R0_PASS_R1_P0_REQUIRED_BEFORE_EXECUTION",
     "config": "eyes-detected-models/configs/datasets/mmrdr_uwf_v1.yaml",
     "selection_split": "VAL",
     "held_out_split": "TEST",
@@ -32,7 +38,7 @@
       "architecture_family": "CONVNEXT_V2_TINY",
       "backbone": "convnextv2_tiny",
       "asset_identifier": "ConvNeXt V2 Tiny ImageNet-22K 384px EMA checkpoint",
-      "asset_revision": "https://dl.fbaipublicfiles.com/convnext/convnextv2/im22k/convnextv2_tiny_22k_384_ema.pt",
+      "asset_revision": "ConvNeXt-V2 main@2553895753323c6fe0b2bf390683f5ea358a42b9; https://dl.fbaipublicfiles.com/convnext/convnextv2/im22k/convnextv2_tiny_22k_384_ema.pt",
       "adaptation_mode": "SUPERVISED_TRANSFER",
       "input_preprocessing_contract": {
         "target_size_px": 384,

@@ -1,19 +1,20 @@
 # OcuForge Operational Handoff
 
-**Updated:** 2026-09-16
+**Updated:** 2026-09-17
 **Authority:** Operational state only. Contracts and the active master plan remain authoritative.
 
 ## Current gate/status
 
 ```text
-R0_V3=COMPLETE
-R0_DATASET_TAXONOMY=BLOCKED
+R0_V3=PASS
+R0_DATASET_TAXONOMY=PASS
+R1_P0_ACQUISITION_PREFLIGHT=READY_NOT_EXECUTED
 R1_GLOBAL_BENCHMARK=READY_NOT_EXECUTED
 CURRENT_R1_CHAMPION=NONE
 ```
 
-R0 evidence review ended as BLOCKED. This is a deliberate evidence outcome, not a permission to substitute a dataset,
-asset, split, or assumption.
+R0 scientific evidence review passed. R1-P0 is the next and only permitted execution gate. It must pass before any
+candidate training; it does not authorize R1 training or cloud provisioning.
 
 ## What was completed
 
@@ -24,36 +25,43 @@ asset, split, or assumption.
 - Audited the official DDR/OIA-DDR repository and did not admit it because dataset terms, checksums, split files, and
   exact annotation inventory were not verified.
 - Audited exact candidate asset sources: ConvNeXt V2-Tiny 22K/384, FLAIR Hub revision, and DINOv3 ViT-B/16 LVD-1689M.
-- Recorded licenses, preprocessing, corpus/overlap status, missing local hashes, taxonomy, negative ROI policy, and a
+- Recorded licenses, preprocessing, corpus/overlap status, deferred byte checks, taxonomy, negative ROI policy, and a
   provider-neutral future download manifest in `docs/RSC_R0_DATASET_TAXONOMY_FREEZE_v0.1.json`.
-- Updated active status documents and the offline R0/R1 validator to preserve a valid BLOCKED R0 result.
+- Reclassified byte-dependent findings into `docs/R1_P0_ACQUISITION_PREFLIGHT.json` without deleting warnings.
+- Updated active status documents, the R1 registry, and the offline validator for separate R0 and R1-P0 gates.
 
-## Active blockers/unverified evidence
+## R1-P0 checks not yet executed
 
-See the six exact blockers in the machine-readable freeze record. The short form is:
+See the machine-readable P0 contract. The short form is:
 
-- MMRDR current file metadata exposes IDs and sizes but not hashes; its data-license scope also needs reconciliation
-  with the associated article copyright notice.
-- MMRDR published UWF split wording does not expose row-level patient IDs for the required identity audit.
-- IDRiD archive terms, complete file inventory, checksums, and exhaustive-negative semantics remain unverified.
-- C0 has no local weight hash; C1 has documented overlap with IDRiD/OIA-DDR/EyePACS and no local hash; C2 is gated,
-  has no local hash, and has unknown source-image overlap.
+- Dataset/archive SHA-256, integrity, extracted inventory, schema/split smoke, and duplicate checks.
+- C0/C1/C2 local weight SHA-256, gated access, preprocessing smoke, and model loading.
+- Storage capacity, permissions, runtime readiness, and public/synthetic-only boundary.
+- IDRiD examples remain UNKNOWN/WEAK_NEGATIVE unless acquisition evidence supports clean negatives.
 
 ## Important artifacts/files
 
 - `docs/RSC_R0_DATASET_TAXONOMY_FREEZE_v0.1.json` - authoritative R0 evidence record and future manifest.
 - `docs/POC_MASTER_PLAN.md` - authoritative project direction.
-- `docs/R0_DATASET_SUPERVISION_FREEZE.md` - R0 protocol and blocked outcome.
+- `docs/R0_DATASET_SUPERVISION_FREEZE.md` - R0 protocol and PASS outcome.
+- `docs/R1_P0_ACQUISITION_PREFLIGHT.md` - next gate and operator checklist.
+- `docs/R1_P0_ACQUISITION_PREFLIGHT.json` - machine-readable P0 contract.
 - `eyes-detected-models/configs/research/r1-global-benchmark.json` - R1 C0/C1/C2 readiness registry; no measured result.
 - `R0_DATASET_COMPARISON_AND_SOURCE_GUIDE.md` - research companion, not authority.
 - `validation/FINAL_DELIVERY_REPORT.md` - repository validation report.
 
 ## Exact next action
 
-Resolve the frozen blockers in this order: reconcile MMRDR data-license scope; obtain authorized MMRDR/IDRiD metadata or
-archives and compute local SHA-256 manifests; verify MMRDR identity/split metadata; define evidence-backed IDRiD negative
-ROI policy; obtain and hash the approved C0/C1/C2 assets and record exact preprocessing and overlap evidence. Then rerun
-the R0 audit and update this handoff before any R1 execution decision.
+`git pull` -> execute R1-P0 acquisition preflight.
+
+From a clean machine/session:
+
+```powershell
+git pull
+```
+
+Then follow `docs/R1_P0_ACQUISITION_PREFLIGHT.md`. Do not execute R1-P0 and R1 in the same phase; after P0, stop for
+review and update this handoff with the evidence and final P0 status.
 
 ## Resume commands/checks
 
@@ -68,7 +76,7 @@ python scripts/package_check.py
 git diff --check
 ```
 
-Inspect `git status --short --branch` before editing. Do not run R1 as part of resuming R0.
+Inspect `git status --short --branch` before editing. Do not train or execute R1 as part of R1-P0.
 
 ## External dependencies/assets
 
@@ -81,7 +89,8 @@ Inspect `git status --short --branch` before editing. Do not run R1 as part of r
 
 ## Do-not-do / governance reminders
 
-- Do not train models, execute R1, provision cloud GPU, or download large archives to make R0 appear active.
+- Do not train models, execute R1, or provision cloud GPU during R1-P0.
+- Acquire only the frozen public records/assets through official paths; do not use mirrors or silently substitute.
 - Do not put hospital images, PHI, credentials, secrets, private data, model weights, or machine-local secrets in Git or
   this handoff.
 - Do not convert MMRDR image-level lesion presence into ROI supervision.

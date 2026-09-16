@@ -1,11 +1,13 @@
 {
   "schema_version": "r0_dataset_supervision_audit.v0.2",
   "record_type": "R0_V3_FREEZE_RECORD",
-  "status": "R0_DATASET_TAXONOMY=BLOCKED",
+  "status": "R0_V3=PASS",
   "audit_date": "2026-09-16",
-  "decision_scope": "R0 V3 evidence freeze completed; no dataset bytes or model weights downloaded",
+  "decision_scope": "R0 V3 scientific evidence freeze completed; no dataset bytes or model weights downloaded",
   "authority": "docs/POC_MASTER_PLAN.md and docs/R0_DATASET_SUPERVISION_FREEZE.md",
   "supersedes_status": "R0_V2_RECORD_RETIRED_BY_V3_REPLAN",
+  "r0_taxonomy_status": "R0_DATASET_TAXONOMY=PASS",
+  "r1_p0_status": "R1_P0_ACQUISITION_PREFLIGHT=READY_NOT_EXECUTED",
   "r1_status": "R1_GLOBAL_BENCHMARK=READY_NOT_EXECUTED",
   "current_r1_champion": "NONE",
   "freeze_scope": [
@@ -48,16 +50,16 @@
       "known_limitations": [
         "No row-level patient identifier is documented in the published UWF CSV description; preserve the released patient split.",
         "Lesion labels are image-level presence and cannot create ROI geometry.",
-        "The release is large and is not bundled or downloaded by this repository."
+        "The release is large and is not bundled or downloaded by this repository; archive integrity and local SHA-256 are R1-P0 checks."
       ],
-      "checksum_or_source_hash": "NOT_VERIFIED; current Figshare API response exposed file IDs and sizes but no MD5 values",
+      "checksum_or_source_hash": "SOURCE_FILE_IDS_AND_SIZES_RECORDED; LOCAL_SHA256_DEFERRED_TO_R1_P0",
       "limitations": [
         "No row-level patient identifier is documented in the published UWF CSV description; preserve the released patient split.",
         "Lesion labels are image-level presence and cannot create ROI geometry.",
-        "The release is large and is not bundled or downloaded by this repository."
+        "The release is large and is not bundled or downloaded by this repository; archive integrity and local SHA-256 are R1-P0 checks."
       ],
       "checksums": {
-        "status": "FILE_METADATA_RECORDED_HASH_NOT_EXPOSED_BY_CURRENT_API",
+        "status": "SOURCE_METADATA_RECORDED_LOCAL_HASH_DEFERRED_TO_R1_P0",
         "algorithm": "MD5",
         "scope": "Nine multipart archive files and README; no combined archive hash is claimed",
         "files": [
@@ -86,7 +88,7 @@
       "source_doi": "https://doi.org/10.21227/H25W98",
       "data_descriptor": "https://doi.org/10.3390/data3030025",
       "access_status": "PUBLIC_RESEARCH_ACCESS_VIA_IEEE_DATAPORT; ACCOUNT_OR_INSTITUTIONAL_ACCESS_MAY_BE_REQUIRED",
-      "license_status": "CC_BY_4.0_DISPLAYED_ON_OFFICIAL_IDRID_DATA_PAGE; IEEE_FILE_TERMS_AND_CHECKSUMS_PENDING",
+      "license_status": "CC_BY_4.0_DISPLAYED_ON_OFFICIAL_IDRID_DATA_PAGE; IEEE_DATAPORT_ACCESS_REQUIRED",
       "cloud_eligible": false,
       "modality": "CFP",
       "image_count": 516,
@@ -108,16 +110,16 @@
       "known_limitations": [
         "Conventional 50-degree CFP is not UWF and is not a local-domain validation set.",
         "Only the localized lesion subset is eligible for ROI positives; exact mask coverage must be checked after download.",
-        "No public-cloud use until license terms, file inventory and SHA-256 checksums are verified locally."
+         "No public-cloud use for this CFP source; archive inventory and local SHA-256 are R1-P0 checks."
       ],
-      "checksum_or_source_hash": "NOT_VERIFIED_NO_DOWNLOAD",
+      "checksum_or_source_hash": "SOURCE_FILE_LAYOUT_RECORDED; LOCAL_SHA256_DEFERRED_TO_R1_P0",
       "limitations": [
         "Conventional 50-degree CFP is not UWF and is not a local-domain validation set.",
         "Only the localized lesion subset is eligible for ROI positives; exact mask coverage must be checked after download.",
-        "No public-cloud use until license terms, file inventory and SHA-256 checksums are verified locally."
+        "No public-cloud use for this CFP source; archive inventory and local SHA-256 are R1-P0 checks."
       ],
       "checksums": {
-        "status": "NOT_COMPUTED_NO_DOWNLOAD",
+        "status": "LOCAL_SHA256_DEFERRED_TO_R1_P0",
         "algorithm": "SHA256",
         "scope": "Downloaded archive and extracted files"
       }
@@ -126,13 +128,13 @@
   "dataset_decisions": {
     "R1_GLOBAL_DR": {
       "dataset": "mmrdr_uwf_v1",
-      "decision": "BLOCKED_PENDING_EVIDENCE",
-      "reason": "Ordinal UWF labels and released split are documented, but current checksum/provenance, row-level identity audit, and license-scope reconciliation are incomplete."
+      "decision": "ELIGIBLE_FOR_R1_P0",
+      "reason": "Official source/version, UWF modality, genuine ordinal labels, released patient-level split, access/license record, identity limitation, leakage policy, and future manifest are defined. Local archive hashes and byte/schema checks belong to R1-P0."
     },
     "R2_R3_SPATIAL_ROI": {
       "dataset": "idrid_v1",
-      "decision": "PRIMARY_CANDIDATE_NOT_EXECUTION_READY",
-      "reason": "Official page verifies the four lesion mask families and CC BY 4.0 display, but exact archive terms, file inventory, checksums, and exhaustive-negative semantics remain unverified."
+      "decision": "ELIGIBLE_FOR_R1_P0",
+      "reason": "Official source/version, CFP modality, grading and four-class mask semantics, image-level split limitation, CC BY 4.0 access statement, frozen taxonomy, and conservative UNKNOWN/WEAK_NEGATIVE policy are defined. Local archive hashes and inventory checks belong to R1-P0."
     },
     "DDR_OIA_DDR": {
       "dataset": "DDR / OIA-DDR",
@@ -169,17 +171,42 @@
       "future_action": "Re-audit only after exact archive access terms, revision, file inventory, split identity, annotations, and checksums are authorized and available."
     }
   ],
-  "blockers": [
-    "MMRDR Figshare metadata exposes the ten future-download file IDs and sizes, but the current API response exposes no MD5 values and no SHA-256 values; the exact archive provenance is therefore not frozen.",
-    "MMRDR data-record licensing reports CC BY 4.0 while the associated Scientific Data article page carries CC BY-NC-ND 4.0 article copyright; the scope of the data license and cloud-use terms must be reconciled before execution.",
-    "MMRDR UWF split is described as patient-level, but the published CSV description does not provide row-level patient IDs; the train/validation identity audit cannot be completed from checked evidence.",
-    "IDRiD's official page displays CC BY 4.0 and verifies the 516-image grading set plus the four lesion mask families, but the exact IEEE archive/file inventory and SHA-256 provenance have not been obtained.",
-    "IDRiD mask coverage is class-dependent (MA 81, EX 81, HE 80, SE 40) and the official evidence does not establish exhaustive absence semantics; clean negative ROI eligibility therefore remains unresolved.",
-    "C0 has an exact upstream checkpoint URL but no locally verified weight hash or execution-time asset card; C1 has a fixed Hub revision but no local weight hash and documented pretraining overlap with IDRiD, OIA-DDR, and EyePACS; C2 has gated access, no local weight hash, and unresolved source-image overlap in the LVD-1689M web corpus."
+  "reclassified_findings": [
+    {
+      "finding": "MMRDR archive file IDs and sizes are recorded, but local archive hashes are not available before download.",
+      "gate": "R1_P0_ACQUISITION_PREFLIGHT",
+      "required_check": "Compute SHA-256 for every downloaded part and verify archive integrity and file inventory."
+    },
+    {
+      "finding": "MMRDR data-record CC BY 4.0 and separate Scientific Data article copyright are both recorded.",
+      "gate": "R0_SATISFIED_WITH_SEPARATE_LICENSE_RECORD",
+      "required_check": "Apply the Figshare data license to dataset acquisition and retain article copyright as publication/provenance metadata."
+    },
+    {
+      "finding": "MMRDR UWF patient-level split is preserved while row-level patient IDs are not documented.",
+      "gate": "R0_KNOWN_IDENTITY_LIMITATION",
+      "required_check": "R1-P0 verifies split membership/schema without inventing patient IDs; preserve the released split and do not claim stronger identity independence."
+    },
+    {
+      "finding": "IDRiD official page defines the source, mask families, and CC BY 4.0 statement, while local archive bytes are absent.",
+      "gate": "R1_P0_ACQUISITION_PREFLIGHT",
+      "required_check": "Verify authorized archive inventory and SHA-256 after acquisition."
+    },
+    {
+      "finding": "IDRiD mask coverage is class-dependent and absence is not exhaustive evidence.",
+      "gate": "R0_SATISFIED_CONSERVATIVE_NEGATIVE_POLICY",
+      "required_check": "Use UNKNOWN or WEAK_NEGATIVE after acquisition unless source evidence supports VERIFIED_TRUE_NEGATIVE."
+    },
+    {
+      "finding": "C0/C1/C2 exact sources, revisions, licenses, preprocessing, and overlap claim limits are recorded; local weight hashes and load/access checks are not available before acquisition.",
+      "gate": "R1_P0_ACQUISITION_PREFLIGHT",
+      "required_check": "Acquire only approved assets, verify gated access and SHA-256, run preprocessing smoke, and load each asset before training."
+    }
   ],
   "future_download_manifest": {
     "manifest_version": "r0_future_download_manifest.v1",
     "download_now": false,
+    "preflight_reference": "docs/R1_P0_ACQUISITION_PREFLIGHT.json",
     "data_roots": {
       "mmrdr": "OCUFORGE_DATA_ROOT/mmrdr/uwf",
       "idrid": "OCUFORGE_DATA_ROOT/idrid/spatial",
@@ -217,7 +244,7 @@
       "candidate_id": "C0",
       "asset": "ConvNeXt V2 Tiny ImageNet-22K 384px EMA checkpoint",
       "source": "https://github.com/facebookresearch/ConvNeXt-V2 and https://dl.fbaipublicfiles.com/convnext/convnextv2/im22k/convnextv2_tiny_22k_384_ema.pt",
-      "asset_revision": "Upstream URL identifier; repository default branch inspected 2026-09-16",
+      "asset_revision": "ConvNeXt-V2 main@2553895753323c6fe0b2bf390683f5ea358a42b9; exact model URL is the asset identifier",
       "access_status": "PUBLIC_URL_NOT_DOWNLOADED",
       "license_status": "CC_BY_NC_4.0_FOR_IMAGENET_PRETRAINED_AND_FINETUNED_MODELS",
       "preprocessing": "384x384 RGB; ImageNet mean/std pending exact loader card",
@@ -225,7 +252,7 @@
       "overlap_with_r1_mmrdr": "UNKNOWN",
       "overlap_status": "UNKNOWN",
       "weight_sha256": null,
-      "claim_consequence": "No execution or clean external claim until the local asset hash and terms are recorded."
+      "claim_consequence": "R0 permits planned acquisition under the recorded CC BY-NC terms; R1-P0 must record the local hash and load result before execution."
     },
     {
       "candidate_id": "C1",
@@ -240,7 +267,7 @@
       "overlap_status": "UNKNOWN",
       "secondary_dataset_overlap": "CONFIRMED_OR_POTENTIAL_FOR_IDRID_OIA_DDR_EYEPACS",
       "weight_sha256": null,
-      "claim_consequence": "C1 cannot support a clean external claim on documented overlapping retinal datasets; MMRDR overlap remains unresolved."
+      "claim_consequence": "C1 cannot support a clean external claim on documented overlapping retinal datasets; MMRDR overlap remains unknown. R1-P0 must record the local hash and load result before execution."
     },
     {
       "candidate_id": "C2",
@@ -254,7 +281,7 @@
       "overlap_with_r1_mmrdr": "UNKNOWN",
       "overlap_status": "UNKNOWN",
       "weight_sha256": null,
-      "claim_consequence": "Do not describe any retinal evaluation as uncontaminated without source-membership evidence."
+      "claim_consequence": "Do not describe any retinal evaluation as uncontaminated without source-membership evidence. R1-P0 must verify gated access, local hash, and load result before execution."
     }
   ],
   "candidate_disposition": [
@@ -357,7 +384,7 @@
     "baseline": "C0/C1/C2 controlled global benchmark with CE first and winner-only CE/CORN ablation",
     "dataset": "mmrdr_uwf_v1 only",
     "tiny_test_encoder": "TEST_ONLY",
-    "real_execution": "Requires R0 approval of data, candidate assets, pretraining overlap and license decisions",
+    "real_execution": "Requires R0 PASS plus R1-P0 PASS; no candidate may train before acquisition, hash, schema, preprocessing, access, storage, and loading checks pass",
     "gpu_policy": "Public or synthetic data only; no provisioning or spending in this commit"
   },
   "foundation_model_overlap_audit": [
@@ -380,12 +407,12 @@
     {
       "source": "MMRDR Figshare API metadata",
       "url": "https://api.figshare.com/v2/articles/29423747",
-      "observed": "Public record version 2, CC BY 4.0, 10,404 UWF images, ten multipart file IDs and sizes; current API response did not expose MD5 values"
+      "observed": "Public record version 2, CC BY 4.0 dataset record, 10,404 UWF images, and ten multipart file IDs/sizes; local hashes are intentionally deferred to R1-P0"
     },
     {
       "source": "MMRDR Scientific Data article",
       "url": "https://doi.org/10.1038/s41597-026-07005-9",
-      "observed": "UWF ordinal grades, seven image-level lesion fields, UWF patient-level release split, lr laterality field"
+      "observed": "UWF ordinal grades, seven image-level lesion fields, UWF patient-level release split, and lr laterality field; missing row-level patient IDs remain a documented limitation"
     },
     {
       "source": "IDRiD Grand Challenge",
@@ -395,7 +422,7 @@
     {
       "source": "IDRiD IEEE DataPort metadata",
       "url": "https://ieee-dataport.org/open-access/indian-diabetic-retinopathy-image-dataset-idrid",
-      "observed": "516 images, 413/103 release split, JPG/TIFF/CSV data format, DOI 10.21227/H25W98; archive checksums were not available without download"
+      "observed": "516 images, 413/103 release split, JPG/TIFF/CSV data format, DOI 10.21227/H25W98, and official CC BY 4.0 statement; local archive checks are deferred to R1-P0"
     },
     {
       "source": "DDR/OIA-DDR official repository",

@@ -2,7 +2,7 @@
 
 <!-- plan_version: 3.0 -->
 
-**Status:** AUTHORITATIVE V3 DIRECTION · R0 V3 COMPLETE / BLOCKED
+**Status:** AUTHORITATIVE V3 DIRECTION · R0 V3 PASS / R1-P0 READY_NOT_EXECUTED
 **Scope:** Research and clinician-review foundation; not a diagnostic product.
 
 This is the only active OcuForge roadmap. Historical plans and prior Eye Detected results remain available under
@@ -23,16 +23,18 @@ inference, clinical integration, and all hospital/private data and derived artif
 ## Current status
 
 ```text
-R0_V3=BLOCKED
+R0_V3=PASS
+R1_P0_ACQUISITION_PREFLIGHT=READY_NOT_EXECUTED
 R1_THREE_CANDIDATE_BENCHMARK=READY_NOT_EXECUTED
 CURRENT_R1_CHAMPION=NONE
 HISTORICAL_PRIOR=AVAILABLE
 PHASE_2B_LIVE_MONGO=UNRESOLVED
 ```
 
-R0 V3 evidence review is complete and recorded as `R0_DATASET_TAXONOMY=BLOCKED`; no datasets or model weights were
-downloaded, no model was trained, R1 was not executed, and no cloud provider was provisioned. Synthetic smoke output
-is engineering evidence only. The exact blockers and future manifest are in
+R0 V3 scientific evidence review is complete and recorded as `R0_DATASET_TAXONOMY=PASS`; no datasets or model weights
+were downloaded, no model was trained, R1 was not executed, and no cloud provider was provisioned. Synthetic smoke
+output is engineering evidence only. Post-download checks are explicitly deferred to R1-P0. The exact findings and
+future manifest are in
 [`RSC_R0_DATASET_TAXONOMY_FREEZE_v0.1.json`](RSC_R0_DATASET_TAXONOMY_FREEZE_v0.1.json).
 
 ## Canonical architecture
@@ -81,9 +83,16 @@ identity-safe split semantics, source/version/access, license compatibility, acc
 access. Its image-level lesion fields are auxiliary presence labels only and cannot become ROI coordinates or masks.
 DDR/IDRiD remain candidates for external anchoring or spatial R2/R3 work only after their own exact audits.
 
-R0 V3 ended on 2026-09-16 with `R0_DATASET_TAXONOMY=BLOCKED`. R1 execution remains prohibited until the exact
-blockers in the machine-readable freeze record are resolved and the gate is explicitly re-audited. The blocked result
-is intentional; no assumption or fallback dataset is permitted.
+R0 V3 passed on 2026-09-17. It establishes that the source/version, task/modality, label semantics, supervision,
+released split limitations, leakage policy, taxonomy, conservative negative policy, license/access path, overlap claim
+limits, future manifest, and exact C0/C1/C2 source revisions are scientifically defined. Archive hashes, extracted
+inventories, schema smoke, preprocessing smoke, gated access, model loading, and storage/runtime checks belong to
+[`R1_P0_ACQUISITION_PREFLIGHT.json`](R1_P0_ACQUISITION_PREFLIGHT.json).
+
+## R1-P0 - acquisition preflight
+
+R1-P0 is `READY_NOT_EXECUTED`. It is the only next gate. No candidate may train until every P0 check passes. P0 must
+not execute R1, provision cloud compute, or silently substitute datasets or model assets.
 
 ## R1 — three architecture hypotheses
 
@@ -175,7 +184,5 @@ Document status is tracked in [DOCUMENT_STATUS.md](DOCUMENT_STATUS.md). A docume
 
 ## Execution gate
 
-The next permitted manual action is to resolve the recorded R0 blockers: reconcile dataset license scope, obtain and
-verify archive/file checksums and identity metadata, establish the IDRiD negative policy, and approve/hash the exact
-candidate assets. Do not begin R1, download a large dataset, provision a cloud provider, or promote a model until the
-R0 record is re-audited and passes.
+The next permitted manual action is to execute the R1-P0 acquisition preflight. Do not train, execute R1, provision a
+cloud provider, or promote a model until P0 passes.
