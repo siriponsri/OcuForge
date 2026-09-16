@@ -10,11 +10,12 @@ from eyes_detected.features.store import NPZFeatureStore, digest
 from eyes_detected.mil.attention import AttentionMIL
 from eyes_detected.mil.global_average import GlobalAveragePooling
 from eyes_detected.ordinal.coral import loss as coral_loss
+from eyes_detected.ordinal.corn import CORNHead, loss as corn_loss
 from eyes_contracts.protocol import load_protocol
 
 
 class ResearchMIL(nn.Module):
-    def __init__(self, dim, task, pooling="attention_mil"):
+    def __init__(self, dim, task, pooling="attention_mil", head=None):
         super().__init__()
         if pooling == "attention_mil":
             self.core = AttentionMIL(dim)
@@ -25,10 +26,19 @@ class ResearchMIL(nn.Module):
         self.binary = nn.Linear(dim, 1)
         self.task = task
         self.pooling = pooling
+        self.head = head or ("CORAL" if task == "ordinal" else "BINARY")
+        if task == "ordinal" and self.head == "CE":
+            self.ordinal_head = nn.Linear(dim, 5)
+        elif task == "ordinal" and self.head == "CORN":
+            self.ordinal_head = CORNHead(dim)
+        elif task == "ordinal" and self.head != "CORAL":
+            raise ValueError("Ordinal head must be CE, CORAL, or CORN")
 
     def forward(self, x, mask):
         r = self.core(x, mask)
         r["binary_logits"] = self.binary(r["embedding"]).squeeze(-1)
+        if self.task == "ordinal" and self.head in ["CE", "CORN"]:
+            r["dr_logits"] = self.ordinal_head(r["embedding"])
         return r
 
 
@@ -78,14 +88,17 @@ def collate(ids, features, device):
     return x.to(device), mask.to(device)
 
 
-def objective(r, ids, targets, task, weights):
+def objective(r, ids, targets, task, weights, head="CORAL"):
     primary = "dr_grade" if task == "ordinal" else "binary_dr"
     y = torch.tensor([getattr(targets[i], primary) for i in ids], device=r["dr_logits"].device)
-    total = (
-        coral_loss(r["dr_logits"], y.long())
-        if task == "ordinal"
-        else F.binary_cross_entropy_with_logits(r["binary_logits"], y.float())
-    )
+    if task == "ordinal" and head == "CORAL":
+        total = coral_loss(r["dr_logits"], y.long())
+    elif task == "ordinal" and head == "CORN":
+        total = corn_loss(r["dr_logits"], y.long())
+    elif task == "ordinal" and head == "CE":
+        total = F.cross_entropy(r["dr_logits"], y.long())
+    else:
+        total = F.binary_cross_entropy_with_logits(r["binary_logits"], y.float())
     total = weights.get("primary", 1.0) * total
     for field, key, factor in [("lesions", "lesion_logits", "lesions"), ("gradable", "qc_logits", "qc")]:
         vals = []
@@ -126,6 +139,9 @@ def train(
     pooling = config.get("pooling", "attention_mil")
     if pooling not in ["attention_mil", "global_average"]:
         raise ValueError("pooling must be attention_mil or global_average")
+    head = config.get("head", "CORAL" if task == "ordinal" else "BINARY")
+    if task == "ordinal" and head not in ["CE", "CORAL", "CORN"]:
+        raise ValueError("Ordinal head must be CE, CORAL, or CORN")
     images, dataset = load_images(manifest, dataset_path, cloud)
     targets = load_targets(targets_path, images)
     features, identity = load_features(features_dir, images)
@@ -169,7 +185,7 @@ def train(
             "feature_identity": identity,
         }
     )
-    model = ResearchMIL(identity[-1], task, pooling).to(device)
+    model = ResearchMIL(identity[-1], task, pooling, head).to(device)
     optimizer = torch.optim.AdamW(
         model.parameters(),
         lr=config.get("learning_rate", 0.001),
@@ -195,6 +211,7 @@ def train(
         "status": "RUNNING",
         "task": task,
         "pooling": pooling,
+        "head": head,
         "fingerprint": fingerprint,
         "feature_identity": list(identity),
         "protocol": protocol.model_dump(),
@@ -218,7 +235,7 @@ def train(
                 ids = order[offset : offset + batch_size]
                 x, mask = collate(ids, features, device)
                 optimizer.zero_grad()
-                value = objective(model(x, mask), ids, targets, task, weights)
+                value = objective(model(x, mask), ids, targets, task, weights, head)
                 if not torch.isfinite(value):
                     raise RuntimeError("Nonfinite training loss")
                 value.backward()
@@ -231,7 +248,7 @@ def train(
                 for offset in range(0, len(val_ids), batch_size):
                     ids = val_ids[offset : offset + batch_size]
                     x, mask = collate(ids, features, device)
-                    vsum += float(objective(model(x, mask), ids, targets, task, weights)) * len(ids)
+                    vsum += float(objective(model(x, mask), ids, targets, task, weights, head)) * len(ids)
             vloss = vsum / len(val_ids)
             history.append({"epoch": epoch, "train_loss": sum(losses) / len(losses), "val_loss": vloss})
             improved = vloss < best
@@ -245,6 +262,7 @@ def train(
                 "fingerprint": fingerprint,
                 "task": task,
                 "pooling": pooling,
+                "head": head,
                 "dim": identity[-1],
                 "feature_identity": list(identity),
                 "protocol": protocol.model_dump(),

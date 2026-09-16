@@ -1,17 +1,11 @@
-# R0 Dataset & Supervision Freeze Protocol
+# R0 Dataset, Supervision, Split, and Asset Freeze
 
-**Phase:** R0
-**Purpose:** Prevent label leakage, supervision mismatch, and taxonomy invention before model training.
+**Status:** ACTIVE SUPPORTING PROTOCOL · `R0_V3=READY_TO_EXECUTE / NOT_YET_PASSED`
+**Authority:** [`POC_MASTER_PLAN.md`](POC_MASTER_PLAN.md)
 
-## R0 question
+R0 is a CPU/document/data-contract gate. It must finish before dataset download, model training, or R1 execution.
 
-For every candidate public dataset, answer:
-
-> What exact prediction task can this dataset supervise without semantic reinterpretation?
-
-## Required dataset record
-
-Each dataset entry must record:
+## Required record for every candidate dataset
 
 ```yaml
 dataset_id:
@@ -35,98 +29,46 @@ known_limitations:
 checksum_or_source_hash:
 ```
 
-Do not write `mask`/`box`/`point` unless verified in the source release actually used.
+Do not claim a spatial supervision type that was not verified in the exact release under review.
 
-## Track A — Global DR grading
+## Task semantics
 
-Eligible datasets need genuine whole-image DR targets.
+The R1 global target is genuine ordinal DR grade 0–4. Binary `DR`/`no-DR` experience labels remain binary and are
+never mapped to grade 0–4. Unknown or ambiguous labels remain unknown. Ungradable images require an explicit policy.
 
-Possible targets:
-- ordinal DR grade;
-- binary referable/non-referable DR;
-- binary DR/no-DR;
-- other versioned global tasks.
+The initial ROI classes are `MICROANEURYSM`, `INTRARETINAL_HEMORRHAGE`, `HARD_EXUDATE`, `SOFT_EXUDATE`, and
+`NO_SUPPORTED_LESION_IN_ROI`. The last is an ROI inference/UI semantic, not proof of a normal eye. MMRDR image-level
+lesion presence cannot create ROI coordinates, boxes, polygons, or masks.
 
-These tasks are not interchangeable.
+Unannotated is not automatically negative. A negative ROI must be classified as verified true negative, curated
+background, weak negative, or unknown, with the source annotation revision and geometry rule retained.
 
-Rules:
-- binary labels never become ordinal;
-- dataset-specific grade schemes must map through an explicit protocol;
-- unknown/ambiguous labels remain unknown;
-- ungradable images must have explicit handling.
+## Foundation-model overlap audit
 
-## Track B — Spatial ROI lesion training
+For C1 FLAIR and C2 DINOv3, R0 records the pretraining corpus description, known included public datasets, overlap with
+R1 selection/test/external data, status (`CONFIRMED`, `EXCLUDED`, `UNKNOWN`, or `POTENTIALLY_CONTAMINATED`), and claim
+consequence. An overlap prevents a clean external-generalization claim unless resolved and disclosed.
 
-A dataset is ROI-supervision eligible only if it contains usable spatial annotation or a defensible derivation from verified spatial annotation.
-
-Initial canonical classes:
-
-```text
-MICROANEURYSM
-INTRARETINAL_HEMORRHAGE
-HARD_EXUDATE
-SOFT_EXUDATE
-NO_SUPPORTED_LESION_IN_ROI
-```
-
-Candidate source priority:
-- IDRiD spatial lesion annotations;
-- DDR spatially annotated lesion subset;
-- additional public sources only after audit.
-
-MMRDR image-level lesion presence may inform global/multi-label experiments, but must not be converted into lesion coordinates or masks.
-
-## Negative ROI policy
-
-Unannotated does not automatically mean negative.
-
-Every negative ROI must have a provenance category:
-
-```text
-VERIFIED_TRUE_NEGATIVE
-CURATED_BACKGROUND
-WEAK_NEGATIVE
-UNKNOWN
-```
-
-Only categories approved by the R0 config may enter clean-negative evaluation.
-
-`NO_SUPPORTED_LESION_IN_ROI` is an inference/UI class meaning no supported lesion was identified in the selected ROI at threshold. It is not synonymous with normal retina.
-
-## Split protocol
-
-Order is fixed:
+## Split and leakage order
 
 ```text
 source records
--> identity normalization
--> patient/eye/image split
--> freeze split manifest
--> derive ROIs/patches
+  -> normalize patient/eye/visit/image identity
+  -> assign and freeze split
+  -> derive ROIs/patches
 ```
 
-Forbidden:
+Never generate patches/ROIs and then random-split them. If patient identity is unavailable, preserve the released split,
+record the limitation, and do not claim patient-level independence.
 
-```text
-source images
--> generate many patches
--> random patch split
-```
+## Current machine-readable record
 
-If patient IDs do not exist, document the limitation and use the strongest remaining identity key without claiming patient-level independence.
+[`RSC_R0_DATASET_TAXONOMY_FREEZE_v0.1.json`](RSC_R0_DATASET_TAXONOMY_FREEZE_v0.1.json) is a V3 pre-execution audit
+record. It contains candidate MMRDR-UWF and IDRiD records, the admitted taxonomy, negative policy, split policy, and
+the currently unresolved C1/C2 overlap audit. It does not contain downloaded dataset bytes.
 
-## Acceptance evidence
+## R0 PASS evidence
 
-R0 can be `PASS` only if:
-
-- every selected dataset has a source/version/license/access record;
-- supervision type is verified;
-- global vs spatial usage is explicit;
-- taxonomy uses only supported classes;
-- negative policy is explicit;
-- split-before-derivation is enforced;
-- dataset limitations are recorded;
-- machine-readable config validates;
-- tests cover supervision type, taxonomy mapping, and split leakage guards.
-
-Otherwise: `R0_DATASET_TAXONOMY=BLOCKED` with the exact blocker.
+R0 can pass only when every selected dataset has verified source/version/license/access, supervision type, identity and
+split semantics, limitations, checksums/provenance, taxonomy eligibility, and machine-readable validation. Otherwise
+the exact blocker remains `R0_DATASET_TAXONOMY=BLOCKED`.

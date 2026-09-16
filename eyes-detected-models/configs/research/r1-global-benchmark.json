@@ -1,125 +1,179 @@
 {
-  "schema_version": "r1_global_benchmark.v0.2",
+  "schema_version": "r1_global_benchmark.v3.0",
   "status": "R1_GLOBAL_BENCHMARK=READY_NOT_EXECUTED",
-  "authority": "docs/POC_MASTER_PLAN_V2.md",
-  "dataset": {
-    "dataset_id": "mmrdr_uwf_v1",
-    "dataset_config": "eyes-detected-models/configs/datasets/mmrdr_uwf_v1.yaml",
-    "manifest_relative": "manifests/mmrdr_uwf_v2.jsonl",
-    "targets_relative": "manifests/mmrdr_uwf_v2_targets.jsonl",
-    "data_relative": "mmrdr/uwf",
-    "split_contract": "released_patient_level_outer_test; validation is derived only within release training after identity audit",
-    "label_contract": "grade is genuine ordinal 0-4; lesion list is image-level auxiliary presence only"
-  },
+  "authority": "docs/POC_MASTER_PLAN.md",
   "selection_split": "VAL",
   "held_out_split": "TEST",
-  "baseline_ladder": [
+  "target": {
+    "task": "GLOBAL_ORDINAL_DR_GRADING",
+    "grades": {
+      "0": "NO_DR",
+      "1": "MILD_NPDR",
+      "2": "MODERATE_NPDR",
+      "3": "SEVERE_NPDR",
+      "4": "PROLIFERATIVE_DR"
+    },
+    "label_requirement": "GENUINE_ORDINAL_0_TO_4_ONLY",
+    "binary_derivation": "P(any DR) = 1 - P(grade 0); never reinterpret binary labels"
+  },
+  "dataset": {
+    "dataset_id": "mmrdr_uwf_v1",
+    "role": "PRIMARY_R1_DOMAIN_HYPOTHESIS",
+    "eligibility": "R0_MUST_VERIFY_BEFORE_EXECUTION",
+    "config": "eyes-detected-models/configs/datasets/mmrdr_uwf_v1.yaml",
+    "selection_split": "VAL",
+    "held_out_split": "TEST",
+    "sealed_test": true
+  },
+  "candidates": [
     {
-      "id": "G0",
-      "name": "compact_supervised_sanity_baseline",
-      "encoder": "compact_supervised_classifier",
-      "aggregation": "global_image",
-      "purpose": "validate the data, split, training and evaluation path"
+      "id": "C0",
+      "name": "compact_supervised_transfer_control",
+      "architecture_family": "CONVNEXT_V2_TINY",
+      "backbone": "convnextv2_tiny",
+      "asset_identifier": "ConvNeXt V2 Tiny pretrained weights",
+      "asset_revision": null,
+      "adaptation_mode": "SUPERVISED_TRANSFER",
+      "input_preprocessing_contract": {
+        "target_size_px": 384,
+        "color_space": "RGB",
+        "normalization": "BACKBONE_ASSET_CARD_REQUIRED",
+        "revision": null
+      },
+      "aggregation": "GLOBAL_IMAGE",
+      "head": "MULTICLASS_LINEAR",
+      "loss": "CE",
+      "target_type": "GENUINE_ORDINAL_0_TO_4_AS_5_CLASS_CE",
+      "license_access": {
+        "status": "REQUIRES_ASSET_AND_LICENSE_REVIEW",
+        "source": "UPSTREAM_ASSET_CARD_REQUIRED",
+        "weight_hash": null
+      },
+      "execution_status": "READY_NOT_EXECUTED",
+      "metrics_artifact_path": null,
+      "deployment_artifact_path": null,
+      "purpose": "Compact modern supervised control and local CPU/deployment comparator"
     },
     {
-      "id": "G1",
-      "name": "frozen_dinov3_global_representation",
-      "encoder": "dinov3_vitb16",
-      "aggregation": "global_representation",
-      "purpose": "isolate frozen encoder transfer quality"
+      "id": "C1",
+      "name": "retina_specialist_foundation_representation",
+      "architecture_family": "FLAIR_IMAGE_ENCODER",
+      "backbone": "flair_image_encoder",
+      "asset_identifier": "FLAIR retinal image encoder",
+      "asset_revision": null,
+      "adaptation_mode": "FROZEN_ENCODER_LIGHTWEIGHT_HEAD_FIRST",
+      "input_preprocessing_contract": {
+        "target_size_px": null,
+        "color_space": "ASSET_CARD_REQUIRED",
+        "normalization": "ASSET_CARD_REQUIRED",
+        "revision": null
+      },
+      "aggregation": "GLOBAL_IMAGE",
+      "head": "MULTICLASS_LINEAR",
+      "loss": "CE",
+      "target_type": "GENUINE_ORDINAL_0_TO_4_AS_5_CLASS_CE",
+      "license_access": {
+        "status": "REQUIRES_ASSET_API_AND_LICENSE_REVIEW",
+        "source": "FLAIR_OFFICIAL_ASSET_SOURCE_REQUIRED",
+        "weight_hash": null
+      },
+      "execution_status": "READY_NOT_EXECUTED",
+      "metrics_artifact_path": null,
+      "deployment_artifact_path": null,
+      "purpose": "Test whether a retina-specialist representation transfers to the selected domain"
     },
     {
-      "id": "G2",
-      "name": "frozen_dinov3_local_pooling",
-      "encoder": "dinov3_vitb16",
-      "aggregation": "patch_mean_and_gem",
-      "purpose": "test whether local patch preservation improves grading"
-    },
-    {
-      "id": "G3",
-      "name": "frozen_dinov3_attention_mil",
-      "encoder": "dinov3_vitb16",
-      "aggregation": "attention_mil",
-      "purpose": "test learned regional aggregation; attention is not lesion localization"
-    },
-    {
-      "id": "G4",
-      "name": "global_local_fusion",
-      "encoder": "dinov3_vitb16",
-      "aggregation": "global_local_fusion",
-      "run_condition": "only if G1-G3 show complementary error patterns"
-    },
-    {
-      "id": "G5",
-      "name": "limited_partial_finetuning",
-      "encoder": "dinov3_vitb16",
-      "aggregation": "best_frozen_candidate",
-      "run_condition": "only after a frozen candidate wins"
+      "id": "C2",
+      "name": "high_resolution_local_detail_hypothesis",
+      "architecture_family": "DINOV3_VIT_B16_PATCH_ATTENTION_MIL",
+      "backbone": "dinov3_vitb16",
+      "asset_identifier": "DINOv3 ViT-B/16 pretrained weights",
+      "asset_revision": null,
+      "adaptation_mode": "FROZEN_ENCODER_PATCH_MIL_FIRST",
+      "input_preprocessing_contract": {
+        "canvas_px": 1024,
+        "grid": 5,
+        "patch_px": 224,
+        "resize_policy": "LETTERBOX",
+        "revision": null
+      },
+      "aggregation": "LEARNED_ATTENTION_MIL",
+      "head": "MULTICLASS_LINEAR",
+      "loss": "CE",
+      "target_type": "GENUINE_ORDINAL_0_TO_4_AS_5_CLASS_CE",
+      "license_access": {
+        "status": "REQUIRES_ASSET_AND_LICENSE_REVIEW",
+        "source": "DINOV3_OFFICIAL_ASSET_SOURCE_REQUIRED",
+        "weight_hash": null
+      },
+      "execution_status": "READY_NOT_EXECUTED",
+      "metrics_artifact_path": null,
+      "deployment_artifact_path": null,
+      "purpose": "Test whether high-resolution patches preserve local retinal detail"
     }
   ],
-  "head_ablation": {
+  "architecture_comparison": {
+    "initial_candidates": ["C0", "C1", "C2"],
+    "initial_loss": "CE",
+    "human_in_the_loop": true,
+    "one_candidate_per_run": true,
+    "stop_after_each_candidate": true,
+    "current_champion": null
+  },
+  "winner_only_ordinal_ablation": {
+    "status": "PLANNED_AFTER_ARCHITECTURE_DECISION",
+    "heads": ["CE", "CORN"],
     "eligible_target": "GENUINE_ORDINAL_0_TO_4",
-    "heads": ["CE", "CORAL"],
-    "binary_labels_allowed": false,
-    "selection_rule": "compare on the same frozen split and select from held-out evidence"
+    "selection_rule": "winner_or_finalist_validation_evidence_only"
   },
   "metrics": {
     "primary": "QWK",
-    "companions": [
+    "scientific_companions": [
       "macro_f1",
-      "per_class_recall",
+      "per_grade_recall",
       "balanced_accuracy",
       "confusion_matrix",
-      "calibration",
       "class_support",
-      "AUROC_AUPRC_WHERE_MEANINGFUL",
+      "calibration_curve",
+      "ECE",
+      "Brier_score",
+      "any_DR_metrics_where_meaningful",
+      "moderate_or_worse_metrics_where_meaningful",
+      "AUROC_AUPRC_where_binary_semantics_are_defined"
+    ],
+    "operational_measurements": [
+      "preprocessing_latency",
       "cpu_inference_latency",
       "peak_ram",
       "serialized_model_size",
-      "preprocessing_latency",
-      "gpu_training_cost",
-      "VRAM_RUNTIME"
+      "gpu_vram_and_runtime",
+      "gpu_training_or_extraction_cost",
+      "model_loading_time_where_useful"
     ],
-    "external_evaluation": "required when a valid independent compatible dataset is available"
+    "selection_rule": "No invented composite score or fixed tolerance before measurement and intended-use discussion"
   },
-  "deployment_practicality": {
-    "required_metrics": [
-      "cpu_inference_latency",
-      "peak_ram",
-      "serialized_model_size",
-      "preprocessing_latency",
-      "gpu_training_cost"
-    ],
-    "authoritative_inference_environment": "LOCAL_ON_PREM",
-    "selection_rule": "scientific evidence and deployment practicality are both required; highest metric alone is not sufficient"
-  },
-  "pass_condition": [
-    "real reviewed public data",
-    "authorized real DINOv3 weights",
-    "held-out evaluation for the benchmark ladder",
-    "versioned artifact metadata and reproducible configuration",
-    "deployment-practicality measurements and selection rationale",
-    "no leakage finding"
-  ],
   "storage_roots": {
     "data_env": "OCUFORGE_DATA_ROOT",
     "model_env": "OCUFORGE_MODEL_ROOT",
     "cache_env": "OCUFORGE_CACHE_ROOT",
     "artifact_env": "OCUFORGE_ARTIFACT_ROOT",
-    "preferred_storage": "provider-neutral persistent public research filesystem",
-    "authoritative_champion_archive": "LOCAL_ON_PREM",
+    "preferred_storage": "PROVIDER_NEUTRAL_PUBLIC_RESEARCH_FILESYSTEM",
+    "authoritative_inference_environment": "LOCAL_ON_PREM",
     "provider_required": false,
     "layout": {
       "data": "mmrdr/uwf",
-      "manifest": "manifests/mmrdr_uwf_v2.jsonl",
-      "model": "dinov3",
-      "features": "features/r1_global_benchmark",
-      "artifacts": "experiments/r1_global_benchmark"
+      "manifest": "manifests/mmrdr_uwf_v1.jsonl",
+      "models": "models/r1_global",
+      "features": "features/r1_global",
+      "artifacts": "experiments/r1_global"
     }
   },
-  "encoder_config": "eyes-detected-models/configs/pipeline/r1-global-extract-dino.json",
-  "train_config": "eyes-detected-models/configs/pipeline/r1-global-train.json",
-  "protocol": "eyes-detected-contracts/protocols/ico_2017_dr.v0.1.json",
+  "configs": {
+    "dataset": "eyes-detected-models/configs/datasets/mmrdr_uwf_v1.yaml",
+    "c2_encoder": "eyes-detected-models/configs/pipeline/r1-global-extract-dino.json",
+    "candidate_training": "eyes-detected-models/configs/pipeline/r1-global-train.json",
+    "protocol": "eyes-detected-contracts/protocols/ico_2017_dr.v0.1.json"
+  },
   "public_gpu_gate": {
     "execution_zone": "PUBLIC_CLOUD",
     "allowed_source_types": ["PUBLIC", "SYNTHETIC"],

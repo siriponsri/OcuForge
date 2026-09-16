@@ -1,41 +1,39 @@
-# เริ่มใช้งาน Eye Detected v0.1
+# OcuForge V3 - จุดเริ่มต้น
 
-แพ็กเกจนี้เป็นโครงระบบวิจัยที่รันด้วยข้อมูลสังเคราะห์ได้ ไม่ต้องใช้ GPU หรือให้แพทย์ทำ label ก่อน
+OcuForge เป็นโครงงานวิจัยและระบบช่วย review ภาพจอตา ไม่ใช่ผลิตภัณฑ์วินิจฉัยโรค แผนที่ใช้งานอยู่มีเพียง
+[`POC_MASTER_PLAN.md`](POC_MASTER_PLAN.md) และยังไม่ผ่าน R0 หรือรัน R1
 
-## 5 คำสั่งแรกบน Windows
+## สถานะปัจจุบัน
 
-แตก ZIP แล้วเปิด PowerShell ในโฟลเดอร์ `eyes-detected-dual-track-starter-v0.1` ติดตั้ง Python 3.12 ให้เรียก `python` ได้ก่อน
-
-```powershell
-python -m venv .venv
-.\.venv\Scripts\python.exe -m pip install torch==2.5.1 --index-url https://download.pytorch.org/whl/cpu
-.\.venv\Scripts\python.exe -m pip install -e ./eyes-detected-contracts -e ./eyes-detected-models -e ./eyes-detected-labeler -r requirements-dev.txt
-.\.venv\Scripts\python.exe -m pytest
-.\.venv\Scripts\python.exe scripts/synthetic_roundtrip.py
+```text
+R0_V3 = READY_TO_EXECUTE / NOT_YET_PASSED
+R1 C0/C1/C2 = READY_NOT_EXECUTED
+CURRENT_R1_CHAMPION = NONE
 ```
 
-การเรียก Python ใน `.venv` โดยตรงไม่ต้องเปลี่ยน PowerShell execution policy การติดตั้งครั้งแรกต้องมีอินเทอร์เน็ต หลังติดตั้งแล้ว test/demo ใช้งาน offline ได้
+การตรวจเอกสารรอบนี้ไม่ download dataset, ไม่ train model และไม่ provision cloud GPU
 
-## ผลที่ควรเห็น
+## ลำดับการอ่าน
 
-- pytest แสดงว่าผ่านทุก test; จำนวนจริงอยู่ใน FINAL_DELIVERY_REPORT
-- demo แสดง `weights_updated: true`, `scientific_result_eligible: false`
-- `artifacts/smoke/images.jsonl` มี 10 synthetic images
-- `artifacts/smoke/predictions.jsonl` เป็นผลโมเดลทดลองพร้อม synthetic candidate point ที่ระบุชัด
-- `artifacts/roundtrip/annotations.jsonl` เก็บประวัติ PROPOSE → CORRECT → ADJUDICATE → LOCK
-- `artifacts/smoke/annotation_batch.json` เป็น 3 cases ที่เลือกได้
+1. [`POC_MASTER_PLAN.md`](POC_MASTER_PLAN.md) - ทิศทาง V3 และ execution gate
+2. [`R0_DATASET_SUPERVISION_FREEZE.md`](R0_DATASET_SUPERVISION_FREEZE.md) - แหล่งข้อมูล supervision และ leakage
+3. [`R1_GLOBAL_MODEL_SELECTION.md`](R1_GLOBAL_MODEL_SELECTION.md) - C0/C1/C2 และ CE-first benchmark
+4. [`IMPLEMENTATION_STATUS.md`](IMPLEMENTATION_STATUS.md) - สิ่งที่พร้อมและ gate ที่ยังเปิด
+5. [`CTR_MODULE_CONTRACT.md`](CTR_MODULE_CONTRACT.md) - boundary ระหว่าง contracts, models และ labeler
 
-คะแนน loss ใช้ตรวจกลไก training เท่านั้น ไม่ใช่ความแม่นยำตรวจโรค
+## ตรวจแบบ offline
 
-## อ่านอะไรต่อ
+```powershell
+.\.venv\Scripts\python.exe -m pytest
+.\.venv\Scripts\python.exe -m ruff check .
+.\.venv\Scripts\python.exe scripts\validate_configs.py
+.\.venv\Scripts\python.exe scripts\package_check.py
+```
 
-1. LOCAL_SETUP_TH.md เพื่อใช้ Docker
-2. GRADING_PROTOCOL_TH.md เพื่อเข้าใจเกณฑ์ ICO และข้อมูล DR/no-DR เดิม
-3. ../eyes-detected-labeler/docs/CVAT_SETUP_TH.md เพื่อทดลอง CVAT local
-4. IMPLEMENTATION_STATUS.md เพื่อแยกสิ่งที่ทำแล้วกับงานถัดไป
+Synthetic smoke ใช้ตรวจ engineering path เท่านั้น ไม่ใช่ผลวิจัยหรือผลทางคลินิก ก่อนรัน R0 ต้องกำหนดแหล่งข้อมูล
+public ให้ครบ ตรวจ license, identity-safe split, supervision semantics และ pretraining overlap ก่อนเสมอ
 
-แผน POC ปัจจุบันอยู่ที่ `docs/POC_MASTER_PLAN_V2.md` ของ workspace; ก่อนรันงานวิจัยให้อ่าน
-`R0_DATASET_SUPERVISION_FREEZE.md` และ `R1_GLOBAL_MODEL_SELECTION.md` ด้วย R0 V2 ยังเป็น READY_TO_EXECUTE
-ไม่ใช่ PASS และ R1 G0-G5 ยังไม่ได้รัน
+## กฎข้อมูล
 
-อย่าใส่ภาพโรงพยาบาลใน GitHub, starter folder, Space หรือ cloud GPU ผู้ใช้ต้องกำหนด local secure data root ภายใต้การดูแลของหน่วยงานในขั้นถัดไป
+ห้าม commit ภาพโรงพยาบาล, PHI, credentials, weights หรือ derived private artifacts ภาพและข้อมูล private ต้องอยู่
+local/on-premise เท่านั้น Public GPU ใช้กับ public หรือ synthetic data ที่ตรวจสอบแล้วเท่านั้น

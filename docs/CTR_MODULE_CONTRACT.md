@@ -25,8 +25,8 @@ The primary goal is to let multiple contributors or agents work in parallel with
 
 ### Current POC direction
 
-The current execution order is the evidence-driven two-track plan in
-`docs/POC_MASTER_PLAN_V2.md`: R0 supervision/taxonomy/split audit, controlled R1 G0-G5 global benchmark,
+The current execution order is the V3 two-track plan in
+`docs/POC_MASTER_PLAN.md`: R0 data/supervision/split/asset audit, controlled R1 C0/C1/C2 global benchmark,
 separate spatial ROI model work, Label Studio Community internal QA, and integration with the existing
 customer-facing GUI reference under `templates/`. `MDL` owns the global and ROI models. `LBL` supports internal
 ROI review through Label Studio Community and retained annotation adapters. `RUN` supports the shared inference
@@ -43,7 +43,7 @@ Use these six canonical module IDs in plans, issues, handoffs, specifications, a
 | Module ID | Short code | Primary responsibility |
 |---|---:|---|
 | `CONTRACTS` | `CTR` | Shared schemas, protocols, provenance, validation, interface contracts |
-| `MODELS` | `MDL` | Encoders, feature extraction, MIL/CORAL, training, inference, evaluation |
+| `MODELS` | `MDL` | C0/C1/C2 adapters, encoders, MIL/ordinal heads, training, inference, evaluation |
 | `LABELER` | `LBL` | ROI review, Label Studio QA, retained CVAT integration, correction, export |
 | `DATA` | `DAT` | Local/on-prem metadata, immutable image objects, revisions, releases, backup/restore |
 | `RUNTIME` | `RUN` | Docker, local deployment, GPU execution, environment/bootstrap, public-cloud execution boundaries |
@@ -103,7 +103,7 @@ eyes-detected-contracts/
 - feature extraction;
 - patch/grid processing;
 - MIL aggregation;
-- ordinal heads such as CORAL;
+- ordinal heads such as CORAL (legacy) and CORN (winner-only V3 ablation);
 - binary/multilabel heads where semantically valid;
 - training loops;
 - checkpoint handling;

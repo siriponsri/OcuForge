@@ -1,196 +1,51 @@
-# DR Review Workspace Integration Contract
+# DR Review Workspace integration contract
 
-**Artifact:** DR Review Workspace — Screening Support POC
-**Role:** Customer-facing GUI reference for OcuForge
-**Status:** Static HTML/CSS/JS package, mock-first
+**Status:** ACTIVE SUPPORTING CONTRACT
+**Authority:** [`POC_MASTER_PLAN.md`](POC_MASTER_PLAN.md)
+**Artifact:** existing `templates/` static HTML/CSS/JS customer-facing POC reference
 
-## 1. Preserve the existing UX
+## Preserve the existing workspace
 
-The package already implements the preferred information architecture:
-
-```text
-Review Workspace
-  Overview
-  Screening
-  Review Queue
-
-Model Lab
-  Explainability
-  Model Comparison
-
-System
-  Integrations
-```
-
-Do not replace this with a generic all-in-one dashboard.
-
-The production implementation may migrate to Vue/Nuxt later, but should preserve the current user story and adapter boundaries.
-
-## 2. Primary clinical-review flow
+Do not replace the current information architecture with a competing dashboard:
 
 ```text
-Open Overview
--> Continue Screening
--> inspect source image / laterality / modality / ROI
--> inspect AI suggestion
--> Confirm | Correct | Reject | Escalate
--> retain original prediction
--> store reviewer decision separately
--> continue
+Review Workspace: Overview · Screening · Review Queue
+Model Lab: Explainability · Model Comparison
+System: Integrations
 ```
 
-The image remains primary. Model suggestion is secondary.
+The image remains primary and the model suggestion remains secondary. Reviewer decisions are stored separately from
+the original prediction, with image/study identity, laterality/modality, ROI identity and geometry, model version,
+scores, reviewer action, note, timestamp, and approved reviewer identity.
 
-## 3. Supported ROI interaction
-
-Current package supports:
-
-- point;
-- rectangle;
-- polygon.
-
-Canonical labels in the package:
+## V3 review flow
 
 ```text
-MICROANEURYSM
-INTRARETINAL_HEMORRHAGE
-HARD_EXUDATE
-SOFT_EXUDATE
-NO_SUPPORTED_LESION_IN_ROI
+image -> QC/gradability -> global DR suggestion -> calibration/OOD -> soft Global→ROI triage
+                                                        |
+                         default ROI skip <-------------+-------------> open ROI review
+                                                        |
+             reviewer can always Inspect ROI Anyway / Correct Grade / Comment / Accept / Mark Incorrect
 ```
 
-Review decisions:
+The versioned contract is `global_roi_triage_policy.v0.1`, `global_roi_triage_input.v0.1`, and
+`global_roi_triage_decision.v0.1` in the contracts package. The confidence threshold is unset until calibration
+evidence validates a policy version; the GUI must not invent `0.5`, `0.8`, or another constant.
 
-```text
-CONFIRM
-CORRECT
-REJECT
-ESCALATE
-```
+`GLOBAL_NO_DR` is not `NO_SUPPORTED_LESION_IN_ROI`. The ROI negative semantic is limited to supported lesion classes
+inside the selected ROI. It is not a statement about the whole eye or pathology outside the ROI.
 
-Reviewer certainty:
+## Adapter boundary
 
-```text
-HIGH
-MEDIUM
-LOW
-```
+Future integration targets include `/v1/infer/global`, `/v1/infer/lesion-roi`, `/v1/models`, `/v1/explain/roi`, and
+`/v1/evaluate/model-diff`. The page code depends on an adapter and shared contracts, never MDL internals. AI evidence
+is labeled as aggregation evidence when it comes from MIL attention; it is not lesion localization.
 
-These align with the revised R0 spatial-taxonomy starting point.
+Label Studio Community is the internal ROI QA/HITL workbench (`suggestion → confirm/correct/reject/escalate`). CVAT is
+optional advanced annotation infrastructure. Browser clients never hold service secrets.
 
-## 4. Model boundary
+## Clinical and governance boundary
 
-Current intended endpoints:
-
-```text
-POST /v1/infer/global
-POST /v1/infer/lesion-roi
-GET  /v1/models
-POST /v1/explain/roi
-POST /v1/evaluate/model-diff
-```
-
-`/v1/explain/roi` and `/v1/evaluate/model-diff` are integration targets until implemented.
-
-Page code should depend on an adapter, not direct model internals.
-
-## 5. Annotation contract
-
-A reviewer record must preserve:
-
-- task identity;
-- image/study identity;
-- laterality/modality where available;
-- ROI identity;
-- ROI type;
-- coordinate space;
-- original ROI geometry;
-- original model name/version;
-- ranked model predictions/scores;
-- original suggestion;
-- reviewer decision;
-- final reviewer label when applicable;
-- reviewer note/certainty when enabled;
-- review timestamp;
-- reviewer identity or approved pseudonymous identifier.
-
-A correction must never overwrite the original model prediction.
-
-## 6. Coordinate systems
-
-The current example contract uses normalized coordinates 0–1.
-
-Label Studio region exports may use 0–100 coordinate conventions.
-
-The trusted bridge/adapter must:
-- convert explicitly;
-- preserve original geometry;
-- record coordinate-space metadata;
-- reject unknown coordinate spaces rather than guess.
-
-## 7. Label Studio role
-
-Label Studio Community Edition is the preferred internal ROI review/QA workbench.
-
-Use the supplied ROI lesion labeling configuration as the POC starting point.
-
-Browser clients must not contain Label Studio API secrets.
-
-Use a trusted backend bridge for:
-- authentication/authorization;
-- task mapping;
-- prediction mapping;
-- decision submission;
-- audit logging;
-- schema validation;
-- CORS;
-- credential storage.
-
-CVAT remains optional for advanced boxes/polygons/masks/segmentation workflows.
-
-## 8. Explainability boundary
-
-The GUI already states the correct interpretation:
-
-- case-first;
-- source image vs attention vs ROI;
-- ranked evidence regions;
-- explicit limitation.
-
-MIL attention must be labeled as **aggregation evidence**, not lesion localization, segmentation, or validated causal explanation.
-
-ROI classifier output and MIL evidence must not be visually conflated.
-
-## 9. Model comparison boundary
-
-The GUI supports:
-- Improved
-- Regressed
-- Changed
-- Unchanged
-
-A live implementation must bind these categories to:
-- a versioned evaluation set;
-- a reference-status definition;
-- task-specific metric/protocol;
-- model A and model B immutable versions.
-
-No mock metric becomes a scientific claim.
-
-## 10. Safety/UI language
-
-Allowed framing:
-- Screening Support
-- Research Review
-- AI Suggestion
-- Reviewer Decision
-- Evidence
-- Model Comparison
-
-Avoid unsupported framing:
-- diagnosis;
-- confirmed disease;
-- treatment/referral instruction;
-- whole-eye normal based on one negative ROI.
-
-`No lesion detected` in the UI must map internally to `NO_SUPPORTED_LESION_IN_ROI` and retain the narrower meaning.
+Allowed language: Screening Support, Research Review, AI Suggestion, Reviewer Decision, Evidence, Model Comparison.
+Avoid diagnosis, confirmed disease, treatment/referral instruction, and whole-eye normal claims. DME remains a separate
+axis and fundus/UWF alone is not OCT-confirmed DME. The templates package remains the GUI target.

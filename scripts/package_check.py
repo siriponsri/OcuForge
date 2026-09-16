@@ -4,7 +4,19 @@ import argparse, ast, hashlib, json, re, zipfile
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
-EXCLUDE = {".git", ".venv", "__pycache__", ".pytest_cache", ".ruff_cache", "artifacts"}
+EXCLUDE = {
+    ".git",
+    ".venv",
+    ".tools",
+    "__pycache__",
+    ".pytest_cache",
+    ".ruff_cache",
+    "artifacts",
+    "cache",
+    "data",
+    "local-state",
+    "weights",
+}
 REQUIRED = [
     "README.md",
     "eyes-detected-models/pyproject.toml",

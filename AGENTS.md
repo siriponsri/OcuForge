@@ -13,18 +13,18 @@ Keep the contracts-first boundary: models and labeler may depend on contracts, b
 ## Current POC Direction
 
 The authoritative evidence-driven research/POC direction is
-[POC_MASTER_PLAN_V2.md](docs/POC_MASTER_PLAN_V2.md). The previous interactive-lesion plan is retained only as
-a superseded historical pointer; do not use it to infer current phase status or model selection.
+[POC_MASTER_PLAN.md](docs/POC_MASTER_PLAN.md). V2 and the previous interactive-lesion plan are retained only as
+superseded historical pointers; do not use them to infer current phase status or model selection.
 The current planning state is:
 
 ```text
 POC_PRIMARY=MODEL_INTERACTIVE_GUI
 MODEL_TRAINING_PRIORITY=HIGH
-R0_V2=READY_TO_EXECUTE
+R0_V3=READY_TO_EXECUTE
 GLOBAL_MODEL=EVIDENCE_SELECTED_AFTER_R1
-GLOBAL_MODEL_LEADING_CANDIDATE=DINOV3_ATTENTION_MIL
-R1=CONTROLLED_BENCHMARK_G0_G5
-ORDINAL_HEADS=CE_AND_CORAL_ABLATION_FOR_GENUINE_ORDINAL_LABELS
+GLOBAL_MODEL_LEADING_CANDIDATE=NONE_BEFORE_R1
+R1=THREE_CANDIDATE_CE_FIRST_BENCHMARK
+ORDINAL_HEADS=CE_AND_WINNER_ONLY_CORN_ABLATION
 ROI_LESION_CLASSIFIER=SEPARATE_MODEL_TRACK
 LESION_TAXONOMY=SPATIALLY_SUPPORTED_CLASSES_ONLY
 MMRDR_LESION_SUPERVISION=IMAGE_LEVEL_ONLY
@@ -40,8 +40,8 @@ HL7_FHIR=PLANNED_AFTER_MODEL_GUI
 PUBLIC_GPU_PRIVATE_DATA=FORBIDDEN
 ```
 
-R0_V2=READY_TO_EXECUTE and has not passed after the supervision/taxonomy re-audit. R1 is a controlled G0-G5
-benchmark and is READY_NOT_EXECUTED. Do not launch a large GPU run, provision RunPod, or download a large dataset
+R0_V3=READY_TO_EXECUTE and has not passed after the supervision/taxonomy/pretraining-overlap audit. R1 is a three-
+candidate CE-first benchmark and is READY_NOT_EXECUTED. Do not launch a large GPU run, provision RunPod, or download a large dataset
 in this documentation gate; use provider-neutral configurable storage roots for the future public-data run.
 
 Before cross-package or cross-runtime work, read `docs/CTR_MODULE_CONTRACT.md`. Respect module ownership, dependency direction,

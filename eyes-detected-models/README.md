@@ -11,16 +11,8 @@ python -m eyes_detected.cli smoke-train --protocol eyes-detected-contracts/proto
 python -m pytest
 ```
 
-Configuration and examples live in this package; model and labeler packages consume `eyes-detected-contracts==0.1.0` independently.
-
-```mermaid
-flowchart TD
- M["Model package"] --> P["Prediction contract"]
- P --> L["CVAT bridge"]
- L --> A["Annotation contract"]
- A --> V["Eligibility validator"]
- V --> M
-```
+Configuration and examples live in this package; model code depends on the shared contracts package and never on the
+labeler implementation. See the [V3 system architecture](../docs/diagrams/ocuforge-system-architecture.svg).
 
 See [implementation status](../docs/IMPLEMENTATION_STATUS.md), [safety](../docs/SAFETY_AND_SCOPE.md) and [Thai quickstart](QUICKSTART_TH.md).
 

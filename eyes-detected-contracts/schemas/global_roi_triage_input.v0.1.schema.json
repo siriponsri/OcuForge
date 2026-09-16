@@ -1,0 +1,118 @@
+{
+  "$defs": {
+    "ProtocolRef": {
+      "additionalProperties": false,
+      "properties": {
+        "protocol_id": {
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,127}$",
+          "title": "Protocol Id",
+          "type": "string"
+        },
+        "version": {
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,127}$",
+          "title": "Version",
+          "type": "string"
+        },
+        "config_sha256": {
+          "pattern": "^[a-f0-9]{64}$",
+          "title": "Config Sha256",
+          "type": "string"
+        }
+      },
+      "required": [
+        "protocol_id",
+        "version",
+        "config_sha256"
+      ],
+      "title": "ProtocolRef",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {
+      "const": "global_roi_triage_input.v0.1",
+      "default": "global_roi_triage_input.v0.1",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "image_id": {
+      "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,127}$",
+      "title": "Image Id",
+      "type": "string"
+    },
+    "in_scope": {
+      "title": "In Scope",
+      "type": "boolean"
+    },
+    "gradability": {
+      "enum": [
+        "GRADABLE",
+        "PARTIALLY_GRADABLE",
+        "UNGRADABLE",
+        "UNKNOWN"
+      ],
+      "title": "Gradability",
+      "type": "string"
+    },
+    "predicted_grade": {
+      "maximum": 4,
+      "minimum": 0,
+      "title": "Predicted Grade",
+      "type": "integer"
+    },
+    "calibrated_confidence": {
+      "anyOf": [
+        {
+          "maximum": 1,
+          "minimum": 0,
+          "type": "number"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Calibrated Confidence"
+    },
+    "qc_uncertainty": {
+      "default": false,
+      "title": "Qc Uncertainty",
+      "type": "boolean"
+    },
+    "ood_flag": {
+      "default": false,
+      "title": "Ood Flag",
+      "type": "boolean"
+    },
+    "grading_protocol": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/ProtocolRef"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null
+    },
+    "reviewer_override": {
+      "default": "NONE",
+      "enum": [
+        "NONE",
+        "OPEN_ROI_REVIEW",
+        "INSPECT_ROI_ANYWAY"
+      ],
+      "title": "Reviewer Override",
+      "type": "string"
+    }
+  },
+  "required": [
+    "image_id",
+    "in_scope",
+    "gradability",
+    "predicted_grade"
+  ],
+  "title": "GlobalROITriageInput",
+  "type": "object"
+}

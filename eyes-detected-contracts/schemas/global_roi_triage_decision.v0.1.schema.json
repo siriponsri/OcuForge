@@ -1,0 +1,69 @@
+{
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {
+      "const": "global_roi_triage_decision.v0.1",
+      "default": "global_roi_triage_decision.v0.1",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "image_id": {
+      "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,127}$",
+      "title": "Image Id",
+      "type": "string"
+    },
+    "action": {
+      "enum": [
+        "DEFAULT_SKIP_ROI_REVIEW",
+        "OPEN_ROI_REVIEW"
+      ],
+      "title": "Action",
+      "type": "string"
+    },
+    "reason_codes": {
+      "items": {
+        "enum": [
+          "REVIEWER_OVERRIDE",
+          "OUT_OF_SCOPE",
+          "NOT_GRADABLE",
+          "GRADE_REQUIRES_REVIEW",
+          "LOW_CONFIDENCE",
+          "QC_UNCERTAINTY",
+          "OOD_FLAG",
+          "PROTOCOL_UNKNOWN",
+          "THRESHOLD_UNSET",
+          "SAFE_GLOBAL_NO_DR"
+        ],
+        "type": "string"
+      },
+      "minItems": 1,
+      "title": "Reason Codes",
+      "type": "array"
+    },
+    "reviewer_controls": {
+      "items": {
+        "type": "string"
+      },
+      "minItems": 5,
+      "title": "Reviewer Controls",
+      "type": "array"
+    },
+    "global_semantic": {
+      "enum": [
+        "GLOBAL_NO_DR",
+        "GLOBAL_DR_PRESENT_OR_UNCERTAIN"
+      ],
+      "title": "Global Semantic",
+      "type": "string"
+    }
+  },
+  "required": [
+    "image_id",
+    "action",
+    "reason_codes",
+    "reviewer_controls",
+    "global_semantic"
+  ],
+  "title": "TriageDecision",
+  "type": "object"
+}

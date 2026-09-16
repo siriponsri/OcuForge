@@ -1,11 +1,11 @@
 {
   "schema_version": "r0_dataset_supervision_audit.v0.2",
-  "record_type": "R0_V2_PRE_EXECUTION_AUDIT_RECORD",
-  "status": "R0_V2=READY_TO_EXECUTE",
+  "record_type": "R0_V3_PRE_EXECUTION_AUDIT_RECORD",
+  "status": "R0_V3=READY_TO_EXECUTE",
   "audit_date": "2026-09-16",
   "decision_scope": "R0 V2 pre-execution audit; candidate records only; no dataset bytes downloaded",
-  "authority": "docs/POC_MASTER_PLAN_V2.md and docs/R0_DATASET_SUPERVISION_FREEZE.md",
-  "supersedes_status": "OLD_R0_RECORD_RETIRED_BY_V2_REPLAN",
+  "authority": "docs/POC_MASTER_PLAN.md and docs/R0_DATASET_SUPERVISION_FREEZE.md",
+  "supersedes_status": "R0_V2_RECORD_RETIRED_BY_V3_REPLAN",
   "candidate_datasets": [
     {
       "role": "GLOBAL_DR",
@@ -211,12 +211,28 @@
   },
   "r1_boundary": {
     "status": "R1_GLOBAL_BENCHMARK=READY_NOT_EXECUTED",
-    "baseline": "G0-G5 controlled global benchmark with CE/CORAL head ablation for genuine ordinal labels",
+    "baseline": "C0/C1/C2 controlled global benchmark with CE first and winner-only CE/CORN ablation",
     "dataset": "mmrdr_uwf_v1 only",
     "tiny_test_encoder": "TEST_ONLY",
-    "real_execution": "Requires approved local DINOv3 checkout, weights, SHA-256 and license decision",
+    "real_execution": "Requires R0 approval of data, candidate assets, pretraining overlap and license decisions",
     "gpu_policy": "Public or synthetic data only; no provisioning or spending in this commit"
   },
+  "foundation_model_overlap_audit": [
+    {
+      "candidate_id": "C1",
+      "pretraining_corpus_description": "FLAIR retinal image encoder pretraining corpus must be recorded from the official asset documentation before R1.",
+      "known_included_public_datasets": [],
+      "overlap_status": "UNKNOWN",
+      "claim_consequence": "No clean external-generalization claim is permitted until corpus overlap is resolved."
+    },
+    {
+      "candidate_id": "C2",
+      "pretraining_corpus_description": "DINOv3 generic visual pretraining corpus and revision must be recorded from the official asset documentation before R1.",
+      "known_included_public_datasets": [],
+      "overlap_status": "UNKNOWN",
+      "claim_consequence": "Retinal dataset evaluation must disclose any known or potential pretraining contamination."
+    }
+  ],
   "evidence": [
     {
       "source": "MMRDR Figshare API metadata",

@@ -44,9 +44,21 @@ def test_r1_freeze_requires_provider_neutral_storage():
         validate_r1(mutated, ROOT)
 
 
-def test_r1_freeze_requires_controlled_g0_to_g5_ladder():
+def test_r1_freeze_requires_all_three_v3_candidates():
     config = load_json(ROOT / "eyes-detected-models/configs/research/r1-global-benchmark.json")
     mutated = copy.deepcopy(config)
-    mutated["baseline_ladder"].pop()
-    with pytest.raises(ValueError, match="G0 through G5"):
+    mutated["candidates"].pop()
+    with pytest.raises(ValueError, match="C0, C1, and C2"):
+        validate_r1(mutated, ROOT)
+
+
+def test_r1_freeze_rejects_fake_metrics_and_architecture_loss_confounding():
+    config = load_json(ROOT / "eyes-detected-models/configs/research/r1-global-benchmark.json")
+    mutated = copy.deepcopy(config)
+    mutated["candidates"][0]["metrics_artifact_path"] = "metrics.json"
+    with pytest.raises(ValueError, match="fake measured metrics"):
+        validate_r1(mutated, ROOT)
+    mutated = copy.deepcopy(config)
+    mutated["candidates"][1]["loss"] = "CORN"
+    with pytest.raises(ValueError, match="CE for every candidate"):
         validate_r1(mutated, ROOT)

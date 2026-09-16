@@ -5,8 +5,8 @@
 **Scope:** Parallel OcuForge development using separate Git branches, worktrees, terminals, agents, PRs, and cleanup
 **Authority:** Repository workflow guidance subordinate to `AGENTS.md` and `docs/CTR_MODULE_CONTRACT.md`
 
-The current POC sequence is the evidence-driven two-track plan. See
-[POC_MASTER_PLAN_V2.md](POC_MASTER_PLAN_V2.md) for the authoritative priority and
+The current POC sequence is the V3 evidence-driven two-track plan. See
+[POC_MASTER_PLAN.md](POC_MASTER_PLAN.md) for the authoritative priority and
 [R0_DATASET_SUPERVISION_FREEZE.md](R0_DATASET_SUPERVISION_FREEZE.md) for the current pre-execution gate.
 
 ---
@@ -28,7 +28,7 @@ Typical ownership:
 | Arm | Primary modules | Typical work |
 |---|---|---|
 | Labeler Arm | `LBL`, `DAT`, local/on-prem `RUN` | Label Studio Community ROI QA, retained CVAT workflow, MongoDB, adjudication, local releases |
-| Research Arm | `MDL`, `RSC`, public/synthetic `RUN` | dataset/taxonomy audit, global and ROI baselines, DINOv3, MIL/CORAL, evaluation, public jobs |
+| Research Arm | `MDL`, `RSC`, public/synthetic `RUN` | R0 audit, C0/C1/C2 global candidates, ROI track, evaluation, public jobs |
 | GUI integration | `RUN` with `LBL` and shared `CTR` | customer-facing ROI interaction, model API integration, confirm/change/reject UX |
 | Shared boundary | `CTR` | schemas, protocols, shared provenance/semantic contracts |
 

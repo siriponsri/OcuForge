@@ -1,5 +1,7 @@
 {
-  "purpose": "shared frozen-feature extraction for eligible R1 G1-G3 candidates",
+  "purpose": "C2-only frozen-feature extraction; attention is aggregation evidence, not lesion localization",
+  "authority": "docs/POC_MASTER_PLAN.md",
+  "candidate_id": "C2",
   "encoder": "dinov3_vitb16",
   "device": "cuda",
   "seed": 42,

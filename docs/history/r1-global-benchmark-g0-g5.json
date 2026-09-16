@@ -1,0 +1,131 @@
+{
+  "schema_version": "r1_global_benchmark.v0.2",
+  "status": "R1_GLOBAL_BENCHMARK=READY_NOT_EXECUTED",
+  "authority": "docs/POC_MASTER_PLAN_V2.md",
+  "dataset": {
+    "dataset_id": "mmrdr_uwf_v1",
+    "dataset_config": "eyes-detected-models/configs/datasets/mmrdr_uwf_v1.yaml",
+    "manifest_relative": "manifests/mmrdr_uwf_v2.jsonl",
+    "targets_relative": "manifests/mmrdr_uwf_v2_targets.jsonl",
+    "data_relative": "mmrdr/uwf",
+    "split_contract": "released_patient_level_outer_test; validation is derived only within release training after identity audit",
+    "label_contract": "grade is genuine ordinal 0-4; lesion list is image-level auxiliary presence only"
+  },
+  "selection_split": "VAL",
+  "held_out_split": "TEST",
+  "baseline_ladder": [
+    {
+      "id": "G0",
+      "name": "compact_supervised_sanity_baseline",
+      "encoder": "compact_supervised_classifier",
+      "aggregation": "global_image",
+      "purpose": "validate the data, split, training and evaluation path"
+    },
+    {
+      "id": "G1",
+      "name": "frozen_dinov3_global_representation",
+      "encoder": "dinov3_vitb16",
+      "aggregation": "global_representation",
+      "purpose": "isolate frozen encoder transfer quality"
+    },
+    {
+      "id": "G2",
+      "name": "frozen_dinov3_local_pooling",
+      "encoder": "dinov3_vitb16",
+      "aggregation": "patch_mean_and_gem",
+      "purpose": "test whether local patch preservation improves grading"
+    },
+    {
+      "id": "G3",
+      "name": "frozen_dinov3_attention_mil",
+      "encoder": "dinov3_vitb16",
+      "aggregation": "attention_mil",
+      "purpose": "test learned regional aggregation; attention is not lesion localization"
+    },
+    {
+      "id": "G4",
+      "name": "global_local_fusion",
+      "encoder": "dinov3_vitb16",
+      "aggregation": "global_local_fusion",
+      "run_condition": "only if G1-G3 show complementary error patterns"
+    },
+    {
+      "id": "G5",
+      "name": "limited_partial_finetuning",
+      "encoder": "dinov3_vitb16",
+      "aggregation": "best_frozen_candidate",
+      "run_condition": "only after a frozen candidate wins"
+    }
+  ],
+  "head_ablation": {
+    "eligible_target": "GENUINE_ORDINAL_0_TO_4",
+    "heads": ["CE", "CORAL"],
+    "binary_labels_allowed": false,
+    "selection_rule": "compare on the same frozen split and select from held-out evidence"
+  },
+  "metrics": {
+    "primary": "QWK",
+    "companions": [
+      "macro_f1",
+      "per_class_recall",
+      "balanced_accuracy",
+      "confusion_matrix",
+      "calibration",
+      "class_support",
+      "AUROC_AUPRC_WHERE_MEANINGFUL",
+      "cpu_inference_latency",
+      "peak_ram",
+      "serialized_model_size",
+      "preprocessing_latency",
+      "gpu_training_cost",
+      "VRAM_RUNTIME"
+    ],
+    "external_evaluation": "required when a valid independent compatible dataset is available"
+  },
+  "deployment_practicality": {
+    "required_metrics": [
+      "cpu_inference_latency",
+      "peak_ram",
+      "serialized_model_size",
+      "preprocessing_latency",
+      "gpu_training_cost"
+    ],
+    "authoritative_inference_environment": "LOCAL_ON_PREM",
+    "selection_rule": "scientific evidence and deployment practicality are both required; highest metric alone is not sufficient"
+  },
+  "pass_condition": [
+    "real reviewed public data",
+    "authorized real DINOv3 weights",
+    "held-out evaluation for the benchmark ladder",
+    "versioned artifact metadata and reproducible configuration",
+    "deployment-practicality measurements and selection rationale",
+    "no leakage finding"
+  ],
+  "storage_roots": {
+    "data_env": "OCUFORGE_DATA_ROOT",
+    "model_env": "OCUFORGE_MODEL_ROOT",
+    "cache_env": "OCUFORGE_CACHE_ROOT",
+    "artifact_env": "OCUFORGE_ARTIFACT_ROOT",
+    "preferred_storage": "provider-neutral persistent public research filesystem",
+    "authoritative_champion_archive": "LOCAL_ON_PREM",
+    "provider_required": false,
+    "layout": {
+      "data": "mmrdr/uwf",
+      "manifest": "manifests/mmrdr_uwf_v2.jsonl",
+      "model": "dinov3",
+      "features": "features/r1_global_benchmark",
+      "artifacts": "experiments/r1_global_benchmark"
+    }
+  },
+  "encoder_config": "eyes-detected-models/configs/pipeline/r1-global-extract-dino.json",
+  "train_config": "eyes-detected-models/configs/pipeline/r1-global-train.json",
+  "protocol": "eyes-detected-contracts/protocols/ico_2017_dr.v0.1.json",
+  "public_gpu_gate": {
+    "execution_zone": "PUBLIC_CLOUD",
+    "allowed_source_types": ["PUBLIC", "SYNTHETIC"],
+    "private_data_allowed": false,
+    "provisioning": false,
+    "network_required_during_run": false,
+    "weights_must_be_local_and_hashed": true
+  }
+}

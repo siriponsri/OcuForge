@@ -1,0 +1,108 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>OcuForge system architecture</title>
+  <style>
+    :root { --paper:#f5f5f5; --paper-2:#fbfbfa; --ink:#2d3142; --muted:#4f5d75; --soft:#9aa3b5; --rule:#d9dbe1; --accent:#eb6c36; --tint:#fbe7dc; --link:#2e5aa8; }
+    * { box-sizing:border-box; }
+    body { margin:0; background:var(--paper); color:var(--ink); font-family:Segoe UI,Arial,sans-serif; }
+    main { max-width:1260px; margin:auto; padding:26px 30px 34px; }
+    .eyebrow { color:var(--muted); font:600 12px Consolas,monospace; letter-spacing:.14em; }
+    h1 { margin:10px 0 5px; font:400 34px Georgia,serif; }
+    p { max-width:800px; margin:0 0 20px; color:var(--muted); font-size:15px; line-height:1.5; }
+    svg { display:block; width:100%; height:auto; }
+    @media print { body { background:#fff; } main { padding:0; } }
+  </style>
+</head>
+<body>
+<main>
+  <div class="eyebrow">OCUFORGE / V3 DIRECTION</div>
+  <h1>Evidence first. Review always.</h1>
+  <p>The contracts-first architecture keeps global DR grading, ROI lesion review, and deployment boundaries explicit.</p>
+  <svg viewBox="0 0 1200 760" role="img" aria-labelledby="architecture-title architecture-desc" xmlns="http://www.w3.org/2000/svg">
+    <title id="architecture-title">OcuForge contracts-first system architecture</title>
+    <desc id="architecture-desc">Public retinal data enters the R0 freeze, splits into global and ROI tracks, reaches a versioned model API, and is reviewed through internal QA and the customer-facing workspace. Later integrations remain downstream.</desc>
+    <defs>
+      <marker id="architecture-arrow" markerWidth="9" markerHeight="7" refX="8" refY="3.5" orient="auto"><path d="M0 0 L9 3.5 L0 7 Z" fill="#4f5d75"/></marker>
+      <marker id="architecture-accent-arrow" markerWidth="9" markerHeight="7" refX="8" refY="3.5" orient="auto"><path d="M0 0 L9 3.5 L0 7 Z" fill="#eb6c36"/></marker>
+      <style>
+        .kicker { font:600 11px Consolas,monospace; letter-spacing:1.7px; fill:#4f5d75; }
+        .title { font:600 17px Segoe UI,Arial,sans-serif; fill:#2d3142; }
+        .body { font:400 13px Segoe UI,Arial,sans-serif; fill:#4f5d75; }
+        .mono { font:500 11px Consolas,monospace; fill:#4f5d75; }
+        .box { fill:#fbfbfa; stroke:#2d3142; stroke-width:1.4; }
+        .store { fill:#eef0f3; stroke:#4f5d75; stroke-width:1.2; }
+        .focal { fill:#fbe7dc; stroke:#eb6c36; stroke-width:1.8; }
+        .optional { fill:#f5f5f5; stroke:#9aa3b5; stroke-width:1.2; stroke-dasharray:6 5; }
+        .connector { fill:none; stroke:#4f5d75; stroke-width:2; stroke-linecap:round; stroke-linejoin:round; marker-end:url(#architecture-arrow); }
+        .connector-accent { fill:none; stroke:#eb6c36; stroke-width:2.5; stroke-linecap:round; stroke-linejoin:round; marker-end:url(#architecture-accent-arrow); }
+        .note { fill:#2d3142; font:italic 16px Georgia,serif; }
+      </style>
+    </defs>
+    <rect width="1200" height="760" fill="#f5f5f5"/>
+    <text x="70" y="48" class="kicker">ONE SYSTEM / SEPARATE EVIDENCE</text>
+    <text x="70" y="78" class="note">The shared boundary is a contract, not a shortcut.</text>
+
+    <path class="connector-accent" d="M245 230 H300"/>
+    <path class="connector-accent" d="M520 228 H575 Q583 228 583 220 V173 H620"/>
+    <path class="connector" d="M520 260 H575 Q583 260 583 340 V393 H620"/>
+    <path class="connector" d="M850 173 H895 Q903 173 903 181 V264 H930"/>
+    <path class="connector" d="M850 393 H915 Q923 393 923 385 V330 H930"/>
+    <path class="connector" d="M976 352 V458 H725 Q717 458 717 466 V540"/>
+    <path class="connector-accent" d="M1010 352 V540"/>
+
+    <g transform="translate(70 185)">
+      <rect width="175" height="92" rx="8" class="store"/>
+      <text x="18" y="24" class="kicker">INPUT</text>
+      <text x="18" y="51" class="title">Public retinal data</text>
+      <text x="18" y="73" class="body">source + access + license</text>
+    </g>
+    <g transform="translate(300 185)">
+      <rect width="220" height="108" rx="8" class="focal"/>
+      <text x="18" y="25" class="kicker">R0 / FREEZE</text>
+      <text x="18" y="54" class="title">Evidence gate</text>
+      <text x="18" y="77" class="body">identity, supervision, splits</text>
+      <text x="18" y="95" class="body">overlap and provenance</text>
+    </g>
+    <g transform="translate(620 128)">
+      <rect width="230" height="90" rx="8" class="box"/>
+      <text x="18" y="24" class="kicker">R1 / GLOBAL</text>
+      <text x="18" y="52" class="title">Ordinal DR track</text>
+      <text x="18" y="74" class="body">grade 0-4 - CE first</text>
+    </g>
+    <g transform="translate(620 348)">
+      <rect width="230" height="90" rx="8" class="box"/>
+      <text x="18" y="24" class="kicker">R2-R3 / ROI</text>
+      <text x="18" y="52" class="title">Lesion track</text>
+      <text x="18" y="74" class="body">spatial supervision only</text>
+    </g>
+    <g transform="translate(930 264)">
+      <rect width="180" height="88" rx="8" class="focal"/>
+      <text x="18" y="24" class="kicker">CTR / API</text>
+      <text x="18" y="52" class="title">Versioned model API</text>
+      <text x="18" y="73" class="body">identity + provenance</text>
+    </g>
+    <g transform="translate(610 540)">
+      <rect width="215" height="84" rx="8" class="box"/>
+      <text x="18" y="24" class="kicker">LBL / INTERNAL</text>
+      <text x="18" y="51" class="title">Label Studio QA</text>
+      <text x="18" y="71" class="body">HITL suggestions and review</text>
+    </g>
+    <g transform="translate(900 540)">
+      <rect width="230" height="84" rx="8" class="box"/>
+      <text x="18" y="24" class="kicker">GUI / CUSTOMER POC</text>
+      <text x="18" y="51" class="title">DR Review Workspace</text>
+      <text x="18" y="71" class="body">existing templates reference</text>
+    </g>
+
+    <text x="70" y="680" class="kicker">LATER / ONLY AFTER MODEL + GUI STABILITY</text>
+    <g transform="translate(70 700)"><rect width="220" height="42" rx="6" class="optional"/><text x="18" y="27" class="title" font-size="14">R6 DICOM</text></g>
+    <g transform="translate(330 700)"><rect width="220" height="42" rx="6" class="optional"/><text x="18" y="27" class="title" font-size="14">R7 model diff / drift</text></g>
+    <g transform="translate(590 700)"><rect width="220" height="42" rx="6" class="optional"/><text x="18" y="27" class="title" font-size="14">R8 HL7 / FHIR demo</text></g>
+    <text x="900" y="727" class="mono">research foundation - not a diagnostic product</text>
+  </svg>
+</main>
+</body>
+</html>

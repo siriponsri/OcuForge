@@ -1,0 +1,9 @@
+status: WINNER_ONLY_ORDINAL_ABLATION
+authority: docs/POC_MASTER_PLAN.md
+architecture: attention_mil_corn
+candidate_scope: WINNER_OR_FINALIST_ONLY
+grades: 5
+head: CORN
+loss: CORN
+lesion_outputs: 7
+qc_outputs: 1

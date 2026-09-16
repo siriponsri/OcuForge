@@ -24,18 +24,9 @@
 
 MongoDB **ไม่แทน PostgreSQL ของ CVAT**; adapter ทำงานร่วมกับ API ของ CVAT และเก็บข้อมูลตามสัญญากลางอีกชุดหนึ่ง จึงไม่แก้ฐานข้อมูล CVAT โดยตรง และไม่ถือว่า MongoDB dump อย่างเดียวกู้ระบบทั้งหมดได้
 
-```mermaid
-flowchart TD
-  A[แพทย์ในเครือข่ายโรงพยาบาล] --> B[CVAT editor]
-  A --> C[Labeler bridge]
-  B --> D[CVAT PostgreSQL และ volumes]
-  C --> B
-  C --> E[MongoDB metadata และ revisions]
-  C --> F[Local image และ export store]
-  D --> G[Consistent local backup]
-  E --> G
-  F --> G
-```
+แผนภาพ trust boundary และ public/local handoff ฉบับปัจจุบันอยู่ที่
+[`ocuforge-deployment-boundary.svg`](diagrams/ocuforge-deployment-boundary.svg) ส่วนรายละเอียด storage และ
+backup ในเอกสารนี้ยังเป็น supporting design ที่ต้องทดสอบใน local/on-premise gate
 
 ## โครงสร้างเอกสาร
 

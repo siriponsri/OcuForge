@@ -37,8 +37,10 @@ def relative_path(value):
 
 
 def validate_freeze(data):
-    if data.get("status") != "R0_V2=READY_TO_EXECUTE":
-        raise ValueError("R0 V2 must be ready to execute, not marked passed")
+    if data.get("status") != "R0_V3=READY_TO_EXECUTE":
+        raise ValueError("R0 V3 must be ready to execute, not marked passed")
+    if data.get("authority") != "docs/POC_MASTER_PLAN.md and docs/R0_DATASET_SUPERVISION_FREEZE.md":
+        raise ValueError("R0 audit must name the V3 authority")
     selected = {row["role"]: row for row in data.get("candidate_datasets", [])}
     required_fields = {
         "source",
@@ -87,6 +89,23 @@ def validate_freeze(data):
     split = data["split_policy"]
     if not split.get("split_before_roi_generation") or split.get("derived_patch_random_split"):
         raise ValueError("R0 split policy permits leakage")
+    overlap = data.get("foundation_model_overlap_audit")
+    if not isinstance(overlap, list) or {row.get("candidate_id") for row in overlap} != {"C1", "C2"}:
+        raise ValueError("R0 must audit pretraining overlap for C1 and C2")
+    required_overlap = {
+        "candidate_id",
+        "pretraining_corpus_description",
+        "known_included_public_datasets",
+        "overlap_status",
+        "claim_consequence",
+    }
+    if any(not required_overlap.issubset(row) for row in overlap):
+        raise ValueError("Foundation overlap audit fields are incomplete")
+    if any(
+        row["overlap_status"] not in ["CONFIRMED", "EXCLUDED", "UNKNOWN", "POTENTIALLY_CONTAMINATED"]
+        for row in overlap
+    ):
+        raise ValueError("Foundation overlap status is not explicit")
     metrics = data["metrics"]
     for key in ["QWK for genuine ordinal grades", "macro F1", "accuracy"]:
         if key not in metrics["global_dr"]:
@@ -100,15 +119,49 @@ def validate_freeze(data):
 def validate_r1(data, root=ROOT):
     if data.get("status") != "R1_GLOBAL_BENCHMARK=READY_NOT_EXECUTED":
         raise ValueError("R1 benchmark must be ready but not executed")
-    candidate_ids = [candidate["id"] for candidate in data["baseline_ladder"]]
-    if candidate_ids != ["G0", "G1", "G2", "G3", "G4", "G5"]:
-        raise ValueError("R1 baseline ladder must contain G0 through G5 in order")
-    if data["baseline_ladder"][3]["aggregation"] != "attention_mil":
-        raise ValueError("R1 G3 must be the Attention MIL candidate")
-    if data["head_ablation"]["eligible_target"] != "GENUINE_ORDINAL_0_TO_4":
+    if data.get("schema_version") != "r1_global_benchmark.v3.0":
+        raise ValueError("R1 benchmark must use the V3 schema")
+    if data.get("authority") != "docs/POC_MASTER_PLAN.md":
+        raise ValueError("R1 benchmark must name the canonical V3 plan")
+    candidates = data.get("candidates", [])
+    candidate_ids = [candidate.get("id") for candidate in candidates]
+    if candidate_ids != ["C0", "C1", "C2"]:
+        raise ValueError("R1 candidate registry must contain C0, C1, and C2 in order")
+    required_candidate_fields = {
+        "id",
+        "architecture_family",
+        "backbone",
+        "asset_identifier",
+        "asset_revision",
+        "adaptation_mode",
+        "input_preprocessing_contract",
+        "aggregation",
+        "head",
+        "loss",
+        "target_type",
+        "license_access",
+        "execution_status",
+        "metrics_artifact_path",
+        "deployment_artifact_path",
+    }
+    if any(not required_candidate_fields.issubset(candidate) for candidate in candidates):
+        raise ValueError("R1 candidate record is incomplete")
+    if any(candidate["loss"] != "CE" for candidate in candidates):
+        raise ValueError("Initial R1 architecture comparison must use CE for every candidate")
+    if any(candidate["metrics_artifact_path"] is not None for candidate in candidates):
+        raise ValueError("R1 candidates must not contain fake measured metrics")
+    if any(candidate["deployment_artifact_path"] is not None for candidate in candidates):
+        raise ValueError("R1 candidates must not contain unmeasured deployment artifacts")
+    if data["architecture_comparison"].get("current_champion") is not None:
+        raise ValueError("R1 cannot claim a champion before execution")
+    if data["architecture_comparison"].get("initial_candidates") != ["C0", "C1", "C2"]:
+        raise ValueError("R1 architecture comparison must enumerate C0, C1, and C2")
+    if data["architecture_comparison"].get("one_candidate_per_run") is not True:
+        raise ValueError("R1 execution must run one candidate at a time")
+    if data["winner_only_ordinal_ablation"]["eligible_target"] != "GENUINE_ORDINAL_0_TO_4":
         raise ValueError("R1 head ablation must be limited to genuine ordinal labels")
-    if set(data["head_ablation"]["heads"]) != {"CE", "CORAL"}:
-        raise ValueError("R1 must compare CE and CORAL heads")
+    if set(data["winner_only_ordinal_ablation"]["heads"]) != {"CE", "CORN"}:
+        raise ValueError("R1 winner-only ablation must compare CE and CORN")
     if data["metrics"]["primary"] != "QWK":
         raise ValueError("R1 primary metric must be QWK")
     if data.get("selection_split") != "VAL" or data.get("held_out_split") != "TEST":
@@ -125,12 +178,15 @@ def validate_r1(data, root=ROOT):
     gate = data["public_gpu_gate"]
     if gate["private_data_allowed"] or gate["provisioning"]:
         raise ValueError("R1 public GPU gate permits unsafe data or provisioning")
-    for key in ["dataset_config", "encoder_config", "train_config", "protocol"]:
-        path = root / data.get(key, data["dataset"].get(key, ""))
+    for key in ["dataset", "candidate_training", "protocol"]:
+        path = root / data["configs"].get(key, "")
         if not path.is_file():
             raise ValueError(f"Missing R1 referenced file: {path.relative_to(root).as_posix()}")
-    if "TinyTestEncoder" in json.dumps(data) or "/workspace/" in json.dumps(data):
-        raise ValueError("R1 config must not hard-code a test encoder or provider path")
+    c2_path = root / data["configs"].get("c2_encoder", "")
+    if not c2_path.is_file():
+        raise ValueError("Missing R1 C2 encoder configuration")
+    if "TinyTestEncoder" in json.dumps(data) or "/workspace/" in json.dumps(data) or "G0" in json.dumps(data):
+        raise ValueError("R1 config must not hard-code a test encoder, provider path, or old ladder")
     return True
 
 

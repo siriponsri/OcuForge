@@ -8,6 +8,10 @@ from eyes_detected.pipeline.data import load_images, load_targets, sha256
 from eyes_detected.features.store import digest
 from eyes_detected.pipeline.train import ResearchMIL, load_features, collate
 from eyes_detected.evaluation.metrics import qwk
+from eyes_detected.ordinal.coral import class_probabilities as coral_class_probabilities
+from eyes_detected.ordinal.coral import predict as coral_predict
+from eyes_detected.ordinal.corn import class_probabilities as corn_class_probabilities
+from eyes_detected.ordinal.corn import predict as corn_predict
 from eyes_contracts.models import Prediction, ModelManifest
 from eyes_contracts.validators import write_records
 
@@ -25,7 +29,8 @@ def infer(
     ckpt = torch.load(checkpoint, map_location="cpu", weights_only=True)
     if list(identity) != ckpt["feature_identity"]:
         raise ValueError("Checkpoint encoder/preprocessing mismatch")
-    model = ResearchMIL(ckpt["dim"], ckpt["task"], ckpt.get("pooling", "attention_mil"))
+    head = ckpt.get("head", "CORAL" if ckpt["task"] == "ordinal" else "BINARY")
+    model = ResearchMIL(ckpt["dim"], ckpt["task"], ckpt.get("pooling", "attention_mil"), head)
     model.load_state_dict(ckpt["state_dict"])
     model.eval()
     model_id = "MIL_" + sha256(checkpoint)[:32]
@@ -35,10 +40,23 @@ def infer(
         for im in selected:
             x, mask = collate([im.image_id], features, "cpu")
             r = model(x, mask)
-            probs = r["dr_logits"][0].sigmoid().tolist()
-            grade = sum(p > 0.5 for p in probs)
+            if head == "CE" and ckpt["task"] == "ordinal":
+                class_probs = r["dr_logits"][0].softmax(-1)
+                probs_tensor = 1 - class_probs.cumsum(-1)[:-1]
+                grade = int((probs_tensor > 0.5).sum())
+                probs = probs_tensor.tolist()
+                distribution = class_probs.tolist()
+            elif head == "CORN" and ckpt["task"] == "ordinal":
+                grade_tensor, probs_tensor = corn_predict(r["dr_logits"][0:1])
+                grade = int(grade_tensor[0])
+                probs = probs_tensor[0].tolist()
+                distribution = corn_class_probabilities(probs_tensor)[0].tolist()
+            else:
+                grade_tensor, probs_tensor = coral_predict(r["dr_logits"][0:1])
+                grade = int(grade_tensor[0])
+                probs = probs_tensor[0].tolist()
+                distribution = coral_class_probabilities(probs_tensor)[0].tolist()
             binary = float(r["binary_logits"][0].sigmoid())
-            distribution = [1 - probs[0]] + [probs[i - 1] - probs[i] for i in range(1, 4)] + [probs[-1]]
             rows.append(
                 {
                     "image_id": im.image_id,
@@ -75,11 +93,11 @@ def infer(
         name="Frozen encoder MIL research pipeline",
         version="0.2.0",
         architecture=(
-            "GlobalAveragePooling-CORAL"
+            f"GlobalAveragePooling-{head}"
             if ckpt.get("pooling") == "global_average" and ckpt["task"] == "ordinal"
             else "GlobalAveragePooling-binary"
             if ckpt.get("pooling") == "global_average"
-            else "AttentionMIL-CORAL"
+            else f"AttentionMIL-{head}"
             if ckpt["task"] == "ordinal"
             else "AttentionMIL-binary"
         ),

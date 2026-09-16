@@ -1,0 +1,57 @@
+{
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {
+      "const": "global_roi_triage_policy.v0.1",
+      "default": "global_roi_triage_policy.v0.1",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "policy_id": {
+      "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,127}$",
+      "title": "Policy Id",
+      "type": "string"
+    },
+    "confidence_threshold": {
+      "anyOf": [
+        {
+          "maximum": 1,
+          "minimum": 0,
+          "type": "number"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Confidence Threshold"
+    },
+    "threshold_status": {
+      "default": "UNSET_UNVALIDATED",
+      "enum": [
+        "UNSET_UNVALIDATED",
+        "VALIDATED"
+      ],
+      "title": "Threshold Status",
+      "type": "string"
+    },
+    "calibration_version": {
+      "anyOf": [
+        {
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,127}$",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Calibration Version"
+    }
+  },
+  "required": [
+    "policy_id"
+  ],
+  "title": "TriagePolicy",
+  "type": "object"
+}

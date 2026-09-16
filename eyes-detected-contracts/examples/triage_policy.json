@@ -1,0 +1,7 @@
+{
+  "schema_version": "global_roi_triage_policy.v0.1",
+  "policy_id": "GLOBAL_ROI_POLICY_V1",
+  "confidence_threshold": null,
+  "threshold_status": "UNSET_UNVALIDATED",
+  "calibration_version": null
+}

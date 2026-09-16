@@ -1,26 +1,17 @@
-# Next POC steps and remaining acceptance work
+# Next steps — V3 handoff
 
-1. Execute **R0 V2 — Dataset, supervision, taxonomy and split audit** on CPU. Record source/version/access/license,
-   supervision type, identity limitations, negative-ROI policy, split-before-derivation rules, taxonomy mapping,
-   and checksum/provenance evidence. Do not download a large dataset in this documentation gate.
-2. After R0 passes, run the controlled **R1 G0-G5 global benchmark**. Compare global, simple patch pooling,
-   Attention MIL, conditional fusion, and conditional limited fine-tuning; compare CE and CORAL only for genuine
-   ordinal labels. Record CPU inference latency, peak RAM, model size, preprocessing latency, and GPU training cost
-   with the scientific metrics. Publish held-out evidence without overstating benchmark evidence as clinical
-   validation.
-3. Complete the spatial IDRiD audit, then build the separate ROI dataset/classifier with audited negatives, top-k
-   output, calibration, support, confusion matrix, CPU inference latency, peak RAM, model size, preprocessing
-   latency, and GPU training cost. MMRDR image-level lesion labels are not ROI supervision.
-4. Validate the internal Label Studio Community workflow, then connect the shared model/API boundary to the
-   customer-facing `templates/` GUI reference through contracts/adapters with confirm/change/reject decisions.
-5. Keep DICOM, model monitoring, and HL7/FHIR behind the R1-R5 milestones. Separately run
-   `02_phase2_local_data.cmd` and the on-prem synthetic gate when scheduled; do
-   not claim Phase 2 overall PASS from Phase 2A alone.
+The only next manual action is owner/architect review of the V3 reconciliation. Do not begin the next phase in the
+same task.
 
-Hospital images, labels, derived features and weights remain on-premises. Public GPU volumes may contain only
-reviewed public/synthetic data and temporary public research artifacts. They are not authoritative deployment or
-production storage. The local/on-premise environment owns inference and clinical integrations; Vercel is reserved for
-public/synthetic demo frontend components and measured optional CPU inference. Do not provision RunPod or download
-a large dataset
-as part of the current R0 V2 reconciliation documentation gate. No clinical-use or clinical-performance claim follows
-from a synthetic smoke test or public benchmark POC alone.
+After approval, the sequence is:
+
+1. Execute R0 on CPU: verify datasets, labels, spatial supervision, identity/split semantics, negative policy,
+   licenses/checksums, and C1/C2 foundation pretraining overlap.
+2. If R0 passes, run R1 one candidate at a time: C0, C1, C2. Stop after each run for human review.
+3. Select a finalist from validation evidence, then run only the winner CE versus CORN ablation.
+4. Calibrate the global model and select a versioned Global→ROI threshold from validation evidence.
+5. Benchmark local/on-prem CPU inference and integrate the existing `templates/` workspace through contracts.
+6. Continue R2–R8 in order: spatial ROI, lesion classifier, Label Studio QA, GUI integration, DICOM, drift, HL7/FHIR.
+
+No current champion, clinical performance, public-data generalization, diagnosis, or deployment claim follows from
+the repository’s synthetic smoke output or historical evidence.

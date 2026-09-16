@@ -14,7 +14,7 @@ export OCUFORGE_ARTIFACT_ROOT=/workspace/artifacts
 
 RunPod Network Volume เป็นตัวเลือก workspace/cache สำหรับ public research เท่านั้น ไม่ใช่ authoritative deployment หรือ
 production storage และไม่ใช่ dependency; root เดียวกันใช้กับ
-filesystem อื่นได้ด้วย layout `data/mmrdr`, `data/idrid`, `data/manifests`, `models/dinov3`,
+filesystem อื่นได้ด้วย layout `data/mmrdr`, `data/idrid`, `data/manifests`, `models/candidates`,
 `cache/features`, `artifacts/experiments`. Git เก็บเฉพาะ code, safe manifests, hashes และ metadata.
 
 ติดตั้ง packages ตาม README แล้วใช้ `eyes-pipeline --help` รองรับ audit, extract, train, evaluate, predict; คำสั่ง smoke/active-learning เดิมยังอยู่ใน `eyes-models --help`
@@ -27,7 +27,8 @@ eyes-pipeline evaluate --manifest /data/images.jsonl --dataset /data/dataset.yam
 eyes-pipeline predict --manifest /data/images.jsonl --dataset /data/dataset.yaml --features /runs/features --checkpoint /runs/mil/best.pt --split ALL --out /runs/predictions
 ```
 
-`extract-dino.json` ต้องแก้ local checkout/path, hash, license_reviewed หลังตรวจสิทธิ์จริง จึงรันได้ ไม่มี tiny fallback; `extract-tiny.json` รับ synthetic เท่านั้น ตั้ง device=cpu สำหรับ CPU synthetic tests โดยชัดเจน
+R1 ต้องเลือก candidate C0, C1 หรือ C2 ทีละตัว และต้องกำหนด local checkout/path, hash และ license_reviewed หลังตรวจสิทธิ์จริง
+จึงรันได้ ไม่มี silent fallback; synthetic CPU smoke ใช้ TinyTestEncoder ได้เฉพาะ engineering tests เท่านั้น
 
 Target JSONL เป็น schema ของ `pipeline.data.Target`: image_id, source, dr_grade **หรือ** binary_dr, optional lesions ลำดับ `[microaneurysm, intraretinal_hemorrhage, hard_exudate, cotton_wool_spot, vb_irma, nv, laser_scar]` (7 ช่อง; null หมายถึงไม่มี supervision), gradable 0/1/null ต้องกำหนด label semantics ของแหล่งข้อมูลก่อนใช้ ความหมาย 7 ช่องเป็นสัญญาของ pipeline นี้ ห้ามส่งออกเป็น lesion localization
 
@@ -52,7 +53,7 @@ MIL attention เป็น model evidence; predictions.jsonl ไม่สร้�
 6. บันทึก image digest, commit SHA, license decision และ run config ก่อนใช้จริง Docker build/GPU/DINO/live service ยังเป็น external acceptance gate ของรุ่นนี้
 
 RunPod ใช้ Dockerfile/launcher เดียวกันบน container ที่ผู้ใช้จัดเตรียม ไม่สมมติว่ามี connected plugin และ
-ไม่บังคับให้ใช้ RunPod. สำหรับ R1 G0-G5 ใช้ benchmark record ใน
+ไม่บังคับให้ใช้ RunPod. สำหรับ R1 C0/C1/C2 ใช้ benchmark record ใน
 `eyes-detected-models/configs/research/r1-global-benchmark.json`; ต้อง mount manifest/data/model roots เอง,
 ตรวจ hash/สิทธิ์ก่อนรัน และยังไม่ provision หรือ download dataset ขนาดใหญ่ใน current documentation gate. Vercel เป็น
 preferred public/synthetic demo frontend สำหรับ adapter/serverless component และอาจทดลอง CPU inference เมื่อวัดแล้วว่า

@@ -1,7 +1,11 @@
 {
   "status": "CANDIDATE_TEMPLATE_NOT_BENCHMARK_RESULT",
-  "candidate_id": "G2_PATCH_MEAN_WITH_CORAL_CANDIDATE_HEAD",
-  "purpose": "candidate parameters only; pooling and head are selected through the R1 G0-G5 benchmark",
+  "candidate_id": null,
+  "purpose": "candidate parameters only; operator selects exactly one of C0, C1, or C2",
+  "authority": "docs/POC_MASTER_PLAN.md",
+  "initial_loss": "CE",
+  "target_type": "GENUINE_ORDINAL_0_TO_4_AS_5_CLASS_CE",
+  "execution_policy": "ONE_CANDIDATE_PER_RUN_STOP_FOR_HUMAN_REVIEW",
   "task": "ordinal",
   "pooling": "global_average",
   "device": "cuda",

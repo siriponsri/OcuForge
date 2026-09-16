@@ -1,0 +1,76 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>OcuForge deployment boundary</title>
+  <style>
+    :root { --paper:#f5f5f5; --ink:#2d3142; --muted:#4f5d75; }
+    * { box-sizing:border-box; }
+    body { margin:0; background:var(--paper); color:var(--ink); font-family:Segoe UI,Arial,sans-serif; }
+    main { max-width:1260px; margin:auto; padding:26px 30px 34px; }
+    .eyebrow { color:var(--muted); font:600 12px Consolas,monospace; letter-spacing:.14em; }
+    h1 { margin:10px 0 5px; font:400 34px Georgia,serif; }
+    p { max-width:850px; margin:0 0 20px; color:var(--muted); font-size:15px; line-height:1.5; }
+    svg { display:block; width:100%; height:auto; }
+    @media print { body { background:#fff; } main { padding:0; } }
+  </style>
+</head>
+<body>
+<main>
+  <div class="eyebrow">OCUFORGE / DATA GOVERNANCE</div>
+  <h1>Compute can travel. Private evidence cannot.</h1>
+  <p>Public and synthetic experiments are temporary and bounded; the local/on-premise environment remains authoritative.</p>
+  <svg viewBox="0 0 1200 700" role="img" aria-labelledby="deployment-title deployment-desc" xmlns="http://www.w3.org/2000/svg">
+    <title id="deployment-title">OcuForge deployment and data boundary</title>
+    <desc id="deployment-desc">GitHub stores safe code and metadata, public GPU providers run reviewed public or synthetic experiments, and local on-premise infrastructure owns inference, clinical integration, and all hospital or private data. Private data do not cross into public compute.</desc>
+    <defs>
+      <marker id="deployment-arrow" markerWidth="9" markerHeight="7" refX="8" refY="3.5" orient="auto"><path d="M0 0 L9 3.5 L0 7 Z" fill="#4f5d75"/></marker>
+      <marker id="deployment-accent-arrow" markerWidth="9" markerHeight="7" refX="8" refY="3.5" orient="auto"><path d="M0 0 L9 3.5 L0 7 Z" fill="#eb6c36"/></marker>
+      <style>
+        .kicker { font:600 11px Consolas,monospace; letter-spacing:1.7px; fill:#4f5d75; }
+        .title { font:600 17px Segoe UI,Arial,sans-serif; fill:#2d3142; }
+        .body { font:400 13px Segoe UI,Arial,sans-serif; fill:#4f5d75; }
+        .mono { font:500 11px Consolas,monospace; fill:#4f5d75; }
+        .box { fill:#fbfbfa; stroke:#2d3142; stroke-width:1.4; }
+        .zone { fill:#eef0f3; stroke:#9aa3b5; stroke-width:1.2; stroke-dasharray:7 5; }
+        .authority { fill:#fbe7dc; stroke:#eb6c36; stroke-width:1.8; }
+        .optional { fill:#f5f5f5; stroke:#9aa3b5; stroke-width:1.2; stroke-dasharray:6 5; }
+        .connector { fill:none; stroke:#4f5d75; stroke-width:2; stroke-linecap:round; stroke-linejoin:round; marker-end:url(#deployment-arrow); }
+        .connector-accent { fill:none; stroke:#eb6c36; stroke-width:2.4; stroke-linecap:round; stroke-linejoin:round; marker-end:url(#deployment-accent-arrow); }
+        .forbidden { fill:none; stroke:#eb6c36; stroke-width:2; stroke-dasharray:7 5; }
+      </style>
+    </defs>
+    <rect width="1200" height="700" fill="#f5f5f5"/>
+    <text x="50" y="50" class="kicker">TRUST BOUNDARY / PERMITTED PATH</text>
+    <path class="connector" d="M320 274 H380"/><path class="connector" d="M500 350 V404"/>
+    <path class="connector-accent" d="M620 274 H800"/>
+    <path class="forbidden" d="M930 390 H760 Q750 390 750 400"/>
+    <path class="forbidden" d="M750 400 l16 -12 M750 400 l16 12"/>
+
+    <rect x="50" y="112" width="710" height="400" rx="12" class="zone"/>
+    <text x="76" y="146" class="kicker">PUBLIC / SYNTHETIC WORK ZONE</text>
+    <text x="76" y="170" class="body">Reviewed public data only - configurable roots - no hospital images</text>
+    <rect x="80" y="230" width="240" height="92" rx="8" class="box"/>
+    <text x="100" y="257" class="kicker">CONTROL PLANE</text><text x="100" y="285" class="title">GitHub</text><text x="100" y="306" class="body">code, safe configs, hashes</text>
+    <rect x="380" y="230" width="240" height="120" rx="8" class="box"/>
+    <text x="400" y="257" class="kicker">EXPERIMENT COMPUTE</text><text x="400" y="285" class="title">Public GPU</text><text x="400" y="307" class="body">training / extraction</text><text x="400" y="327" class="body">reviewed public or synthetic</text>
+    <rect x="380" y="404" width="240" height="92" rx="8" class="optional"/>
+    <text x="400" y="431" class="kicker">OPTIONAL PROVIDERS</text><text x="400" y="459" class="title">RunPod / Vast</text><text x="400" y="480" class="body">not deployment storage</text>
+    <rect x="80" y="390" width="240" height="92" rx="8" class="optional"/>
+    <text x="100" y="417" class="kicker">OPTIONAL DEMO</text><text x="100" y="445" class="title">Vercel</text><text x="100" y="466" class="body">public/synthetic frontend only</text>
+
+    <rect x="800" y="112" width="350" height="400" rx="12" class="authority"/>
+    <text x="826" y="146" class="kicker">LOCAL / ON-PREMISE AUTHORITY</text>
+    <text x="826" y="170" class="body">private evidence stays inside this boundary</text>
+    <rect x="830" y="220" width="290" height="88" rx="8" class="box"/>
+    <text x="850" y="247" class="kicker">RUNTIME</text><text x="850" y="275" class="title">Inference + clinical API</text><text x="850" y="296" class="body">authoritative serving boundary</text>
+    <rect x="830" y="340" width="290" height="100" rx="8" class="box"/>
+    <text x="850" y="367" class="kicker">PRIVATE DATA</text><text x="850" y="395" class="title">Hospital images + labels</text><text x="850" y="416" class="body">archives, predictions, derivatives</text>
+    <text x="826" y="478" class="mono">NO PUBLIC UPLOAD / NO PHI EGRESS</text>
+    <text x="50" y="585" class="kicker">PERMITTED HANDOFF</text><text x="50" y="614" class="body">Only reviewed public/synthetic experiment artifacts may be promoted across the boundary.</text>
+    <text x="50" y="654" class="mono">Research foundation - not production clinical deployment - no cloud authority</text>
+  </svg>
+</main>
+</body>
+</html>

@@ -1,0 +1,52 @@
+{
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {
+      "const": "roi_lesion_review_result.v0.1",
+      "default": "roi_lesion_review_result.v0.1",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "roi_id": {
+      "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,127}$",
+      "title": "Roi Id",
+      "type": "string"
+    },
+    "result": {
+      "enum": [
+        "SUPPORTED_LESION_PRESENT",
+        "NO_SUPPORTED_LESION_IN_ROI"
+      ],
+      "title": "Result",
+      "type": "string"
+    },
+    "supported_classes": {
+      "items": {
+        "enum": [
+          "MICROANEURYSM",
+          "INTRARETINAL_HEMORRHAGE",
+          "HARD_EXUDATE",
+          "SOFT_EXUDATE"
+        ],
+        "type": "string"
+      },
+      "minItems": 1,
+      "title": "Supported Classes",
+      "type": "array"
+    },
+    "decision_threshold": {
+      "maximum": 1,
+      "minimum": 0,
+      "title": "Decision Threshold",
+      "type": "number"
+    }
+  },
+  "required": [
+    "roi_id",
+    "result",
+    "supported_classes",
+    "decision_threshold"
+  ],
+  "title": "ROILesionReviewResult",
+  "type": "object"
+}

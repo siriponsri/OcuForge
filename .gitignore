@@ -39,3 +39,6 @@ artifacts/
 /.codex/skills/research/
 /.codex/skills/prototype/
 /.codex/THIRD_PARTY_LICENSES/
+
+# Pinned visual-authoring checkout; generated diagrams are tracked under docs/diagrams/.
+/.tools/

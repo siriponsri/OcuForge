@@ -3,13 +3,15 @@
 import json
 from pathlib import Path
 from .models import TYPES, Annotation, AnnotationBatch
+from .triage import TRIAGE_TYPES
 
 
 def validate(record):
     kind = record.get("schema_version")
-    if kind not in TYPES:
+    if kind not in TYPES and kind not in TRIAGE_TYPES:
         raise ValueError(f"Unsupported schema version: {kind}")
-    return TYPES[kind].model_validate(record)
+    model = TYPES.get(kind) or TRIAGE_TYPES[kind]
+    return model.model_validate(record)
 
 
 def read_records(path):

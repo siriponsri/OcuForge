@@ -1,0 +1,9 @@
+{
+  "name": "diagram-design",
+  "repository": "https://github.com/cathrynlavery/diagram-design.git",
+  "commit": "9874ad73813715fc36875e45afd9cd94c68f3c3f",
+  "version": "2.6.27",
+  "license": "MIT",
+  "skill_path": "skills/diagram-design",
+  "local_checkout": ".tools/diagram-design"
+}

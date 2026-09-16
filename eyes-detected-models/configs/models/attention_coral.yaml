@@ -1,4 +1,7 @@
+status: LEGACY_REUSABLE_NOT_ACTIVE_R1
 architecture: attention_mil_coral
+authority: docs/POC_MASTER_PLAN.md
+candidate_id: null
 grades: 5
 lesion_outputs: 7
 qc_outputs: 1

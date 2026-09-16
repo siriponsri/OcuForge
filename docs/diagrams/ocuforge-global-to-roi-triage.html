@@ -1,0 +1,62 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>OcuForge Global to ROI triage</title>
+  <style>
+    :root { --paper:#f5f5f5; --ink:#2d3142; --muted:#4f5d75; }
+    * { box-sizing:border-box; }
+    body { margin:0; background:var(--paper); color:var(--ink); font-family:Segoe UI,Arial,sans-serif; }
+    main { max-width:1260px; margin:auto; padding:26px 30px 34px; }
+    .eyebrow { color:var(--muted); font:600 12px Consolas,monospace; letter-spacing:.14em; }
+    h1 { margin:10px 0 5px; font:400 34px Georgia,serif; }
+    p { max-width:850px; margin:0 0 20px; color:var(--muted); font-size:15px; line-height:1.5; }
+    svg { display:block; width:100%; height:auto; }
+    @media print { body { background:#fff; } main { padding:0; } }
+  </style>
+</head>
+<body>
+<main>
+  <div class="eyebrow">OCUFORGE / SOFT TRIAGE</div>
+  <h1>Global prediction opens a question. It never closes review.</h1>
+  <p>The Global-to-ROI gate is a calibrated default, with a human override at every branch.</p>
+  <svg viewBox="0 0 1200 680" role="img" aria-labelledby="triage-title triage-desc" xmlns="http://www.w3.org/2000/svg">
+    <title id="triage-title">OcuForge Global to ROI soft triage workflow</title>
+    <desc id="triage-desc">An image passes QC, global DR grading, calibration and uncertainty checks, then reaches a soft decision. A safe no-DR result may skip opening ROI review by default, while any escalation opens it. Review controls remain available in both cases.</desc>
+    <defs>
+      <marker id="triage-arrow" markerWidth="9" markerHeight="7" refX="8" refY="3.5" orient="auto"><path d="M0 0 L9 3.5 L0 7 Z" fill="#4f5d75"/></marker>
+      <marker id="triage-accent-arrow" markerWidth="9" markerHeight="7" refX="8" refY="3.5" orient="auto"><path d="M0 0 L9 3.5 L0 7 Z" fill="#eb6c36"/></marker>
+      <style>
+        .kicker { font:600 11px Consolas,monospace; letter-spacing:1.7px; fill:#4f5d75; }
+        .title { font:600 16px Segoe UI,Arial,sans-serif; fill:#2d3142; }
+        .body { font:400 12px Segoe UI,Arial,sans-serif; fill:#4f5d75; }
+        .mono { font:500 11px Consolas,monospace; fill:#4f5d75; }
+        .box { fill:#fbfbfa; stroke:#2d3142; stroke-width:1.4; }
+        .focal { fill:#fbe7dc; stroke:#eb6c36; stroke-width:1.8; }
+        .optional { fill:#f5f5f5; stroke:#9aa3b5; stroke-width:1.2; stroke-dasharray:6 5; }
+        .connector { fill:none; stroke:#4f5d75; stroke-width:2; stroke-linecap:round; stroke-linejoin:round; marker-end:url(#triage-arrow); }
+        .connector-accent { fill:none; stroke:#eb6c36; stroke-width:2.4; stroke-linecap:round; stroke-linejoin:round; marker-end:url(#triage-accent-arrow); }
+      </style>
+    </defs>
+    <rect width="1200" height="680" fill="#f5f5f5"/>
+    <text x="50" y="50" class="kicker">DEFAULT PATH / REVIEWABLE PATH</text>
+    <path class="connector" d="M190 273 H235"/><path class="connector" d="M405 273 H450"/><path class="connector-accent" d="M620 273 H665"/><path class="connector-accent" d="M835 273 H840"/>
+    <path class="connector" d="M900 213 V170 H1000"/><path class="connector-accent" d="M900 333 V390 H1000"/>
+    <path class="connector" d="M1080 230 V470 H880"/>
+
+    <g transform="translate(40 230)"><rect width="150" height="86" rx="8" class="box"/><text x="18" y="25" class="kicker">INPUT</text><text x="18" y="53" class="title">Image</text><text x="18" y="74" class="body">in-scope image</text></g>
+    <g transform="translate(235 230)"><rect width="170" height="86" rx="8" class="box"/><text x="18" y="25" class="kicker">GATE 01</text><text x="18" y="53" class="title">QC / gradability</text><text x="18" y="74" class="body">quality + scope</text></g>
+    <g transform="translate(450 230)"><rect width="170" height="86" rx="8" class="focal"/><text x="18" y="25" class="kicker">R1 GLOBAL</text><text x="18" y="53" class="title">DR model</text><text x="18" y="74" class="body">grade distribution</text></g>
+    <g transform="translate(665 230)"><rect width="170" height="86" rx="8" class="box"/><text x="18" y="25" class="kicker">GATE 02</text><text x="18" y="53" class="title">Calibrate + assess</text><text x="18" y="74" class="body">confidence / OOD</text></g>
+    <polygon points="900,203 960,273 900,343 840,273" class="focal"/>
+    <text x="900" y="264" text-anchor="middle" class="kicker">SOFT</text><text x="900" y="283" text-anchor="middle" class="title" font-size="14">triage?</text>
+    <g transform="translate(1000 110)"><rect width="160" height="120" rx="8" class="optional"/><text x="18" y="25" class="kicker">DEFAULT SKIP</text><text x="18" y="53" class="title">Do not open ROI</text><text x="18" y="76" class="body">only if gradable,</text><text x="18" y="94" class="body">grade 0, calibrated,</text><text x="18" y="112" class="body">known protocol</text></g>
+    <g transform="translate(1000 390)"><rect width="160" height="120" rx="8" class="focal"/><text x="18" y="25" class="kicker">ESCALATE</text><text x="18" y="53" class="title">Open ROI review</text><text x="18" y="76" class="body">grade 1-4, low</text><text x="18" y="94" class="body">confidence, OOD, QC,</text><text x="18" y="112" class="body">or reviewer override</text></g>
+    <g transform="translate(270 470)"><rect width="610" height="98" rx="8" fill="#eef0f3" stroke="#d9dbe1"/><text x="22" y="27" class="kicker">ALWAYS AVAILABLE / HUMAN REVIEW</text><text x="22" y="58" class="title">Accept</text><text x="138" y="58" class="title">Mark Incorrect</text><text x="315" y="58" class="title">Correct Grade</text><text x="475" y="58" class="title">Comment</text><text x="22" y="82" class="body">Inspect ROI Anyway remains available even when the default path skips opening it.</text></g>
+    <text x="50" y="630" class="mono">GLOBAL_NO_DR != NO_SUPPORTED_LESION_IN_ROI</text>
+    <text x="560" y="630" class="body">The threshold is unset until calibration evidence exists.</text>
+  </svg>
+</main>
+</body>
+</html>
