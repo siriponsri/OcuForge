@@ -1,4 +1,8 @@
-# EXPERIMENT MATRIX & BASELINES — TRACK A
+# Historical experiment matrix & baselines — Track A
+
+> **Historical matrix.** The active global benchmark is the controlled G0-G5 ladder in
+> [R1_GLOBAL_MODEL_SELECTION.md](../R1_GLOBAL_MODEL_SELECTION.md). This document is retained as implementation
+> history and does not make B1, Attention MIL or CORAL the current champion.
 
 This document prevents the project from jumping straight to a single “hero model”.
 

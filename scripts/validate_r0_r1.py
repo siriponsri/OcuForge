@@ -1,4 +1,4 @@
-"""Validate the checked-in R0 freeze and R1 readiness contracts."""
+"""Validate the checked-in R0 pre-execution and R1 benchmark contracts."""
 
 import json
 from pathlib import Path
@@ -7,7 +7,7 @@ from pathlib import PurePosixPath
 
 ROOT = Path(__file__).resolve().parents[1]
 FREEZE = ROOT / "docs/RSC_R0_DATASET_TAXONOMY_FREEZE_v0.1.json"
-R1 = ROOT / "eyes-detected-models/configs/research/r1-global-b1.json"
+R1 = ROOT / "eyes-detected-models/configs/research/r1-global-benchmark.json"
 REQUIRED_ROI = {
     "MICROANEURYSM",
     "INTRARETINAL_HEMORRHAGE",
@@ -37,17 +37,44 @@ def relative_path(value):
 
 
 def validate_freeze(data):
-    if data.get("status") != "R0_DATASET_TAXONOMY=PASS":
-        raise ValueError("R0 freeze is not PASS")
-    selected = {row["role"]: row for row in data.get("selected_datasets", [])}
+    if data.get("status") != "R0_V2=READY_TO_EXECUTE":
+        raise ValueError("R0 V2 must be ready to execute, not marked passed")
+    selected = {row["role"]: row for row in data.get("candidate_datasets", [])}
+    required_fields = {
+        "source",
+        "version_or_revision",
+        "access_status",
+        "license_status",
+        "modality",
+        "image_count",
+        "patient_id_available",
+        "eye_id_available",
+        "image_id_available",
+        "global_labels",
+        "ordinal_labels",
+        "lesion_labels",
+        "lesion_supervision",
+        "split_source",
+        "known_limitations",
+        "checksum_or_source_hash",
+        "limitations",
+    }
+    if any(not required_fields.issubset(row) for row in selected.values()):
+        raise ValueError("R0 candidate dataset records are missing supervision audit fields")
+    valid_supervision_types = {"image_level", "point", "box", "polygon", "mask", "none"}
+    if any(
+        row["lesion_supervision"].get("type") not in valid_supervision_types
+        for row in selected.values()
+    ):
+        raise ValueError("R0 lesion supervision type is not explicit")
     if selected.get("GLOBAL_DR", {}).get("dataset_id") != "mmrdr_uwf_v1":
-        raise ValueError("R0 global dataset must be MMRDR UWF")
+        raise ValueError("R0 candidate global dataset must be MMRDR UWF")
     if selected.get("ROI_LESION_CLASSIFIER", {}).get("dataset_id") != "idrid_v1":
-        raise ValueError("R0 ROI dataset must be IDRiD")
+        raise ValueError("R0 candidate ROI dataset must be IDRiD")
     if not selected["GLOBAL_DR"].get("cloud_eligible"):
-        raise ValueError("R0 global dataset must be public-cloud eligible")
+        raise ValueError("R0 candidate global dataset must be public-cloud eligible")
     if selected["ROI_LESION_CLASSIFIER"].get("cloud_eligible"):
-        raise ValueError("R0 ROI dataset is not cleared for public cloud")
+        raise ValueError("R0 candidate ROI dataset is not cleared for public cloud")
     if set(data["taxonomy"]["roi_classifier"]["admitted"]) != REQUIRED_ROI:
         raise ValueError("R0 ROI taxonomy changed without updating the gate")
     if "OPTIC_DISC" in set(data["taxonomy"]["global_image_level_presence"]):
@@ -71,19 +98,21 @@ def validate_freeze(data):
 
 
 def validate_r1(data, root=ROOT):
-    if data.get("status") != "R1_GLOBAL_BASELINE=READY_NOT_EXECUTED":
-        raise ValueError("R1 must be ready but not executed")
-    baseline = data["baseline"]
-    if baseline != {
-        "baseline_id": "B1",
-        "task": "ordinal",
-        "pooling": "global_average",
-        "encoder": "dinov3_vitb16",
-        "tiny_test_encoder": "forbidden",
-        "selection_split": "VAL",
-        "held_out_split": "TEST",
-    }:
-        raise ValueError("R1 baseline must be frozen DINOv3 global average pooling")
+    if data.get("status") != "R1_GLOBAL_BENCHMARK=READY_NOT_EXECUTED":
+        raise ValueError("R1 benchmark must be ready but not executed")
+    candidate_ids = [candidate["id"] for candidate in data["baseline_ladder"]]
+    if candidate_ids != ["G0", "G1", "G2", "G3", "G4", "G5"]:
+        raise ValueError("R1 baseline ladder must contain G0 through G5 in order")
+    if data["baseline_ladder"][3]["aggregation"] != "attention_mil":
+        raise ValueError("R1 G3 must be the Attention MIL candidate")
+    if data["head_ablation"]["eligible_target"] != "GENUINE_ORDINAL_0_TO_4":
+        raise ValueError("R1 head ablation must be limited to genuine ordinal labels")
+    if set(data["head_ablation"]["heads"]) != {"CE", "CORAL"}:
+        raise ValueError("R1 must compare CE and CORAL heads")
+    if data["metrics"]["primary"] != "QWK":
+        raise ValueError("R1 primary metric must be QWK")
+    if data.get("selection_split") != "VAL" or data.get("held_out_split") != "TEST":
+        raise ValueError("R1 must select on VAL and hold out TEST")
     if data["dataset"]["dataset_id"] != "mmrdr_uwf_v1":
         raise ValueError("R1 must use the frozen MMRDR global dataset")
     roots = data["storage_roots"]
@@ -100,12 +129,6 @@ def validate_r1(data, root=ROOT):
         path = root / data.get(key, data["dataset"].get(key, ""))
         if not path.is_file():
             raise ValueError(f"Missing R1 referenced file: {path.relative_to(root).as_posix()}")
-    commands = data["commands"]
-    if set(commands) != {"audit", "extract", "train", "evaluate", "report", "package"}:
-        raise ValueError("R1 audit/extract/train/evaluate/report/package commands are required")
-    for key in ["audit", "extract", "train", "evaluate"]:
-        if "--cloud" not in commands[key]:
-            raise ValueError(f"R1 {key} command must enforce the public-cloud gate")
     if "TinyTestEncoder" in json.dumps(data) or "/workspace/" in json.dumps(data):
         raise ValueError("R1 config must not hard-code a test encoder or provider path")
     return True

@@ -1,4 +1,8 @@
-# TRACK B — ANNOTATION & CLINICIAN LABELING PLATFORM SPECIFICATION
+# Historical Track B — Annotation & Clinician Labeling Platform Specification
+
+> **Historical implementation specification.** Current POC authority is [POC_MASTER_PLAN_V2.md](../POC_MASTER_PLAN_V2.md).
+> Label Studio Community is now the internal ROI QA workbench, `templates/` is the customer-facing GUI reference,
+> and CVAT remains optional advanced annotation infrastructure.
 
 ## 0. Mission
 

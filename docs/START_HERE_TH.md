@@ -34,4 +34,8 @@ python -m venv .venv
 3. ../eyes-detected-labeler/docs/CVAT_SETUP_TH.md เพื่อทดลอง CVAT local
 4. IMPLEMENTATION_STATUS.md เพื่อแยกสิ่งที่ทำแล้วกับงานถัดไป
 
+แผน POC ปัจจุบันอยู่ที่ `docs/POC_MASTER_PLAN_V2.md` ของ workspace; ก่อนรันงานวิจัยให้อ่าน
+`R0_DATASET_SUPERVISION_FREEZE.md` และ `R1_GLOBAL_MODEL_SELECTION.md` ด้วย R0 V2 ยังเป็น READY_TO_EXECUTE
+ไม่ใช่ PASS และ R1 G0-G5 ยังไม่ได้รัน
+
 อย่าใส่ภาพโรงพยาบาลใน GitHub, starter folder, Space หรือ cloud GPU ผู้ใช้ต้องกำหนด local secure data root ภายใต้การดูแลของหน่วยงานในขั้นถัดไป

@@ -4,7 +4,7 @@ from eyes_detected.ordinal.coral import CoralHead
 
 
 class GlobalAveragePooling(nn.Module):
-    """Pool valid patch features uniformly for the frozen-encoder B1 baseline."""
+    """Pool valid patch features uniformly for a global benchmark candidate."""
 
     def __init__(self, dim=16):
         super().__init__()

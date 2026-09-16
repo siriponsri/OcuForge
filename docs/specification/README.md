@@ -1,6 +1,11 @@
-# Eye Detected — Dual-Track GPT Work Package v1.0
+# Eye Detected — Dual-Track GPT Work Package v1.0 (historical)
 
-**Purpose:** authoritative handoff package for GPT Work / GPT-6 Astra Low to draft a **starter ZIP workspace** for the next stage of the Eye Detected project.
+> **Historical starter specification.** The current authoritative POC/research direction is
+> [POC_MASTER_PLAN_V2.md](../POC_MASTER_PLAN_V2.md), with the R0 and R1 protocols in the sibling documents.
+> This package records the implementation constraints used to build the existing starter; it does not define
+> the current model-selection order or gate status.
+
+**Purpose:** historical handoff package for GPT Work / GPT-6 Astra Low that drafted the existing **starter ZIP workspace**.
 
 This package intentionally separates the work into two parallel tracks:
 

@@ -25,16 +25,14 @@ The primary goal is to let multiple contributors or agents work in parallel with
 
 ### Current POC direction
 
-The current execution order is model-first interactive lesion classification.
-`MDL` owns the global and ROI models. `LBL` supports internal ROI review through
-Label Studio Community and retained annotation adapters. `RUN` supports the shared
-inference boundary and runtime surfaces; the custom GUI is customer-facing. The
-exact lesion taxonomy remains pending dataset/annotation audit and must be frozen.
-
-The immediate sequence is dataset/taxonomy freeze, global baseline, ROI classifier,
-Label Studio validation, and
-custom GUI integration. DICOM, model monitoring, and HL7/FHIR remain planned afterward. CVAT remains
-optional advanced labeling infrastructure and is not deleted or migrated by this pivot.
+The current execution order is the evidence-driven two-track plan in
+`docs/POC_MASTER_PLAN_V2.md`: R0 supervision/taxonomy/split audit, controlled R1 G0-G5 global benchmark,
+separate spatial ROI model work, Label Studio Community internal QA, and integration with the existing
+customer-facing GUI reference under `templates/`. `MDL` owns the global and ROI models. `LBL` supports internal
+ROI review through Label Studio Community and retained annotation adapters. `RUN` supports the shared inference
+boundary and runtime surfaces. The exact ROI taxonomy remains an R0 audit outcome; MMRDR image-level lesion
+presence is not ROI supervision. DICOM, model monitoring, and HL7/FHIR remain planned afterward. CVAT remains
+optional advanced labeling infrastructure and is not deleted or migrated by this replan.
 
 ---
 

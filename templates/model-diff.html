@@ -1,0 +1,76 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Model-to-model error analysis for retinal lesion research outputs.">
+  <title>Model Comparison — DR Review Workspace</title>
+  <link rel="icon" href="assets/favicon.svg" type="image/svg+xml"><link rel="stylesheet" href="styles.css">
+</head>
+<body data-page="model-diff" data-title="Model comparison">
+  <a class="skip-link" href="#main-content">Skip to content</a>
+  <div class="app-shell"><aside class="sidebar" data-sidebar></aside><div class="workspace"><header class="topbar" data-topbar></header>
+    <main class="main" id="main-content"><div class="page page--wide">
+      <header class="page-heading">
+        <div class="heading-copy"><span class="eyebrow">Model lab · Error analysis</span><h1>Find what changed between two models</h1><p>Start with improved and regressed cases, then inspect the exact prediction transition and image evidence.</p></div>
+      </header>
+
+      <div class="stack">
+        <div class="notice"><span data-icon="info"></span><div><strong>Illustrative comparison</strong><br>All models, counts, predictions, and case identifiers on this page are mock data. No performance claim is made.</div></div>
+
+        <section class="filter-bar" aria-label="Comparison setup">
+          <div class="field"><label for="model-a">Model A · Baseline</label><select id="model-a"><option>roi-lesion-model 0.1.0-mock</option><option>global-model 0.1.0-mock</option></select></div>
+          <div class="field"><label for="model-b">Model B · Candidate</label><select id="model-b"><option>roi-lesion-model 0.2.0-mock</option><option>roi-lesion-model 0.1.1-mock</option></select></div>
+          <div class="field"><label for="dataset">Evaluation set</label><select id="dataset"><option>public-demo-v1 · 160 cases</option><option>selection-set · Not connected</option></select></div>
+          <button class="button button--primary" type="button" data-run-comparison><span data-icon="git-compare"></span>Load demo comparison</button>
+        </section>
+
+        <section class="summary-strip" aria-label="Mock comparison summary">
+          <div class="summary-item"><span>Demo cases</span><strong>160</strong><small>Illustrative only</small></div>
+          <div class="summary-item"><span>Improved</span><strong class="text-success">9</strong><small>B matches reference; A does not</small></div>
+          <div class="summary-item"><span>Regressed</span><strong class="text-danger">6</strong><small>A matches reference; B does not</small></div>
+          <div class="summary-item"><span>Changed / unresolved</span><strong>13</strong><small>Prediction changed without a clear win</small></div>
+        </section>
+
+        <div class="grid-2">
+          <section class="surface" aria-labelledby="diff-table-title">
+            <div class="surface-header"><h2 id="diff-table-title">Changed cases</h2><span class="badge">6 shown</span></div>
+            <div class="table-tools"><label class="search-field"><span class="sr-only">Search cases</span><span data-icon="search"></span><input type="search" data-diff-search placeholder="Search task or label"></label><div class="field"><label class="sr-only" for="diff-filter">Difference type</label><select id="diff-filter" data-diff-filter><option value="all">All differences</option><option value="improved">Improved</option><option value="regressed">Regressed</option><option value="changed">Changed</option><option value="unchanged">Unchanged</option></select></div></div>
+            <div class="table-wrap"><table class="data-table">
+              <thead><tr><th scope="col">Task</th><th scope="col">Reference</th><th scope="col">Model A</th><th scope="col">Model B</th><th scope="col">Diff</th><th scope="col"><span class="sr-only">Action</span></th></tr></thead>
+              <tbody>
+                <tr data-diff-row="improved"><td class="mono">TASK-D001</td><td>Microaneurysm</td><td>IR hemorrhage · 0.61</td><td>Microaneurysm · 0.76</td><td><span class="badge badge--success"><span data-icon="arrow-up-right"></span>Improved</span></td><td><button class="link-button" type="button" data-dialog-open="#diff-detail">Inspect</button></td></tr>
+                <tr data-diff-row="regressed"><td class="mono">TASK-D002</td><td>No supported lesion</td><td>No supported lesion · 0.74</td><td>Hard exudate · 0.58</td><td><span class="badge badge--danger"><span data-icon="arrow-down-right"></span>Regressed</span></td><td><button class="link-button" type="button" data-dialog-open="#diff-detail">Inspect</button></td></tr>
+                <tr data-diff-row="changed"><td class="mono">TASK-D003</td><td>Hard exudate</td><td>Soft exudate · 0.52</td><td>Microaneurysm · 0.55</td><td><span class="badge badge--warning">Changed</span></td><td><button class="link-button" type="button" data-dialog-open="#diff-detail">Inspect</button></td></tr>
+                <tr data-diff-row="unchanged"><td class="mono">TASK-D004</td><td>IR hemorrhage</td><td>IR hemorrhage · 0.81</td><td>IR hemorrhage · 0.85</td><td><span class="badge"><span data-icon="minus"></span>Unchanged</span></td><td><button class="link-button" type="button" data-dialog-open="#diff-detail">Inspect</button></td></tr>
+                <tr data-diff-row="improved"><td class="mono">TASK-D005</td><td>Soft exudate</td><td>Hard exudate · 0.49</td><td>Soft exudate · 0.68</td><td><span class="badge badge--success"><span data-icon="arrow-up-right"></span>Improved</span></td><td><button class="link-button" type="button" data-dialog-open="#diff-detail">Inspect</button></td></tr>
+                <tr data-diff-row="regressed"><td class="mono">TASK-D006</td><td>Microaneurysm</td><td>Microaneurysm · 0.72</td><td>No supported lesion · 0.51</td><td><span class="badge badge--danger"><span data-icon="arrow-down-right"></span>Regressed</span></td><td><button class="link-button" type="button" data-dialog-open="#diff-detail">Inspect</button></td></tr>
+              </tbody>
+            </table></div>
+          </section>
+
+          <aside class="stack">
+            <section class="surface" aria-labelledby="clusters-title"><div class="surface-header"><h2 id="clusters-title">Failure clusters</h2><span class="badge">Mock</span></div><div class="surface-body cluster-list">
+              <div class="cluster-row"><div><strong>Low-contrast small lesions</strong><span>3 regressed demo cases</span></div><span class="badge badge--danger">Priority</span></div>
+              <div class="cluster-row"><div><strong>Peripheral illumination falloff</strong><span>2 regressed demo cases</span></div><span class="badge badge--warning">Review</span></div>
+              <div class="cluster-row"><div><strong>Exudate class boundary</strong><span>5 changed demo cases</span></div><span class="badge">Monitor</span></div>
+            </div></section>
+            <section class="surface" aria-labelledby="definition-title"><div class="surface-header"><h2 id="definition-title">Diff definitions</h2></div><div class="surface-body evidence-list">
+              <div class="evidence-row"><span data-icon="arrow-up-right"></span><div><strong>Improved</strong><span>Model B matches the reference while Model A does not.</span></div></div>
+              <div class="evidence-row"><span data-icon="arrow-down-right"></span><div><strong>Regressed</strong><span>Model A matches the reference while Model B does not.</span></div></div>
+              <div class="evidence-row"><span data-icon="refresh"></span><div><strong>Changed</strong><span>The prediction changed, but neither output creates a clear reference-aligned win.</span></div></div>
+            </div></section>
+          </aside>
+        </div>
+      </div>
+    </div></main>
+  </div></div>
+
+  <dialog class="dialog" id="diff-detail" aria-labelledby="diff-detail-title">
+    <div class="dialog-head"><div><h2 id="diff-detail-title">TASK-D001 · Prediction transition</h2><p class="muted small">Improved demo case</p></div><button class="icon-button" type="button" data-dialog-close aria-label="Close"><span data-icon="x"></span></button></div>
+    <div class="dialog-body"><div class="dialog-grid"><img class="detail-image" src="assets/fundus-retinopathy-eda03.jpg" alt="Public demonstration fundus image"><div><div class="notice"><span data-icon="info"></span><div><strong>Why it changed</strong><br>Model B changed the top label and increased confidence for the reference class.</div></div><dl class="comparison"><div class="comparison-row"><dt>Reference</dt><dd>Microaneurysm</dd></div><div class="comparison-row"><dt>Model A</dt><dd>IR hemorrhage · 0.61</dd></div><div class="comparison-row"><dt>Model B</dt><dd>Microaneurysm · 0.76</dd></div><div class="comparison-row"><dt>Confidence delta</dt><dd>+0.29 for reference</dd></div><div class="comparison-row"><dt>Review state</dt><dd>Mock reference</dd></div></dl></div></div></div>
+    <div class="dialog-foot"><button class="button button--ghost" type="button" data-dialog-close>Close</button><a class="button button--primary" href="explainability.html">Open evidence view</a></div>
+  </dialog>
+  <div class="toast-region" data-toast-region aria-live="polite"></div>
+  <script src="integration/config.js"></script><script src="integration/mock-data.js"></script><script src="integration/adapter.js"></script><script src="app.js"></script>
+</body>
+</html>

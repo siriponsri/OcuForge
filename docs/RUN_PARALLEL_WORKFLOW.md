@@ -5,9 +5,9 @@
 **Scope:** Parallel OcuForge development using separate Git branches, worktrees, terminals, agents, PRs, and cleanup
 **Authority:** Repository workflow guidance subordinate to `AGENTS.md` and `docs/CTR_MODULE_CONTRACT.md`
 
-The current POC sequence is model-first interactive lesion classification. See
-[POC_MASTER_PLAN_INTERACTIVE_LESION.md](POC_MASTER_PLAN_INTERACTIVE_LESION.md) for the authoritative priority and
-R0 / MDL gate.
+The current POC sequence is the evidence-driven two-track plan. See
+[POC_MASTER_PLAN_V2.md](POC_MASTER_PLAN_V2.md) for the authoritative priority and
+[R0_DATASET_SUPERVISION_FREEZE.md](R0_DATASET_SUPERVISION_FREEZE.md) for the current pre-execution gate.
 
 ---
 

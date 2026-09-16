@@ -1,4 +1,9 @@
-# DUAL-TRACK IMPLEMENTATION ROADMAP, GATES & ACCEPTANCE
+# Historical dual-track implementation roadmap, gates & acceptance
+
+> **Historical roadmap.** Current planning authority is [POC_MASTER_PLAN_V2.md](../POC_MASTER_PLAN_V2.md),
+> with the active R0/R1 gates in [R0_DATASET_SUPERVISION_FREEZE.md](../R0_DATASET_SUPERVISION_FREEZE.md) and
+> [R1_GLOBAL_MODEL_SELECTION.md](../R1_GLOBAL_MODEL_SELECTION.md). The gates below document the earlier
+> starter-package sequence and do not define current R0/R1 status.
 
 ## 0. Parallel schedule
 

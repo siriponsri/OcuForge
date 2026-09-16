@@ -1,4 +1,7 @@
 {
+  "status": "CANDIDATE_TEMPLATE_NOT_BENCHMARK_RESULT",
+  "candidate_id": "G2_PATCH_MEAN_WITH_CORAL_CANDIDATE_HEAD",
+  "purpose": "candidate parameters only; pooling and head are selected through the R1 G0-G5 benchmark",
   "task": "ordinal",
   "pooling": "global_average",
   "device": "cuda",

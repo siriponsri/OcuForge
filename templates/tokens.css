@@ -1,0 +1,74 @@
+@font-face {
+  font-family: "Public Sans";
+  src: url("assets/fonts/public-sans-latin-wght-normal.woff2") format("woff2-variations");
+  font-style: normal;
+  font-weight: 100 900;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "IBM Plex Mono";
+  src: url("assets/fonts/ibm-plex-mono-latin-400-normal.woff2") format("woff2");
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+}
+
+:root {
+  --font-sans: "Public Sans", ui-sans-serif, system-ui, sans-serif;
+  --font-mono: "IBM Plex Mono", ui-monospace, monospace;
+
+  --bg: #fafafa;
+  --surface: #ffffff;
+  --surface-muted: #f7f7f8;
+  --surface-hover: #f4f4f5;
+  --line: #e4e4e7;
+  --line-strong: #d4d4d8;
+  --text: #18181b;
+  --text-soft: #3f3f46;
+  --muted: #71717a;
+  --dimmed: #a1a1aa;
+
+  --primary: #a73b24;
+  --primary-hover: #8f2f1b;
+  --primary-soft: #fff1ed;
+  --primary-line: #f2c7bc;
+  --primary-ink: #ffffff;
+
+  --success: #087c5b;
+  --success-soft: #ecfdf5;
+  --success-line: #a7f3d0;
+  --warning: #9a5b13;
+  --warning-soft: #fffbeb;
+  --warning-line: #fde68a;
+  --danger: #b42318;
+  --danger-soft: #fef3f2;
+  --danger-line: #fecdca;
+  --info: #2563eb;
+  --info-soft: #eff6ff;
+  --info-line: #bfdbfe;
+
+  --canvas: #111113;
+  --canvas-muted: #27272a;
+  --overlay: rgb(24 24 27 / 0.52);
+
+  --s-1: 0.25rem;
+  --s-2: 0.5rem;
+  --s-3: 0.75rem;
+  --s-4: 1rem;
+  --s-5: 1.25rem;
+  --s-6: 1.5rem;
+  --s-8: 2rem;
+  --s-10: 2.5rem;
+  --s-12: 3rem;
+
+  --r-sm: 0.375rem;
+  --r-md: 0.5rem;
+  --r-lg: 0.75rem;
+  --r-xl: 1rem;
+
+  --shadow-popover: 0 16px 40px rgb(24 24 27 / 0.14);
+  --sidebar-width: 15.5rem;
+  --topbar-height: 3.75rem;
+  --ease: cubic-bezier(0.2, 0.8, 0.2, 1);
+}

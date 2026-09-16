@@ -51,9 +51,9 @@ MIL attention เป็น model evidence; predictions.jsonl ไม่สร้�
 6. บันทึก image digest, commit SHA, license decision และ run config ก่อนใช้จริง Docker build/GPU/DINO/live service ยังเป็น external acceptance gate ของรุ่นนี้
 
 RunPod ใช้ Dockerfile/launcher เดียวกันบน container ที่ผู้ใช้จัดเตรียม ไม่สมมติว่ามี connected plugin และ
-ไม่บังคับให้ใช้ RunPod. สำหรับ R1 B1 ใช้คำสั่งใน
-`eyes-detected-models/configs/research/r1-global-b1.json`; ต้อง mount manifest/data/model roots เอง,
-ตรวจ hash/สิทธิ์ก่อนรัน และยังไม่ provision หรือ download dataset ขนาดใหญ่ใน gate ปัจจุบัน. Vercel ใช้ได้เฉพาะ
+ไม่บังคับให้ใช้ RunPod. สำหรับ R1 G0-G5 ใช้ benchmark record ใน
+`eyes-detected-models/configs/research/r1-global-benchmark.json`; ต้อง mount manifest/data/model roots เอง,
+ตรวจ hash/สิทธิ์ก่อนรัน และยังไม่ provision หรือ download dataset ขนาดใหญ่ใน current documentation gate. Vercel ใช้ได้เฉพาะ
 เอกสารหรือ synthetic demo; clinical UI/API/database ไม่ deploy ที่นั่น
 
 [Vast SSH connection](https://docs.vast.ai/guides/instances/connect/ssh)

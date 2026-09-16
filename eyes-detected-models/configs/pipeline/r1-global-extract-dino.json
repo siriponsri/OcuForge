@@ -1,4 +1,5 @@
 {
+  "purpose": "shared frozen-feature extraction for eligible R1 G1-G3 candidates",
   "encoder": "dinov3_vitb16",
   "device": "cuda",
   "seed": 42,

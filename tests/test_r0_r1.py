@@ -27,10 +27,26 @@ def test_r0_freeze_rejects_unannotated_negative_policy():
         validate_freeze(mutated)
 
 
+def test_r0_freeze_requires_explicit_supervision_fields():
+    freeze = load_json(ROOT / "docs/RSC_R0_DATASET_TAXONOMY_FREEZE_v0.1.json")
+    mutated = copy.deepcopy(freeze)
+    del mutated["candidate_datasets"][0]["lesion_supervision"]
+    with pytest.raises(ValueError, match="supervision audit fields"):
+        validate_freeze(mutated)
+
+
 def test_r1_freeze_requires_provider_neutral_storage():
-    config = load_json(ROOT / "eyes-detected-models/configs/research/r1-global-b1.json")
+    config = load_json(ROOT / "eyes-detected-models/configs/research/r1-global-benchmark.json")
     validate_r1(config, ROOT)
     mutated = copy.deepcopy(config)
     mutated["storage_roots"]["provider_required"] = True
     with pytest.raises(ValueError, match="RunPod must remain optional"):
+        validate_r1(mutated, ROOT)
+
+
+def test_r1_freeze_requires_controlled_g0_to_g5_ladder():
+    config = load_json(ROOT / "eyes-detected-models/configs/research/r1-global-benchmark.json")
+    mutated = copy.deepcopy(config)
+    mutated["baseline_ladder"].pop()
+    with pytest.raises(ValueError, match="G0 through G5"):
         validate_r1(mutated, ROOT)

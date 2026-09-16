@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="A focused queue for uncertain and conflicting retinal review cases.">
+  <title>Review Queue — DR Review Workspace</title>
+  <link rel="icon" href="assets/favicon.svg" type="image/svg+xml"><link rel="stylesheet" href="styles.css">
+</head>
+<body data-page="review" data-title="Review queue">
+  <a class="skip-link" href="#main-content">Skip to content</a>
+  <div class="app-shell"><aside class="sidebar" data-sidebar></aside><div class="workspace"><header class="topbar" data-topbar></header>
+    <main class="main" id="main-content"><div class="page page--wide">
+      <header class="page-heading">
+        <div class="heading-copy"><span class="eyebrow">Adjudication</span><h1>Resolve only the cases that need attention</h1><p>Low-confidence predictions, reviewer disagreements, and missing predictions are separated from routine screening.</p></div>
+      </header>
+
+      <div class="review-workspace">
+        <aside class="queue-pane" aria-label="Cases requiring review">
+          <div class="pane-head"><h2>Needs review</h2><span class="badge">3</span></div>
+          <div class="queue-tabs" role="tablist" aria-label="Queue filters"><button type="button" role="tab" data-queue-tab aria-selected="true">All</button><button type="button" role="tab" data-queue-tab aria-selected="false">Uncertain</button><button type="button" role="tab" data-queue-tab aria-selected="false">Conflict</button></div>
+          <button class="queue-item" type="button" data-queue-item="TASK-0043" aria-current="true"><span><strong>TASK-0043</strong><span>Low confidence · OD</span></span><span class="badge badge--warning">0.54</span></button>
+          <button class="queue-item" type="button" data-queue-item="TASK-0044" aria-current="false"><span><strong>TASK-0044</strong><span>Reviewer disagreement · OS</span></span><span class="badge badge--danger">Conflict</span></button>
+          <button class="queue-item" type="button" data-queue-item="TASK-0045" aria-current="false"><span><strong>TASK-0045</strong><span>No prediction · OD</span></span><span class="badge">Pending</span></button>
+        </aside>
+
+        <section class="detail-pane" aria-labelledby="selected-case-title">
+          <div class="pane-head"><h2 id="selected-case-title">Case <span data-selected-case>TASK-0043</span></h2><a class="button button--ghost" href="explainability.html">Inspect evidence <span data-icon="arrow-right"></span></a></div>
+          <div class="detail-body">
+            <figure><img class="detail-image" src="assets/fundus-retinopathy-eda03.jpg" alt="Public demonstration fundus image"><figcaption class="helper">Public demonstration image · ROI geometry preserved in the task contract.</figcaption></figure>
+            <div>
+              <div class="notice notice--warning"><span data-icon="alert-triangle"></span><div><strong>Why this case is here</strong><br>Model confidence is below the review threshold.</div></div>
+              <dl class="comparison">
+                <div class="comparison-row"><dt>Reference task</dt><dd>TASK-0043</dd></div>
+                <div class="comparison-row"><dt>Model suggestion</dt><dd>Intraretinal hemorrhage</dd></div>
+                <div class="comparison-row"><dt>Model confidence</dt><dd>0.54</dd></div>
+                <div class="comparison-row"><dt>Reviewer label</dt><dd>Microaneurysm</dd></div>
+                <div class="comparison-row"><dt>Decision state</dt><dd>Pending</dd></div>
+              </dl>
+              <div class="detail-actions"><button class="button button--primary" type="button" data-review-action="Reviewer label accepted"><span data-icon="check"></span>Accept reviewer label</button><button class="button button--outline" type="button" data-review-action="Correction requested"><span data-icon="pencil"></span>Request correction</button><button class="button button--danger" type="button" data-review-action="Case escalated"><span data-icon="flag"></span>Escalate</button></div>
+            </div>
+          </div>
+        </section>
+      </div>
+    </div></main>
+  </div></div>
+  <div class="toast-region" data-toast-region aria-live="polite"></div>
+  <script src="integration/config.js"></script><script src="integration/mock-data.js"></script><script src="integration/adapter.js"></script><script src="app.js"></script>
+</body>
+</html>

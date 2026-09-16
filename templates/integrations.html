@@ -1,0 +1,67 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Adapter-first Label Studio and model API integration setup.">
+  <title>Integrations — DR Review Workspace</title>
+  <link rel="icon" href="assets/favicon.svg" type="image/svg+xml"><link rel="stylesheet" href="styles.css">
+</head>
+<body data-page="integrations" data-title="Integrations">
+  <a class="skip-link" href="#main-content">Skip to content</a>
+  <div class="app-shell"><aside class="sidebar" data-sidebar></aside><div class="workspace"><header class="topbar" data-topbar></header>
+    <main class="main" id="main-content"><div class="page">
+      <header class="page-heading">
+        <div class="heading-copy"><span class="eyebrow">System setup</span><h1>Connect through stable adapters</h1><p>Keep reviewer pages independent from Label Studio versions, model implementations, and credential handling.</p></div>
+        <div class="heading-actions"><a class="button button--outline" href="docs/INTEGRATION_GUIDE.md">Read integration guide</a></div>
+      </header>
+
+      <div class="stack">
+        <div class="notice"><span data-icon="info"></span><div><strong>Mock mode is active</strong><br>Connection tests return demonstration status until <span class="mono">integration/config.js</span> is changed to live mode.</div></div>
+
+        <div class="grid-2">
+          <section class="surface" aria-labelledby="connections-title">
+            <div class="surface-header"><h2 id="connections-title">Connections</h2><span class="badge">4 services</span></div>
+            <div class="surface-body">
+              <div class="endpoint-row"><div class="endpoint-copy"><strong>Label Studio</strong><span>http://localhost:8080 · Annotation storage and review</span></div><div class="task-meta"><span class="badge" data-connection-status="label-studio">Mock only</span><button class="button button--outline" type="button" data-test-connection="label-studio">Test</button></div></div>
+              <div class="endpoint-row"><div class="endpoint-copy"><strong>Trusted API bridge</strong><span>http://localhost:8787 · Credentials and contract mapping</span></div><span class="badge badge--warning">Required for live mode</span></div>
+              <div class="endpoint-row"><div class="endpoint-copy"><strong>Model API</strong><span>http://localhost:8000 · Inference, explanation, and model-diff adapters</span></div><div class="task-meta"><span class="badge" data-connection-status="model-api">Mock only</span><button class="button button--outline" type="button" data-test-connection="model-api">Test</button></div></div>
+              <div class="endpoint-row"><div class="endpoint-copy"><strong>Static UI adapter</strong><span>integration/adapter.js · Mock/live implementation boundary</span></div><span class="badge badge--success">Ready</span></div>
+            </div>
+          </section>
+
+          <aside class="surface" aria-labelledby="flow-title"><div class="surface-header"><h2 id="flow-title">Request path</h2></div><div class="surface-body evidence-list">
+            <div class="evidence-row"><span class="evidence-index">1</span><div><strong>Reviewer page</strong><span>Calls one browser adapter.</span></div></div>
+            <div class="evidence-row"><span class="evidence-index">2</span><div><strong>Trusted bridge</strong><span>Validates contracts and protects credentials.</span></div></div>
+            <div class="evidence-row"><span class="evidence-index">3</span><div><strong>Label Studio</strong><span>Stores tasks, predictions, and annotations.</span></div></div>
+            <div class="evidence-row"><span class="evidence-index">4</span><div><strong>Model API</strong><span>Returns versioned global or ROI outputs.</span></div></div>
+          </div></aside>
+        </div>
+
+        <section class="surface" aria-labelledby="config-title">
+          <div class="surface-header"><h2 id="config-title">Live-mode configuration</h2><button class="button button--ghost" type="button" data-copy="#live-config"><span data-icon="copy"></span>Copy</button></div>
+          <div class="surface-body"><pre class="code" id="live-config"><code>window.DR_REVIEW_CONFIG = {
+  mode: "live",
+  labelStudio: {
+    baseUrl: "http://localhost:8080",
+    projectId: 1
+  },
+  apiBridge: {
+    baseUrl: "http://localhost:8787"
+  },
+  modelApi: {
+    baseUrl: "http://localhost:8000"
+  }
+};</code></pre></div>
+        </section>
+
+        <section class="surface" aria-labelledby="files-title">
+          <div class="surface-header"><h2 id="files-title">Integration assets</h2></div>
+          <div class="surface-body"><div class="endpoint-row"><div class="endpoint-copy"><strong>Label Studio interface</strong><span>Point, rectangle, and polygon ROI labels</span></div><a class="button button--ghost" href="label-studio/roi-lesion-label-config.xml">Open XML <span data-icon="arrow-right"></span></a></div><div class="endpoint-row"><div class="endpoint-copy"><strong>Annotation contract</strong><span>Example versioned task, prediction, ROI, and review payload</span></div><a class="button button--ghost" href="integration/annotation-contract.example.json">Open JSON <span data-icon="arrow-right"></span></a></div><div class="endpoint-row"><div class="endpoint-copy"><strong>Model-lab contracts</strong><span>Proposed explanation and model-diff response shapes</span></div><div class="task-meta"><a class="button button--ghost" href="integration/explanation-contract.example.json">Explanation</a><a class="button button--ghost" href="integration/model-diff-contract.example.json">Model diff</a></div></div><div class="endpoint-row"><div class="endpoint-copy"><strong>Integration guide</strong><span>Bridge routes, coordinate conversion, and safety boundaries</span></div><a class="button button--ghost" href="docs/INTEGRATION_GUIDE.md">Open guide <span data-icon="arrow-right"></span></a></div></div>
+        </section>
+      </div>
+    </div></main>
+  </div></div>
+  <div class="toast-region" data-toast-region aria-live="polite"></div>
+  <script src="integration/config.js"></script><script src="integration/mock-data.js"></script><script src="integration/adapter.js"></script><script src="app.js"></script>
+</body>
+</html>

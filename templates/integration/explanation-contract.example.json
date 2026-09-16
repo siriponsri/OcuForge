@@ -1,0 +1,25 @@
+{
+  "schema_version": "0.1",
+  "task_id": "TASK-0042",
+  "roi_id": "ROI-01",
+  "model": {
+    "name": "roi-lesion-model",
+    "version": "0.1.0-mock"
+  },
+  "method": "MIL_ATTENTION_ILLUSTRATIVE",
+  "not_lesion_localization": true,
+  "evidence_regions": [
+    {
+      "rank": 1,
+      "region_id": "REGION-01",
+      "coordinate_space": "normalized_0_1",
+      "center_x": 0.56,
+      "center_y": 0.48,
+      "relative_contribution": 0.42
+    }
+  ],
+  "limitations": [
+    "Attention is aggregation evidence, not a lesion mask.",
+    "Human image review remains required."
+  ]
+}

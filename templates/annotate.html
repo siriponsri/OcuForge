@@ -1,0 +1,76 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Focused ROI screening review with human confirmation.">
+  <title>Screening — DR Review Workspace</title>
+  <link rel="icon" href="assets/favicon.svg" type="image/svg+xml"><link rel="stylesheet" href="styles.css">
+</head>
+<body data-page="screening" data-title="Screening">
+  <a class="skip-link" href="#main-content">Skip to content</a>
+  <div class="app-shell"><aside class="sidebar" data-sidebar></aside><div class="workspace"><header class="topbar" data-topbar></header>
+    <main class="main" id="main-content"><div class="page page--wide">
+      <header class="page-heading">
+        <div class="heading-copy"><span class="eyebrow">Case review</span><h1>Inspect one region at a time</h1><p>Use the image as the primary evidence. The model suggestion stays secondary until you record a reviewer decision.</p></div>
+        <div class="heading-actions"><a class="button button--outline" href="explainability.html"><span data-icon="layers"></span>Open explanation</a></div>
+      </header>
+
+      <div class="case-bar">
+        <div class="case-progress"><strong>Case 4 of 15</strong><div class="progress-track" role="progressbar" aria-label="Queue progress" aria-valuemin="0" aria-valuemax="15" aria-valuenow="4"><span style="width:26.7%"></span></div><span class="muted small">TASK-0042</span></div>
+        <div class="task-meta"><span class="badge">OD</span><span class="badge">Color fundus</span><span class="badge badge--primary">ROI 01</span></div>
+      </div>
+
+      <div class="screening-layout">
+        <section class="viewer" aria-label="Retinal image viewer">
+          <div class="viewer-toolbar">
+            <div class="tool-group" aria-label="Viewer tools">
+              <button class="tool-button" type="button" data-tool aria-pressed="true" aria-label="Pointer"><span data-icon="mouse-pointer"></span></button>
+              <button class="tool-button" type="button" data-tool aria-pressed="false" aria-label="Rectangle ROI"><span data-icon="box-select"></span></button>
+              <button class="tool-button" type="button" data-zoom-out aria-label="Zoom out"><span data-icon="zoom-out"></span></button>
+              <span class="badge" data-zoom-output>100%</span>
+              <button class="tool-button" type="button" data-zoom-in aria-label="Zoom in"><span data-icon="zoom-in"></span></button>
+              <button class="tool-button" type="button" data-reset aria-label="Reset view"><span data-icon="refresh"></span></button>
+            </div>
+            <span class="muted small">Public demonstration image</span>
+          </div>
+          <div class="image-stage" data-image-stage>
+            <div class="image-wrap"><img class="retina-image" src="assets/fundus-retinopathy-eda03.jpg" alt="Public demonstration fundus image"><span class="roi-box" aria-label="Selected region of interest"></span><span class="roi-label">ROI 01</span></div>
+            <div class="viewer-meta"><span class="canvas-pill">DEMO-IMG-0042</span><span class="canvas-pill">Rectangle ROI</span></div>
+          </div>
+        </section>
+
+        <aside class="review-panel" aria-label="Reviewer decision panel">
+          <section class="review-section">
+            <div class="section-heading"><h2>Model suggestion</h2><span class="badge">Mock</span></div>
+            <div class="prediction"><strong>Microaneurysm</strong><span>Top suggestion · confidence 0.87</span></div>
+            <div class="score-row"><span>Microaneurysm</span><span class="mono">0.87</span><div class="score-bar"><span style="width:87%"></span></div></div>
+            <div class="score-row"><span>Intraretinal hemorrhage</span><span class="mono">0.08</span><div class="score-bar"><span style="width:8%"></span></div></div>
+            <div class="score-row"><span>No supported lesion</span><span class="mono">0.03</span><div class="score-bar"><span style="width:3%"></span></div></div>
+          </section>
+          <section class="review-section">
+            <div class="section-heading"><h2>Your decision</h2></div>
+            <div class="decision-grid">
+              <button class="button button--primary" type="button" data-decision="CONFIRM"><span data-icon="check"></span>Confirm</button>
+              <button class="button button--outline" type="button" data-decision="CORRECT"><span data-icon="pencil"></span>Correct</button>
+              <button class="button button--danger" type="button" data-decision="REJECT"><span data-icon="x"></span>Reject suggestion</button>
+            </div>
+            <p class="helper" data-decision-status aria-live="polite">No decision recorded in this session.</p>
+          </section>
+          <section class="review-section">
+            <div class="field"><label for="review-note">Reviewer note <span class="muted">(optional)</span></label><textarea id="review-note" placeholder="Add context only when it helps downstream review."></textarea></div>
+          </section>
+          <section class="review-section"><div class="notice notice--warning"><span data-icon="info"></span><div><strong>Human review required</strong><br>No evidence overlay can replace direct image inspection.</div></div></section>
+        </aside>
+      </div>
+    </div></main>
+  </div></div>
+
+  <dialog class="dialog" data-correction-dialog aria-labelledby="correction-title">
+    <div class="dialog-head"><h2 id="correction-title">Correct lesion label</h2><button class="icon-button" type="button" data-dialog-close aria-label="Close"><span data-icon="x"></span></button></div>
+    <div class="dialog-body"><div class="field"><label for="corrected-label">Final reviewer label</label><select id="corrected-label" data-corrected-label><option value="MICROANEURYSM">Microaneurysm</option><option value="INTRARETINAL_HEMORRHAGE">Intraretinal hemorrhage</option><option value="HARD_EXUDATE">Hard exudate</option><option value="SOFT_EXUDATE">Soft exudate</option><option value="NO_SUPPORTED_LESION_IN_ROI">No supported lesion in ROI</option></select></div><p class="helper">The original model output remains unchanged in the audit record.</p></div>
+    <div class="dialog-foot"><button class="button button--ghost" type="button" data-dialog-close>Cancel</button><button class="button button--primary" type="button" data-save-correction>Save correction</button></div>
+  </dialog>
+  <div class="toast-region" data-toast-region aria-live="polite"></div>
+  <script src="integration/config.js"></script><script src="integration/mock-data.js"></script><script src="integration/adapter.js"></script><script src="app.js"></script>
+</body>
+</html>

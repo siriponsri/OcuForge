@@ -12,20 +12,26 @@ Keep the contracts-first boundary: models and labeler may depend on contracts, b
 
 ## Current POC Direction
 
-The authoritative model-first interactive lesion direction is
-[POC_MASTER_PLAN_INTERACTIVE_LESION.md](docs/POC_MASTER_PLAN_INTERACTIVE_LESION.md).
+The authoritative evidence-driven research/POC direction is
+[POC_MASTER_PLAN_V2.md](docs/POC_MASTER_PLAN_V2.md). The previous interactive-lesion plan is retained only as
+a superseded historical pointer; do not use it to infer current phase status or model selection.
 The current planning state is:
 
 ```text
 POC_PRIMARY=MODEL_INTERACTIVE_GUI
 MODEL_TRAINING_PRIORITY=HIGH
-GLOBAL_MODEL=PRIMARY
-ROI_LESION_CLASSIFIER=PRIMARY_POC_FEATURE
-LESION_TAXONOMY=FREEZE_BEFORE_TRAINING
-TARGET_LESION_COUNT=APPROXIMATELY_7_PENDING_AUDIT
+R0_V2=READY_TO_EXECUTE
+GLOBAL_MODEL=EVIDENCE_SELECTED_AFTER_R1
+GLOBAL_MODEL_LEADING_CANDIDATE=DINOV3_ATTENTION_MIL
+R1=CONTROLLED_BENCHMARK_G0_G5
+ORDINAL_HEADS=CE_AND_CORAL_ABLATION_FOR_GENUINE_ORDINAL_LABELS
+ROI_LESION_CLASSIFIER=SEPARATE_MODEL_TRACK
+LESION_TAXONOMY=SPATIALLY_SUPPORTED_CLASSES_ONLY
+MMRDR_LESION_SUPERVISION=IMAGE_LEVEL_ONLY
 NO_LESION=NO_SUPPORTED_LESION_IN_ROI
 LABEL_STUDIO_COMMUNITY=INTERNAL_ROI_QA_WORKBENCH
-CUSTOM_GUI=CUSTOMER_FACING
+CUSTOM_GUI=CUSTOMER_FACING_REFERENCE_TEMPLATES
+GUI_REFERENCE=templates/
 CVAT=OPTIONAL_ADVANCED_LABELING
 SAM=OPTIONAL_REFINEMENT
 DICOM=PLANNED_AFTER_MODEL_GUI
@@ -34,9 +40,9 @@ HL7_FHIR=PLANNED_AFTER_MODEL_GUI
 PUBLIC_GPU_PRIVATE_DATA=FORBIDDEN
 ```
 
-R0 / MDL dataset and taxonomy freeze has passed. The next implementation phase is R1 / B1, which is ready but
-not executed. Do not launch a large GPU run, provision RunPod, or download a large dataset in the current
-documentation gate; use provider-neutral configurable storage roots for the future public-data run.
+R0_V2=READY_TO_EXECUTE and has not passed after the supervision/taxonomy re-audit. R1 is a controlled G0-G5
+benchmark and is READY_NOT_EXECUTED. Do not launch a large GPU run, provision RunPod, or download a large dataset
+in this documentation gate; use provider-neutral configurable storage roots for the future public-data run.
 
 Before cross-package or cross-runtime work, read `docs/CTR_MODULE_CONTRACT.md`. Respect module ownership, dependency direction,
 and data/runtime boundaries. Phases define execution order; modules define architectural ownership. Use `docs/PROJECT_MAP.md`

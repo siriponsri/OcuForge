@@ -150,7 +150,7 @@ def test_binary_pipeline_keeps_scores_out_of_ordinal_contract(tmp_path):
     )
 
 
-def test_global_average_b1_synthetic_path(tmp_path):
+def test_global_average_candidate_synthetic_path(tmp_path):
     manifest = prepare(tmp_path)
     config = json.loads((tmp_path / "train.json").read_text(encoding="utf-8"))
     config["pooling"] = "global_average"

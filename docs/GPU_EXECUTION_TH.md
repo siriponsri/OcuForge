@@ -2,9 +2,11 @@
 
 ## Current model-first gate
 
-GPU work follows the completed R0 / MDL dataset and lesion-taxonomy freeze. The selected global dataset is
-MMRDR UWF; IDRiD is the selected ROI source but remains local-audit-only. R1 B1 is ready but not executed:
-frozen DINOv3 ViT-B/16 features, global-average pooling, and an ordinal CORAL head. Vast.ai and RunPod remain
+The current gate is **R0_V2=READY_TO_EXECUTE**. Supervision semantics, spatial taxonomy, negative policy and
+identity split rules must be re-audited before R0 can pass. R1 is **READY_NOT_EXECUTED** and uses the controlled
+G0-G5 ladder; DINOv3 plus Attention MIL is a leading candidate, not a predetermined champion, and CE versus
+CORAL is an ablation for genuine ordinal labels only. MMRDR UWF is a candidate global source; IDRiD is a
+candidate spatial ROI source and remains local-audit-only. Vast.ai and RunPod remain
 limited to reviewed public or synthetic
 data and public model assets;
 hospital images, labels, embeddings, predictions and checkpoints remain local/on-premises.
@@ -31,8 +33,8 @@ docker build -f eyes-detected-models/Dockerfile --target gpu-research -t ocuforg
 docker run --rm --gpus all --network none ocuforge-gpu-research:0.1.0 python -c "import torch; print(torch.cuda.is_available())"
 ```
 
-ก่อนใช้ public dataset ให้ตรวจ dataset access/license, hashes และ split freeze. สำหรับ R1 ให้ดูคำสั่งใน
-`eyes-detected-models/configs/research/r1-global-b1.json` และ mount volume เอง. ภาพ local hospital ให้อยู่
+ก่อนใช้ public dataset ให้ตรวจ dataset access/license, hashes และ split freeze. สำหรับ R1 ให้ดู benchmark record ใน
+`eyes-detected-models/configs/research/r1-global-benchmark.json` และ mount volume เอง. ภาพ local hospital ให้อยู่
 on-prem ตามค่าเริ่มต้น; การอนุมัติการใช้ข้อมูลจริงเป็นคนละเรื่องกับการมี adapter ที่ทำงานได้ ไม่ใส่ raw data
-ลง image และไม่ใช้ Google Drive/HF เป็นช่องทาง upload จาก starter. รอบ R0/R1-ready นี้ไม่ provision
+ลง image และไม่ใช้ Google Drive/HF เป็นช่องทาง upload จาก starter. รอบ R0 V2 reconciliation นี้ไม่ provision
 RunPod และไม่ download dataset ขนาดใหญ่.

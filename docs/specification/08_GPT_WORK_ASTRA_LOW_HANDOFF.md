@@ -1,18 +1,23 @@
-# HANDOFF TO GPT WORK — ASTRA LOW
+# Historical handoff to GPT Work — Astra Low
+
+> This v0.1 starter handoff is retained for implementation history. It is subordinate to the current
+> [POC Master Plan V2](../POC_MASTER_PLAN_V2.md); its former fixed-primary model choices do not define current
+> R0 or R1.
 
 ## Use case
 
 This document is intentionally optimized for a lower-reasoning drafting pass.
 
-Do not ask Astra Low to decide the scientific architecture from scratch. The architecture is already specified. Astra Low should **implement the starter faithfully**.
+Do not ask Astra Low to decide the scientific architecture from scratch for the historical starter. Current
+scientific selection follows the evidence-driven R1 G0-G5 benchmark.
 
 ---
 
 # 1. Paste this instruction to GPT Work
 
 ```text
-Implement the Eye Detected dual-track starter workspace using
-00_GPT_WORK_MASTER_PROMPT_TH.md as the authoritative implementation command.
+Implement the historical Eye Detected dual-track starter workspace using
+00_GPT_WORK_MASTER_PROMPT_TH.md as its historical implementation command.
 
 Read all Markdown files in this package before making files.
 
@@ -78,13 +83,13 @@ Never sacrifice provenance/schema correctness to add visual polish.
 
 # 3. Decisions Astra Low must not change
 
-- DINOv3 ViT-B/16 = primary encoder target.
-- RETFound = challenger.
-- patch-based MIL = primary UWF aggregation path.
-- CORAL = primary ordinal head.
-- MMRDR-UWF = primary public UWF source.
-- IDRiD = primary early lesion-localization bootstrap.
-- CVAT = initial annotation backend.
+- DINOv3 ViT-B/16 = leading encoder candidate.
+- RETFound = challenger candidate.
+- patch-based pooling/MIL = benchmark candidates for UWF aggregation.
+- CE and CORAL = head ablation for genuine ordinal labels.
+- MMRDR-UWF = candidate public global source pending R0 V2 audit.
+- IDRiD = candidate spatial ROI source pending R0 V2 audit.
+- Label Studio Community = internal ROI QA; CVAT = optional advanced annotation infrastructure.
 - MA = point-primary annotation.
 - NV = manual region first; no fake pixel pre-label from MMRDR.
 - DME separated by modality.

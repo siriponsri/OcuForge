@@ -1,0 +1,54 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Case-level model evidence inspection for retinal research workflows.">
+  <title>Explainability — DR Review Workspace</title>
+  <link rel="icon" href="assets/favicon.svg" type="image/svg+xml"><link rel="stylesheet" href="styles.css">
+</head>
+<body data-page="explainability" data-title="Explainability">
+  <a class="skip-link" href="#main-content">Skip to content</a>
+  <div class="app-shell"><aside class="sidebar" data-sidebar></aside><div class="workspace"><header class="topbar" data-topbar></header>
+    <main class="main" id="main-content"><div class="page page--wide">
+      <header class="page-heading">
+        <div class="heading-copy"><span class="eyebrow">Model lab · Case evidence</span><h1>Understand what influenced the output</h1><p>Compare the source image, illustrative attention, and the reviewer-selected ROI without treating attention as lesion localization.</p></div>
+        <div class="heading-actions"><div class="field"><label class="sr-only" for="explain-case">Case</label><select id="explain-case"><option>TASK-0042 · ROI 01</option><option>TASK-0043 · ROI 01</option><option>TASK-0044 · ROI 02</option></select></div></div>
+      </header>
+
+      <div class="notice notice--warning bottom-gap"><span data-icon="alert-triangle"></span><div><strong>Interpretation boundary</strong><br>This is an illustrative explanation view. MIL attention is aggregation evidence and must not be converted into a lesion annotation or clinical finding.</div></div>
+
+      <div class="stack">
+        <div class="explain-layout">
+          <section class="surface" aria-labelledby="evidence-view-title">
+            <div class="surface-header"><h2 id="evidence-view-title">Image evidence</h2><div class="segmented" aria-label="Evidence view"><button type="button" data-evidence-view="original" aria-pressed="false">Original</button><button type="button" data-evidence-view="attention" aria-pressed="true">Attention</button><button type="button" data-evidence-view="roi" aria-pressed="false">ROI</button></div></div>
+            <div class="evidence-stage" data-evidence-stage data-view="attention">
+              <div class="evidence-image-wrap"><img src="assets/fundus-retinopathy-eda03.jpg" alt="Public demonstration fundus image with an illustrative model evidence overlay"><span class="heatmap" aria-hidden="true"></span><span class="evidence-pin" aria-label="Reviewer-selected ROI center"></span></div>
+              <div class="legend"><span>Lower</span><span class="legend-scale" aria-hidden="true"></span><span>Higher</span></div>
+            </div>
+          </section>
+
+          <aside class="stack">
+            <section class="surface" aria-labelledby="prediction-title"><div class="surface-header"><h2 id="prediction-title">Current output</h2><span class="badge">Mock</span></div><div class="surface-body"><div class="prediction"><strong>Microaneurysm</strong><span>ROI lesion model · confidence 0.87</span></div><dl class="comparison"><div class="comparison-row"><dt>Model</dt><dd>roi-lesion-model</dd></div><div class="comparison-row"><dt>Version</dt><dd>0.1.0-mock</dd></div><div class="comparison-row"><dt>ROI</dt><dd>ROI 01</dd></div><div class="comparison-row"><dt>Reviewer state</dt><dd>Not recorded</dd></div></dl></div></section>
+
+            <section class="surface" aria-labelledby="regions-title"><div class="surface-header"><h2 id="regions-title">Evidence regions</h2><span class="badge">Illustrative</span></div><div class="surface-body evidence-list">
+              <div class="evidence-row"><span class="evidence-index">1</span><div><strong>Central temporal region</strong><span>Highest relative contribution in this view</span></div><span class="mono">0.42</span></div>
+              <div class="evidence-row"><span class="evidence-index">2</span><div><strong>Inferior temporal region</strong><span>Secondary relative contribution</span></div><span class="mono">0.27</span></div>
+              <div class="evidence-row"><span class="evidence-index">3</span><div><strong>Superior central region</strong><span>Lower relative contribution</span></div><span class="mono">0.16</span></div>
+            </div></section>
+
+            <section class="surface" aria-labelledby="agreement-title"><div class="surface-header"><h2 id="agreement-title">Evidence check</h2></div><div class="surface-body"><div class="status-list"><div class="status-item"><div><span data-icon="target"></span>Reviewer ROI overlaps top region</div><span class="badge badge--info">Partial</span></div><div class="status-item"><div><span data-icon="eye"></span>Image quality</div><span class="badge badge--success">Gradable</span></div><div class="status-item"><div><span data-icon="shield-check"></span>Clinical interpretation</div><span class="badge">Required</span></div></div></div></section>
+          </aside>
+        </div>
+
+        <section class="interpretation-list" aria-label="How to interpret this page">
+          <div class="interpretation-item"><h3>What it shows</h3><p>Relative image regions that influenced the model output for this one case.</p></div>
+          <div class="interpretation-item"><h3>What to compare</h3><p>Check whether influential regions align with visible findings and the reviewer-selected ROI.</p></div>
+          <div class="interpretation-item"><h3>What it cannot prove</h3><p>Attention alone does not establish lesion boundaries, diagnosis, or clinical correctness.</p></div>
+        </section>
+      </div>
+    </div></main>
+  </div></div>
+  <div class="toast-region" data-toast-region aria-live="polite"></div>
+  <script src="integration/config.js"></script><script src="integration/mock-data.js"></script><script src="integration/adapter.js"></script><script src="app.js"></script>
+</body>
+</html>

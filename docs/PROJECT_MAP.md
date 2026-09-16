@@ -3,10 +3,10 @@
 This page is the short human handoff map for OcuForge. It explains where work belongs and which gate is current.
 The normative rules are in [CTR_MODULE_CONTRACT.md](CTR_MODULE_CONTRACT.md); this page does not replace them.
 
-The current POC direction is
-[POC_MASTER_PLAN_INTERACTIVE_LESION.md](POC_MASTER_PLAN_INTERACTIVE_LESION.md): train the
-global and ROI models first, then expose interactive suggestions through the internal QA workbench and the
-customer-facing GUI.
+The current POC direction is the evidence-driven two-track plan in
+[POC_MASTER_PLAN_V2.md](POC_MASTER_PLAN_V2.md). The global DR and ROI lesion models are separate tracks; the
+existing `templates/` package is the preferred customer-facing GUI reference, while Label Studio Community is
+internal ROI QA. The former interactive-lesion plan is superseded.
 
 ## What OcuForge Is
 
@@ -66,7 +66,7 @@ may silently upload private data or provision cloud resources.
 | Machine bootstrap | PASS |
 | Phase 2A - Docker-independent local data foundation | PASS |
 | Phase 2B - Live MongoDB acceptance | PENDING / NOT RUN |
-| Model-first interactive lesion POC | R0 / MDL PASS; R1 / B1 READY, NOT EXECUTED |
+| Evidence-driven two-track POC | R0 V2 READY TO EXECUTE; R1 G0-G5 READY, NOT EXECUTED |
 
 Phase 2A passing does not mean that Phase 2 overall has passed.
 
@@ -95,13 +95,16 @@ Run these commands from the repository root:
 | `02_phase2_local_data.cmd` | Run the synthetic-only Phase 2B live-Mongo gate on a Docker-capable machine. CVAT stays off. |
 | `python -m pytest` | Run the offline test suite after bootstrap. |
 | `python scripts/synthetic_roundtrip.py` | Run the synthetic research/annotation roundtrip; it does not prove clinical performance. |
-| `docs/POC_MASTER_PLAN_INTERACTIVE_LESION.md` | Read the model-first POC sequence and R0 / MDL outputs. |
+| `docs/POC_MASTER_PLAN_V2.md` | Read the authoritative evidence-driven roadmap. |
+| `docs/R0_DATASET_SUPERVISION_FREEZE.md` | Read the R0 supervision/taxonomy/split acceptance gate. |
+| `docs/R1_GLOBAL_MODEL_SELECTION.md` | Read the controlled G0-G5 global benchmark. |
+| `templates/README.md` | Open the preferred customer-facing GUI reference. |
 | `deploy/onprem/README.md` | Read the local on-prem manual handoff and Phase 2B prerequisites. |
 
 ## Current Next Action
 
-The next POC action is **R1 / B1 — Global MMRDR baseline**. Use the frozen dataset/taxonomy record and
-provider-neutral storage roots; preserve the released split and report held-out evidence before starting ROI
-model work. The separate Phase 2B live-Mongo gate remains
-pending and can be run on a Docker-capable machine; it is independent of the public-data model gate and
+The next POC action is **R0 V2 — Dataset, supervision, taxonomy and split audit**. It must establish what each
+candidate dataset can supervise before any R1 run. After R0 passes, execute the controlled R1 G0-G5 benchmark;
+do not treat DINOv3 + Attention MIL or CORAL as predetermined winners. The separate Phase 2B live-Mongo gate
+remains pending and can be run on a Docker-capable machine; it is independent of the public-data model gate and
 must use synthetic fixtures only.

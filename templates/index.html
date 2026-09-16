@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="A clean review workspace for diabetic retinopathy screening support research.">
+  <title>Overview — DR Review Workspace</title>
+  <link rel="icon" href="assets/favicon.svg" type="image/svg+xml"><link rel="stylesheet" href="styles.css">
+</head>
+<body data-page="overview" data-title="Overview">
+  <a class="skip-link" href="#main-content">Skip to content</a>
+  <div class="app-shell"><aside class="sidebar" data-sidebar></aside><div class="workspace"><header class="topbar" data-topbar></header>
+    <main class="main" id="main-content"><div class="page">
+      <header class="page-heading">
+        <div class="heading-copy"><span class="eyebrow">Good morning</span><h1>Your review workspace</h1><p>Continue the screening queue, resolve uncertain cases, or inspect model behavior from one clear starting point.</p></div>
+      </header>
+
+      <div class="stack">
+        <section class="surface next-action" aria-labelledby="next-action-title">
+          <div class="next-action-copy"><div class="task-meta"><span class="badge badge--primary">Next action</span><span class="badge">12 cases remaining</span></div><h2 id="next-action-title">Continue ROI lesion review</h2><p>Resume at TASK-0042. Inspect the selected region, review the model suggestion, then confirm, correct, or send the case to the review queue.</p><div class="task-meta"><span class="mono">TASK-0042</span><span class="muted small">OD · Color fundus · ROI 01</span></div></div>
+          <a class="button button--primary" href="annotate.html">Continue screening <span data-icon="arrow-right"></span></a>
+        </section>
+
+        <section class="surface" aria-labelledby="flow-title">
+          <div class="surface-header"><h2 id="flow-title">Clinical review flow</h2><span class="badge badge--success"><span class="dot"></span>Ready</span></div>
+          <div class="workflow">
+            <div class="workflow-step is-current"><span class="step-number">1</span><div><h3>Inspect image</h3><span>Check image quality and the selected ROI.</span></div></div>
+            <div class="workflow-step"><span class="step-number">2</span><div><h3>Review evidence</h3><span>Compare the suggestion with visible findings.</span></div></div>
+            <div class="workflow-step"><span class="step-number">3</span><div><h3>Record decision</h3><span>Confirm, correct, reject, or escalate.</span></div></div>
+            <div class="workflow-step"><span class="step-number">4</span><div><h3>Finalize queue</h3><span>Resolve uncertain cases before locking.</span></div></div>
+          </div>
+        </section>
+
+        <div class="grid-2">
+          <section class="surface" aria-labelledby="waiting-title">
+            <div class="surface-header"><h2 id="waiting-title">Waiting for review</h2><a class="button button--ghost" href="review.html">View queue <span data-icon="chevron-right"></span></a></div>
+            <ul class="list">
+              <li class="list-row"><div class="list-main"><strong>TASK-0043 · Low confidence</strong><span>Model confidence 0.54 · Intraretinal hemorrhage</span></div><div class="list-side"><span class="badge badge--warning">Review</span><span data-icon="chevron-right"></span></div></li>
+              <li class="list-row"><div class="list-main"><strong>TASK-0044 · Reviewer disagreement</strong><span>Model suggestion differs from reviewer label</span></div><div class="list-side"><span class="badge badge--danger">Conflict</span><span data-icon="chevron-right"></span></div></li>
+              <li class="list-row"><div class="list-main"><strong>TASK-0045 · No prediction</strong><span>Manual ROI assessment required</span></div><div class="list-side"><span class="badge">Pending</span><span data-icon="chevron-right"></span></div></li>
+            </ul>
+          </section>
+
+          <aside class="surface" aria-labelledby="status-title">
+            <div class="surface-header"><h2 id="status-title">Workspace status</h2></div>
+            <div class="surface-body status-list">
+              <div class="status-item"><div><span data-icon="database"></span>Demo dataset</div><span class="badge badge--success">Loaded</span></div>
+              <div class="status-item"><div><span data-icon="activity"></span>Model API</div><span class="badge">Mock</span></div>
+              <div class="status-item"><div><span data-icon="plug"></span>Label Studio</div><span class="badge">Not connected</span></div>
+              <div class="divider"></div>
+              <div class="notice"><span data-icon="shield-check"></span><div><strong>Research use only</strong><br>Predictions support review and do not provide a diagnosis or referral decision.</div></div>
+            </div>
+          </aside>
+        </div>
+      </div>
+    </div></main>
+  </div></div>
+  <div class="toast-region" data-toast-region aria-live="polite"></div>
+  <script src="integration/config.js"></script><script src="integration/mock-data.js"></script><script src="integration/adapter.js"></script><script src="app.js"></script>
+</body>
+</html>

@@ -1,0 +1,49 @@
+<View>
+  <Header value="Retinal ROI Lesion Review" />
+  <Text name="case_context" value="$case_context" />
+  <Image name="image" value="$image" zoom="true" zoomControl="true" rotateControl="false" />
+
+  <Header value="Rectangle ROI" />
+  <RectangleLabels name="rectangle_labels" toName="image" strokeWidth="2">
+    <Label value="MICROANEURYSM" background="#A73B24" />
+    <Label value="INTRARETINAL_HEMORRHAGE" background="#7F1D1D" />
+    <Label value="HARD_EXUDATE" background="#B7791F" />
+    <Label value="SOFT_EXUDATE" background="#6B7280" />
+    <Label value="NO_SUPPORTED_LESION_IN_ROI" background="#2563EB" />
+  </RectangleLabels>
+
+  <Header value="Polygon ROI" />
+  <PolygonLabels name="polygon_labels" toName="image" strokeWidth="2" pointSize="small">
+    <Label value="MICROANEURYSM" background="#A73B24" />
+    <Label value="INTRARETINAL_HEMORRHAGE" background="#7F1D1D" />
+    <Label value="HARD_EXUDATE" background="#B7791F" />
+    <Label value="SOFT_EXUDATE" background="#6B7280" />
+    <Label value="NO_SUPPORTED_LESION_IN_ROI" background="#2563EB" />
+  </PolygonLabels>
+
+  <Header value="Point ROI" />
+  <KeyPointLabels name="point_labels" toName="image" strokeWidth="2">
+    <Label value="MICROANEURYSM" background="#A73B24" />
+    <Label value="INTRARETINAL_HEMORRHAGE" background="#7F1D1D" />
+    <Label value="HARD_EXUDATE" background="#B7791F" />
+    <Label value="SOFT_EXUDATE" background="#6B7280" />
+    <Label value="NO_SUPPORTED_LESION_IN_ROI" background="#2563EB" />
+  </KeyPointLabels>
+
+  <Header value="Reviewer decision" />
+  <Choices name="review_decision" toName="image" choice="single" showInline="true" perRegion="true">
+    <Choice value="CONFIRM" />
+    <Choice value="CORRECT" />
+    <Choice value="REJECT" />
+    <Choice value="ESCALATE" />
+  </Choices>
+
+  <Header value="Reviewer certainty" />
+  <Choices name="reviewer_certainty" toName="image" choice="single" showInline="true" perRegion="true">
+    <Choice value="HIGH" />
+    <Choice value="MEDIUM" />
+    <Choice value="LOW" />
+  </Choices>
+
+  <TextArea name="reviewer_note" toName="image" placeholder="Optional review note" rows="3" maxSubmissions="1" perRegion="true" />
+</View>

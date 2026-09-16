@@ -1,0 +1,35 @@
+{
+  "schema_version": "0.1",
+  "task_id": "TASK-0042",
+  "image": {
+    "id": "DEMO-IMG-0042",
+    "uri": "assets/fundus-retinopathy-eda03.jpg",
+    "laterality": "OD",
+    "modality": "CFP"
+  },
+  "roi": {
+    "id": "ROI-01",
+    "type": "rectangle",
+    "coordinate_space": "normalized_0_1",
+    "x": 0.53,
+    "y": 0.43,
+    "width": 0.18,
+    "height": 0.17
+  },
+  "model_output": {
+    "model_name": "roi-lesion-model",
+    "model_version": "0.1.0-mock",
+    "predictions": [
+      { "label": "MICROANEURYSM", "score": 0.87 },
+      { "label": "INTRARETINAL_HEMORRHAGE", "score": 0.08 },
+      { "label": "NO_SUPPORTED_LESION_IN_ROI", "score": 0.03 },
+      { "label": "HARD_EXUDATE", "score": 0.02 }
+    ]
+  },
+  "review": {
+    "decision": "CONFIRM",
+    "final_label": "MICROANEURYSM",
+    "reviewer_note": "",
+    "reviewed_at": null
+  }
+}

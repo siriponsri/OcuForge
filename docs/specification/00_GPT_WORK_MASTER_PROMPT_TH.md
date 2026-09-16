@@ -1,6 +1,7 @@
 # GPT WORK MASTER PROMPT — EYE DETECTED DUAL TRACK STARTER v0.1
 
-> **Authoritative implementation command for GPT Work / GPT-6 Astra Low**
+> **Historical implementation command for the v0.1 starter.** Current POC authority is
+> [POC_MASTER_PLAN_V2.md](../POC_MASTER_PLAN_V2.md).
 
 ## บทบาท
 

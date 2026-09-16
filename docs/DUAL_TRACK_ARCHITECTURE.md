@@ -14,10 +14,10 @@ flowchart TD
  V["CVAT optional advanced labeling"] --> C
 ```
 
-The current POC is model-first: global inference and ROI lesion classification precede
-the interactive GUI milestone.
-Label Studio Community is an internal ROI labeling/QA workbench; the custom GUI is
-customer-facing; CVAT remains optional advanced infrastructure. Contracts contain no
+The current POC follows the evidence-driven sequence in [POC_MASTER_PLAN_V2.md](POC_MASTER_PLAN_V2.md): R0
+supervision audit, R1 global G0-G5 benchmark, separate spatial ROI track, then review/integration milestones.
+Label Studio Community is an internal ROI labeling/QA workbench; `templates/` is the preferred customer-facing
+GUI reference; CVAT remains optional advanced infrastructure. Contracts contain no
 torch, GUI, Label Studio, or CVAT implementation. The root
 integration script orchestrates packages through files. Seven schemas are generated from Pydantic models. JSON
 Schema validates structural constraints; the Python validator also enforces geometry,

@@ -1,4 +1,4 @@
-"""Review every releasable file, enforce text-only starter, and inspect ZIP structure."""
+"""Review every releasable file, enforce the safe starter allowlist, and inspect ZIP structure."""
 
 import argparse, ast, hashlib, json, re, zipfile
 from pathlib import Path
@@ -27,6 +27,14 @@ ALLOWED = {
     ".js",
     ".example",
     ".cmd",
+    ".html",
+    ".css",
+    ".xml",
+}
+BINARY_ALLOWLIST = {
+    "templates/assets/fundus-retinopathy-eda03.jpg",
+    "templates/assets/fonts/ibm-plex-mono-latin-400-normal.woff2",
+    "templates/assets/fonts/public-sans-latin-wght-normal.woff2",
 }
 PATTERNS = [
     r"gh[pousr]_[A-Za-z0-9]{30,}",
@@ -53,7 +61,7 @@ def inspect(root=ROOT, require_report=True):
             raise ValueError(f"Symlink excluded: {rel}")
         if p.stat().st_size > 50 * 1024 * 1024:
             raise ValueError(f"Large file: {rel}")
-        if p.suffix not in ALLOWED and p.name not in [
+        if p.suffix not in ALLOWED and rel not in BINARY_ALLOWLIST and p.name not in [
             "Dockerfile",
             "Makefile",
             ".gitignore",
@@ -61,6 +69,11 @@ def inspect(root=ROOT, require_report=True):
         ]:
             raise ValueError(f"Unexpected binary/data file: {rel}")
         raw = p.read_bytes()
+        if rel in BINARY_ALLOWLIST:
+            if not raw:
+                raise ValueError(f"Empty file: {rel}")
+            records.append({"path": rel, "bytes": len(raw), "sha256": hashlib.sha256(raw).hexdigest()})
+            continue
         text = raw.decode("utf-8")
         if not text.strip():
             raise ValueError(f"Empty file: {rel}")
@@ -111,5 +124,5 @@ if __name__ == "__main__":
         print(f"PASS ZIP: {check_zip(a.zip)} files")
     else:
         print(
-            f"PASS file gate: {len(inspect(require_report=not a.pre_report))} reviewed text files; no binary images/weights, common secret scan clear"
+            f"PASS file gate: {len(inspect(require_report=not a.pre_report))} reviewed files; only allowlisted GUI assets are binary, common secret scan clear"
         )

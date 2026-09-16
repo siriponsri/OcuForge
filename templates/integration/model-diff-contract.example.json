@@ -1,0 +1,18 @@
+{
+  "schema_version": "0.1",
+  "comparison_id": "DEMO-COMPARE-001",
+  "model_a": { "name": "roi-lesion-model", "version": "0.1.0-mock" },
+  "model_b": { "name": "roi-lesion-model", "version": "0.2.0-mock" },
+  "evaluation_set": { "id": "public-demo-v1", "version": "1", "reference_status": "MOCK_REFERENCE" },
+  "counts": { "total": 160, "improved": 9, "regressed": 6, "changed": 13, "unchanged": 132 },
+  "case_diffs": [
+    {
+      "task_id": "TASK-D001",
+      "reference_label": "MICROANEURYSM",
+      "model_a": { "label": "INTRARETINAL_HEMORRHAGE", "score": 0.61 },
+      "model_b": { "label": "MICROANEURYSM", "score": 0.76 },
+      "category": "IMPROVED"
+    }
+  ],
+  "disclaimer": "Illustrative mock comparison only; no performance claim."
+}

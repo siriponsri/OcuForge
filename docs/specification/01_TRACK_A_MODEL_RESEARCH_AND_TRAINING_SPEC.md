@@ -1,4 +1,9 @@
-# TRACK A — MODEL RESEARCH & TRAINING SPECIFICATION
+# Historical Track A — Model Research & Training Specification
+
+> **Historical implementation specification.** Use [POC_MASTER_PLAN_V2.md](../POC_MASTER_PLAN_V2.md) and
+> [R1_GLOBAL_MODEL_SELECTION.md](../R1_GLOBAL_MODEL_SELECTION.md) for current model-selection authority. The
+> current R1 plan treats DINOv3, patch pooling, Attention MIL, CE and CORAL as benchmark candidates/ablations,
+> not predetermined winners.
 
 ## 0. Mission
 
