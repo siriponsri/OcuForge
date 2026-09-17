@@ -21,10 +21,14 @@ Use provider-neutral roots: `OCUFORGE_DATA_ROOT`, `OCUFORGE_MODEL_ROOT`, `OCUFOR
 
 ## R1 execution discipline
 
-After R0 and R1-P0 reaches `PASS` or `PASS_WITH_WARNINGS` with no blocker, run one candidate at a time from the
-registry: C0, stop/review; C1, stop/review; C2, stop/review. No candidate may train before that unlock condition.
-Compare CE first. Only a measured winner/finalist may enter the CE versus CORN ablation. Record exact asset revision,
-license decision, hashes, preprocessing, runtime image, git SHA, data manifest, split, and operational measurements.
+After R0 and R1-P0 reaches `PASS` or `PASS_WITH_WARNINGS` with no blocker, and `RUNPOD_AUTOMATION_SMOKE` reaches
+`PASS` or `PASS_WITH_WARNINGS`, the authorized unattended overnight run may execute one candidate at a time from the
+registry: C0 -> validated checkpoint -> C1
+-> validated checkpoint -> C2. No candidate may train before those unlock conditions. Validate each checkpoint before
+continuing, carrying all warnings into the next artifact; stop on a blocker. After C2, stop at the evidence freeze for
+the mandatory OWNER/morning architecture-selection gate. Compare CE first; the overnight run does not authorize
+CE-vs-CORN. Record exact asset revision, license decision, hashes, preprocessing, runtime image, git SHA, data
+manifest, split, and operational measurements.
 
 No automatic promotion, fixed champion, or “DINO required to pass” rule exists. Missing FLAIR/DINOv3 assets are explicit
 blocked/asset-not-present conditions, not silent substitutions.

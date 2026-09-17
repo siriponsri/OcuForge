@@ -4,7 +4,7 @@
 **Authority:** [`POC_MASTER_PLAN.md`](POC_MASTER_PLAN.md)
 
 R1 selects a defensible global ordinal DR architecture after R0 and R1-P0 reaches `PASS` or `PASS_WITH_WARNINGS`
-without a blocking finding. It is not a training instruction for this reconciliation and it does not claim a current
+without a blocking finding. This protocol defines the controlled execution conditions and does not claim a current
 model result.
 
 ## Target and candidates
@@ -32,24 +32,29 @@ remains blocking.
 ## Controlled execution order
 
 ```text
-C0 run -> STOP -> owner/reviewer inspect metrics, errors, cost
-  -> C1 run -> STOP -> review
-  -> C2 run -> STOP -> review
-  -> architecture decision
-  -> winner-only CE vs CORN
+C0 run -> validate checkpoint
+  -> C1 run -> validate checkpoint
+  -> C2 run -> validate checkpoint
+  -> comparison/calibration/error-analysis evidence freeze
+  -> mandatory OWNER/morning architecture-selection gate
   -> STOP
-  -> calibration and threshold selection
-  -> local CPU/on-prem deployment benchmark
 ```
 
-The operator runs one candidate at a time. No autonomous command trains all three or promotes a champion. The current
-champion is `NONE`.
+After R1-P0 reaches `PASS` or `PASS_WITH_WARNINGS` without a blocker and `RUNPOD_AUTOMATION_SMOKE` reaches `PASS` or
+`PASS_WITH_WARNINGS`, the authorized unattended overnight run may continue from one validated checkpoint to the next.
+The operator still runs one candidate at a time, and a blocker stops continuation; non-blocking warnings must be recorded and
+propagated. No autonomous command trains all three or promotes a champion. The overnight run ends at the OWNER/morning
+gate. The overnight run does not authorize CE-vs-CORN. The current champion is `NONE`.
+
+Any later winner-only CE-vs-CORN, calibration/threshold selection, or local CPU/on-prem deployment benchmark requires
+separate explicit OWNER authorization after the morning gate.
 
 ## Loss and target controls
 
-The initial comparison is C0 + CE, C1 + CE, and C2 + CE. This prevents architecture/loss confounding. After a
-winner/finalist is selected from validation evidence, compare winner + CE against winner + CORN once. CORAL remains
-supported legacy code and may remain covered by tests, but is not a required initial R1 candidate.
+The initial comparison is C0 + CE, C1 + CE, and C2 + CE. This prevents architecture/loss confounding. Any later
+winner + CE versus winner + CORN comparison requires separate explicit owner authorization after the mandatory
+OWNER/morning gate and is not part of the overnight run. CORAL remains supported legacy code and may remain covered by
+tests, but is not a required initial R1 candidate.
 
 Binary labels cannot train ordinal heads. `no-DR` experience labels are not adjudicated grade 0.
 

@@ -116,7 +116,12 @@ distribution, such as `P(any DR) = 1 - P(grade 0)`, but binary `DR`/`no-DR` expe
 | C2 | High-resolution local-detail hypothesis | DINOv3 ViT-B/16, high-resolution patches, learned Attention MIL | 5-class CE |
 
 All three are compared with CE first. No current champion is selected in configuration. C0/C1/C2 run one at a time;
-the operator stops after each run for owner/reviewer inspection of metrics, errors, cost, and asset provenance.
+after R1-P0 reaches `PASS` or `PASS_WITH_WARNINGS` without a blocker and `RUNPOD_AUTOMATION_SMOKE` reaches `PASS` or
+`PASS_WITH_WARNINGS`, an authorized unattended overnight run may continue from each validated checkpoint to the next
+candidate.
+Checkpoint validation covers metrics, errors, cost, asset provenance, and warnings. After C2, the run stops at the
+comparison/calibration/error-analysis evidence freeze for the
+mandatory OWNER/morning architecture-selection gate.
 
 Every candidate must distinguish research execution eligibility from deployment license status. A deployment or
 commercial restriction may remain a non-blocking warning for a research-eligible candidate. Scientific and deployment
@@ -198,4 +203,9 @@ Document status is tracked in [DOCUMENT_STATUS.md](DOCUMENT_STATUS.md). A docume
 ## Execution gate
 
 The next permitted manual action is to execute the R1-P0 acquisition preflight. Do not train, execute R1, provision a
-cloud provider, or promote a model until P0 passes.
+cloud provider, or promote a model until P0 passes. After P0 reaches `PASS` or `PASS_WITH_WARNINGS` without a blocker,
+and `RUNPOD_AUTOMATION_SMOKE` reaches `PASS` or `PASS_WITH_WARNINGS`, the authorized unattended overnight run may
+execute C0, C1,
+and C2 in order with validated checkpoints between candidates. It must stop at the evidence freeze for the mandatory
+OWNER/morning architecture-selection gate; no champion is selected and no CE-vs-CORN ablation is authorized by this
+overnight continuation.
