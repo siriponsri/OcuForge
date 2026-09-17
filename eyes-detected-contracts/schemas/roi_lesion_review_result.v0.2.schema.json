@@ -1,0 +1,133 @@
+{
+  "$defs": {
+    "ROILesionModelSuggestion": {
+      "additionalProperties": false,
+      "description": "The model-side ROI result retained verbatim inside a clinician review record.",
+      "properties": {
+        "prediction_id": {
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,127}$",
+          "title": "Prediction Id",
+          "type": "string"
+        },
+        "model_manifest_id": {
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,127}$",
+          "title": "Model Manifest Id",
+          "type": "string"
+        },
+        "result": {
+          "enum": [
+            "SUPPORTED_LESION_PRESENT",
+            "NO_SUPPORTED_LESION_IN_ROI"
+          ],
+          "title": "Result",
+          "type": "string"
+        },
+        "supported_classes": {
+          "items": {
+            "enum": [
+              "MICROANEURYSM",
+              "INTRARETINAL_HEMORRHAGE",
+              "HARD_EXUDATE",
+              "SOFT_EXUDATE"
+            ],
+            "type": "string"
+          },
+          "minItems": 1,
+          "title": "Supported Classes",
+          "type": "array"
+        },
+        "decision_threshold": {
+          "maximum": 1,
+          "minimum": 0,
+          "title": "Decision Threshold",
+          "type": "number"
+        }
+      },
+      "required": [
+        "prediction_id",
+        "model_manifest_id",
+        "result",
+        "supported_classes",
+        "decision_threshold"
+      ],
+      "title": "ROILesionModelSuggestion",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {
+      "const": "roi_lesion_review_result.v0.2",
+      "default": "roi_lesion_review_result.v0.2",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "roi_id": {
+      "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,127}$",
+      "title": "Roi Id",
+      "type": "string"
+    },
+    "original_model_suggestion": {
+      "$ref": "#/$defs/ROILesionModelSuggestion"
+    },
+    "reviewer_decision": {
+      "enum": [
+        "CONFIRM_SUPPORTED_LESION",
+        "CORRECT_SUPPORTED_LESION",
+        "UNKNOWN_OR_UNSUPPORTED_FINDING",
+        "NO_SUPPORTED_LESION_IN_ROI"
+      ],
+      "title": "Reviewer Decision",
+      "type": "string"
+    },
+    "reviewer_supported_classes": {
+      "items": {
+        "enum": [
+          "MICROANEURYSM",
+          "INTRARETINAL_HEMORRHAGE",
+          "HARD_EXUDATE",
+          "SOFT_EXUDATE"
+        ],
+        "type": "string"
+      },
+      "title": "Reviewer Supported Classes",
+      "type": "array"
+    },
+    "reviewer_remark": {
+      "default": "",
+      "title": "Reviewer Remark",
+      "type": "string"
+    }
+  },
+  "required": [
+    "roi_id",
+    "original_model_suggestion",
+    "reviewer_decision"
+  ],
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "reviewer_decision": {
+            "const": "UNKNOWN_OR_UNSUPPORTED_FINDING"
+          }
+        },
+        "required": [
+          "reviewer_decision"
+        ]
+      },
+      "then": {
+        "required": [
+          "reviewer_remark"
+        ],
+        "properties": {
+          "reviewer_remark": {
+            "pattern": "\\S"
+          }
+        }
+      }
+    }
+  ],
+  "title": "ROILesionReviewResultV02",
+  "type": "object"
+}
