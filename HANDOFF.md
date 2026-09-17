@@ -8,7 +8,7 @@
 ```text
 R0_V3=PASS
 R0_DATASET_TAXONOMY=PASS
-R1_P0_ACQUISITION_PREFLIGHT=READY_NOT_EXECUTED
+R1_P0_ACQUISITION_PREFLIGHT=BLOCKED
 R1_GLOBAL_BENCHMARK=READY_NOT_EXECUTED
 CURRENT_R1_CHAMPION=NONE
 ```
@@ -36,13 +36,19 @@ when no blocking finding remains. It does not authorize cloud provisioning or ex
 - Updated active status documents, the R1 registry, report generator, tests, and offline validator for the simplified
   R1-P0 Global gate.
 
-## R1-P0 checks not yet executed
+## R1-P0 decision and checks
 
-See the machine-readable P0 contract. The short form is:
+The campaign cannot proceed: R1 is locked by R1-P0 `BLOCKED`. The requested RunPod IDRiD lane is separately blocked
+by the frozen R0 `cloud_eligible=false` policy; that policy does not add IDRiD as an R1-P0 blocker.
 
-- MMRDR dataset/archive SHA-256, integrity, extracted inventory, schema/split smoke, and duplicate checks.
-- C0/C1/C2 local weight SHA-256, gated access, preprocessing smoke, and model loading.
-- Storage capacity, permissions, runtime readiness, and public/synthetic-only boundary.
+See the machine-readable P0 contract and its redacted execution receipt. The short form is:
+
+- `BLOCKED`: C0/C1/C2 local model assets and required gated access. No model or data bytes were downloaded; exact C2
+  resolution returned HTTP 401 `GatedRepo`, and Hugging Face auth reported `Not logged in`.
+- `BLOCKED`: storage/runtime readiness. The four local OcuForge roots are unset and the intended Python runtime lacks
+  `torch`; local C volume free space and the MMRDR multipart total are recorded in the receipt.
+- `NOT_EXECUTED`: MMRDR dataset/archive integrity, extracted inventory, schema/split smoke, and duplicate checks.
+- `NOT_EXECUTED`: preprocessing and model loading because no bytes were acquired.
 - IDRiD acquisition, mask coverage, and image-level split checks are deferred to R2/R3; unannotated regions remain
   `UNKNOWN`/`WEAK_NEGATIVE` unless acquisition evidence supports clean negatives.
 
@@ -57,9 +63,11 @@ See the machine-readable P0 contract. The short form is:
 - `R0_DATASET_COMPARISON_AND_SOURCE_GUIDE.md` - research companion, not authority.
 - `validation/FINAL_DELIVERY_REPORT.md` - repository validation report.
 
-## Exact next action
+## Exact owner-resolvable next action
 
-`git pull` -> execute R1-P0 Global acquisition preflight.
+Before a new preflight, authenticate and accept the exact gated C2 asset through the official Hugging Face path,
+configure sufficient local OcuForge roots/runtime, and obtain an explicit governance decision for any IDRiD compute
+location. Do not ask for or place a secret in this handoff.
 
 From a clean machine/session:
 
@@ -68,8 +76,9 @@ git pull
 ```
 
 Then follow `docs/R1_P0_ACQUISITION_PREFLIGHT.md`. Acquire only MMRDR and the approved C0/C1/C2 assets. Do not
-execute R1-P0 and R1 in the same phase; after P0, stop for review and update this handoff with the evidence and final
-P0 status. IDRiD acquisition belongs to the later R2/R3 gate.
+execute R1-P0 and R1 in the same phase; after the new preflight, stop for review and update this handoff with the
+evidence and final P0 status. IDRiD acquisition belongs to the later R2/R3 gate and its compute location requires
+explicit governance clearance.
 
 ## Resume commands/checks
 

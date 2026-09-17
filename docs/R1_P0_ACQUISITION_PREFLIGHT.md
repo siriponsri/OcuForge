@@ -1,6 +1,6 @@
 # R1-P0 Acquisition Preflight
 
-**Status:** `R1_P0_ACQUISITION_PREFLIGHT=READY_NOT_EXECUTED` · states: `READY_NOT_EXECUTED`, `RUNNING`,
+**Status:** `R1_P0_ACQUISITION_PREFLIGHT=BLOCKED` · states: `READY_NOT_EXECUTED`, `RUNNING`,
 `PASS_WITH_WARNINGS`, `PASS`, `BLOCKED`
 **Authority:** [`POC_MASTER_PLAN.md`](POC_MASTER_PLAN.md)
 **Machine-readable contract:** [`R1_P0_ACQUISITION_PREFLIGHT.json`](R1_P0_ACQUISITION_PREFLIGHT.json)
@@ -14,7 +14,7 @@ are acquired. It is not an R1 training run.
 ```text
 R0_V3=PASS
 R0_DATASET_TAXONOMY=PASS
-R1_P0_ACQUISITION_PREFLIGHT=READY_NOT_EXECUTED
+R1_P0_ACQUISITION_PREFLIGHT=BLOCKED
 R1_GLOBAL_BENCHMARK=READY_NOT_EXECUTED
 CURRENT_R1_CHAMPION=NONE
 TRAINING_UNLOCK=FORBIDDEN_UNTIL_PASS_OR_PASS_WITH_WARNINGS
@@ -23,18 +23,34 @@ TRAINING_UNLOCK=FORBIDDEN_UNTIL_PASS_OR_PASS_WITH_WARNINGS
 `PASS` requires every required check to pass. `PASS_WITH_WARNINGS` permits only `PASS` or
 `PASS_WITH_WARNINGS` checks, requires no blocker, and requires every warning to be recorded and copied into R1
 artifacts. `BLOCKED` is reserved for an invalidating, unauthorized, corrupt, leaking, incompatible, or impossible
-R1 execution condition. `RUNNING` is not an unlock state.
+R1 execution condition. `RUNNING` is not an unlock state. The 2026-09-17 receipt records `BLOCKED` for
+`MODEL_ASSET`, `GATED_ACCESS`, and `STORAGE_RUNTIME`; `DATASET_ARCHIVE`, `DATASET_SCHEMA_SPLIT`,
+`PREPROCESSING`, and `MODEL_LOADING` remain `NOT_EXECUTED` because no data or model bytes were acquired.
+
+## Current decision
+
+R1 cannot proceed because R1-P0 is `BLOCKED`. The exact C2 resolution returned HTTP 401 `GatedRepo`, Hugging Face
+authentication reported `Not logged in`, the four local OcuForge roots are unset, and the intended local Python
+runtime lacks `torch`. No model or data bytes were downloaded. The structured, redacted execution receipt is stored in
+the machine-readable contract; it contains no secrets, tokens, PHI, image bytes, or private artifacts.
+
+The requested RunPod IDRiD lane is separately blocked by the frozen R0 `cloud_eligible=false` policy. This does not
+add IDRiD as an R1-P0 blocker, and IDRiD remains deferred to R2/R3.
 
 ## Required sequence
 
 1. `git pull` and inspect `HANDOFF.md`.
 2. Resolve the four provider-neutral storage roots without placing secrets in Git.
-3. Acquire only the frozen MMRDR-UWF record and the exact C0/C1/C2 assets through their official access paths.
-4. Compute and record archive/file SHA-256 values, integrity results, and extracted inventories locally.
-5. Run MMRDR schema, split, identity, duplicate, and preprocessing smoke checks. IDRiD acquisition and mask-coverage
+3. Authenticate and accept the exact gated C2 asset through the official Hugging Face path, without placing credentials
+   or tokens in Git.
+4. Configure sufficient local runtime dependencies and roots before acquiring large archives.
+5. Obtain an explicit governance decision for any IDRiD compute location before a new preflight.
+6. Acquire only the frozen MMRDR-UWF record and the exact C0/C1/C2 assets through their official access paths.
+7. Compute and record archive/file SHA-256 values, integrity results, and extracted inventories locally.
+8. Run MMRDR schema, split, identity, duplicate, and preprocessing smoke checks. IDRiD acquisition and mask-coverage
    checks are deferred to R2/R3 preparation and do not block R1.
-6. Acquire only the exact C0/C1/C2 assets and record local SHA-256, terms, gated-access status, and loading results.
-7. Update the P0 record only with safe metadata; training is permitted after `PASS` or `PASS_WITH_WARNINGS` when no
+9. Acquire only the exact C0/C1/C2 assets and record local SHA-256, terms, gated-access status, and loading results.
+10. Update the P0 record only with safe metadata; training is permitted after `PASS` or `PASS_WITH_WARNINGS` when no
    blocking finding remains.
 
 ## R1 critical path

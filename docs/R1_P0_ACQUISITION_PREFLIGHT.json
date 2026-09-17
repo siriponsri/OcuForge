@@ -2,11 +2,11 @@
   "schema_version": "r1_p0_acquisition_preflight.v2",
   "artifact_schema_version": "r1_p0_acquisition_preflight_record.v1",
   "record_type": "R1_P0_ACQUISITION_PREFLIGHT_CONTRACT",
-  "status": "R1_P0_ACQUISITION_PREFLIGHT=READY_NOT_EXECUTED",
-  "gate_state": "READY_NOT_EXECUTED",
-  "outcome": null,
-  "evidence_audit_date": null,
-  "gate_decision_date": null,
+  "status": "R1_P0_ACQUISITION_PREFLIGHT=BLOCKED",
+  "gate_state": "BLOCKED",
+  "outcome": "BLOCKED",
+  "evidence_audit_date": "2026-09-17",
+  "gate_decision_date": "2026-09-17",
   "authority": "docs/POC_MASTER_PLAN.md",
   "r0_status": "R0_DATASET_TAXONOMY=PASS",
   "r1_status": "R1_GLOBAL_BENCHMARK=READY_NOT_EXECUTED",
@@ -89,7 +89,7 @@
       "check_id": "P0-MODEL-ASSETS",
       "gate": "MODEL_ASSET",
       "scope": "R1_GLOBAL",
-      "status": "NOT_EXECUTED",
+      "status": "BLOCKED",
       "status_rule": "Acquire only the exact C0, C1, and C2 source/revision recorded by R0; no silent substitution.",
       "evidence_required": [
         "Local SHA-256 for every candidate checkpoint",
@@ -137,7 +137,7 @@
       "check_id": "P0-GATED-ACCESS",
       "gate": "GATED_ACCESS",
       "scope": "R1_GLOBAL",
-      "status": "NOT_EXECUTED",
+      "status": "BLOCKED",
       "status_rule": "Complete and record only the access/terms steps required by the official MMRDR and C0/C1/C2 sources; no credentials or tokens enter Git.",
       "evidence_required": [
         "MMRDR authorized access and applicable terms confirmation",
@@ -152,7 +152,7 @@
       "check_id": "P0-STORAGE-RUNTIME",
       "gate": "STORAGE_RUNTIME",
       "scope": "R1_GLOBAL",
-      "status": "NOT_EXECUTED",
+      "status": "BLOCKED",
       "status_rule": "Verify provider-neutral roots, sufficient local capacity, runtime dependencies, and offline/restricted-egress behavior before acquisition.",
       "evidence_required": [
         "OCUFORGE_DATA_ROOT, OCUFORGE_MODEL_ROOT, OCUFORGE_CACHE_ROOT, and OCUFORGE_ARTIFACT_ROOT resolved",
@@ -192,7 +192,43 @@
     }
   ],
   "warnings": [],
-  "blockers": [],
+  "blockers": [
+    "MODEL_ASSET: No approved local C0/C1/C2 model bytes were acquired; the exact C2 resolution returned HTTP 401 GatedRepo.",
+    "GATED_ACCESS: Hugging Face auth whoami reported Not logged in; required gated C2 access/terms acceptance is not recorded, and no credential or token was recorded.",
+    "STORAGE_RUNTIME: The four provider-neutral OcuForge roots are unset and the intended local Python runtime lacks torch; local C volume free space is 39.93 GB for MMRDR multipart parts totaling 18,610,317,731 bytes before extraction."
+  ],
+  "execution_receipt": {
+    "receipt_schema_version": "r1_p0_execution_receipt.v1",
+    "recorded_date": "2026-09-17",
+    "base_git_sha": "c63821d",
+    "data_or_model_bytes_downloaded": false,
+    "observations": {
+      "hf_auth_status": "Not logged in",
+      "c2_exact_resolution": "HTTP 401 GatedRepo",
+      "local_roots_configured": false,
+      "intended_local_python_torch_available": false,
+      "local_c_volume_free_space": "39.93 GB",
+      "mmrdr_parts_total_bytes_before_extraction": 18610317731,
+      "runpod_list_pods": "empty list",
+      "runpod_capacity": {
+        "gpu": "RTX 4090",
+        "vram": "24 GB",
+        "cuda": "12.8",
+        "market": "stock Low",
+        "rate_usd_per_hour": 0.34
+      }
+    },
+    "governance": {
+      "private_data_or_artifacts_recorded": false,
+      "secrets_or_tokens_recorded": false,
+      "phi_or_image_bytes_recorded": false,
+      "cloud_provisioning_performed": false,
+      "idrid_cloud_eligible": false,
+      "idrid_r1_p0_blocker": false,
+      "requested_runpod_idrid_lane": "BLOCKED_BY_FROZEN_CLOUD_ELIGIBLE_FALSE_POLICY"
+    },
+    "owner_resolvable_next_action": "Authenticate and accept the exact gated C2 asset through the official Hugging Face path, configure sufficient local OcuForge roots and runtime, and obtain an explicit governance decision for any IDRiD compute location before a new preflight."
+  },
   "r1_dependencies": {
     "required_datasets": ["mmrdr_uwf_v1"],
     "required_candidates": ["C0", "C1", "C2"],

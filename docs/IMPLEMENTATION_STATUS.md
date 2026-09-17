@@ -14,9 +14,16 @@ result.
 | Phase 2A local data foundation | IMPLEMENTED / VERIFIED | Local adapters and provenance safeguards exist. |
 | Phase 2B live Mongo acceptance | UNKNOWN / NOT RUN | Requires the target service; Phase 2 overall is not PASS. |
 | R0 V3 data/supervision/asset freeze | PASS | Scientific source/task/supervision/split/taxonomy/license/overlap freeze is complete; byte-dependent checks moved to R1-P0. |
-| R1-P0 acquisition preflight | READY_NOT_EXECUTED | Uses the v2 state machine. `PASS` or `PASS_WITH_WARNINGS` unlocks R1 only when no blocking finding remains; archive/weight hashes, inventories, schema/split smoke, preprocessing, access, loading, and runtime checks are pending. IDRiD is deferred to R2/R3. |
-| R1 C0/C1/C2 benchmark | READY_NOT_EXECUTED | No candidate was trained or selected. |
+| R1-P0 acquisition preflight | BLOCKED | R1 is locked by P0. Model assets, gated access, and storage/runtime are blocked by the 2026-09-17 receipt; archive/schema, preprocessing, and model loading remain not executed because no bytes were acquired. IDRiD is deferred to R2/R3. |
+| R1 C0/C1/C2 benchmark | READY_NOT_EXECUTED | Campaign cannot proceed while P0 is blocked; no candidate was trained or selected. |
 | Current R1 champion | NONE | Selection is forbidden before measured evidence. |
+
+The campaign cannot proceed: R1 is locked by R1-P0 `BLOCKED`. The requested RunPod IDRiD lane is separately blocked
+by the frozen R0 `cloud_eligible=false` policy; this does not make IDRiD an R1-P0 dependency or blocker.
+
+The owner-resolvable next action is to authenticate and accept the exact gated C2 asset through the official Hugging
+Face path, configure sufficient local OcuForge roots/runtime, and obtain an explicit governance decision for any IDRiD
+compute location before a new preflight. No secret is requested or recorded here.
 
 ## Implemented and verified
 
@@ -32,7 +39,7 @@ result.
 
 ## Planned, not executed
 
-- Execution and completion of R1-P0 acquisition preflight.
+- Recovery and re-execution of R1-P0 acquisition preflight after its blockers are resolved.
 - R1 C0, C1, and C2 runs, model comparison, calibration, and winner-only CORN ablation.
 - R2 spatial ROI dataset construction and R3 lesion classifier.
 - R4 Label Studio Community live QA validation and R5 contract/API integration into the existing GUI.
