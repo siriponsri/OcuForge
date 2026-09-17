@@ -13,6 +13,9 @@ from .models import ID, Prob, ProtocolRef, Strict
 
 GLOBAL_NO_DR = "GLOBAL_NO_DR"
 NO_SUPPORTED_LESION_IN_ROI = "NO_SUPPORTED_LESION_IN_ROI"
+CONFIRM_SUPPORTED_LESION = "CONFIRM_SUPPORTED_LESION"
+CORRECT_SUPPORTED_LESION = "CORRECT_SUPPORTED_LESION"
+UNKNOWN_OR_UNSUPPORTED_FINDING = "UNKNOWN_OR_UNSUPPORTED_FINDING"
 REVIEWER_CONTROLS = ["ACCEPT", "MARK_INCORRECT", "CORRECT_GRADE", "COMMENT", "INSPECT_ROI_ANYWAY"]
 
 
@@ -89,6 +92,63 @@ class ROILesionReviewResult(Strict):
     decision_threshold: Prob
 
 
+class ROILesionModelSuggestion(Strict):
+    """The model-side ROI result retained verbatim inside a clinician review record."""
+
+    prediction_id: ID
+    model_manifest_id: ID
+    result: Literal["SUPPORTED_LESION_PRESENT", "NO_SUPPORTED_LESION_IN_ROI"]
+    supported_classes: list[
+        Literal[
+            "MICROANEURYSM",
+            "INTRARETINAL_HEMORRHAGE",
+            "HARD_EXUDATE",
+            "SOFT_EXUDATE",
+        ]
+    ] = Field(min_length=1)
+    decision_threshold: Prob
+
+
+class ROILesionReviewResultV02(Strict):
+    schema_version: Literal["roi_lesion_review_result.v0.2"] = "roi_lesion_review_result.v0.2"
+    roi_id: ID
+    original_model_suggestion: ROILesionModelSuggestion
+    reviewer_decision: Literal[
+        "CONFIRM_SUPPORTED_LESION",
+        "CORRECT_SUPPORTED_LESION",
+        "UNKNOWN_OR_UNSUPPORTED_FINDING",
+        "NO_SUPPORTED_LESION_IN_ROI",
+    ]
+    reviewer_supported_classes: list[
+        Literal[
+            "MICROANEURYSM",
+            "INTRARETINAL_HEMORRHAGE",
+            "HARD_EXUDATE",
+            "SOFT_EXUDATE",
+        ]
+    ] = Field(default_factory=list)
+    reviewer_remark: str = ""
+
+    @model_validator(mode="after")
+    def review_semantics(self):
+        if self.reviewer_decision == "CONFIRM_SUPPORTED_LESION":
+            if self.original_model_suggestion.result != "SUPPORTED_LESION_PRESENT":
+                raise ValueError("Confirming a lesion requires a supported model suggestion")
+            if self.reviewer_supported_classes:
+                raise ValueError("Confirming a lesion must retain the original model classes")
+        elif self.reviewer_decision == "CORRECT_SUPPORTED_LESION":
+            if not self.reviewer_supported_classes:
+                raise ValueError("Correcting a lesion requires at least one supported class")
+        elif self.reviewer_decision == "UNKNOWN_OR_UNSUPPORTED_FINDING":
+            if not self.reviewer_remark.strip():
+                raise ValueError("Unknown or unsupported findings require a non-whitespace remark")
+            if self.reviewer_supported_classes:
+                raise ValueError("Unknown or unsupported findings cannot have supported classes")
+        elif self.reviewer_supported_classes:
+            raise ValueError("No supported lesion in the ROI cannot have supported classes")
+        return self
+
+
 def decide_global_to_roi(state: GlobalROITriageInput, policy: TriagePolicy) -> TriageDecision:
     """Apply the soft default gate while preserving reviewer override and controls."""
 
@@ -142,4 +202,5 @@ TRIAGE_TYPES = {
     "global_roi_triage_input.v0.1": GlobalROITriageInput,
     "global_roi_triage_decision.v0.1": TriageDecision,
     "roi_lesion_review_result.v0.1": ROILesionReviewResult,
+    "roi_lesion_review_result.v0.2": ROILesionReviewResultV02,
 }
