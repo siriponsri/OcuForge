@@ -5,7 +5,7 @@
 **Date prepared:** 2026-09-16  
 **Repository authority remains:** `docs/POC_MASTER_PLAN.md` and `docs/R0_DATASET_SUPERVISION_FREEZE.md`
 
-This document exists to help the implementing agent understand **why each dataset is being considered, what it can and cannot supervise, which source should be treated as authoritative, and what R1-P0 still has to verify after acquisition**.
+This document exists to help the implementing agent understand **why each dataset is being considered, what it can and cannot supervise, which source should be treated as authoritative, and which later gate must verify each acquisition**.
 
 It is not a substitute for the machine-readable R0 freeze record. If this guide conflicts with an official source inspected during R0, the official source wins and the discrepancy must be documented.
 
@@ -18,7 +18,7 @@ The smallest useful dataset strategy for OcuForge is:
 | Dataset | Primary role | Current disposition | Why it matters |
 |---|---|---|---|
 | **MMRDR-UWF** | R1 global DR grading | **Primary hypothesis / R0 PASS; R1-P0 pending** | UWF modality, ordinal DR labels, released patient-level train/test split; archive hashes and byte checks move to R1-P0 |
-| **IDRiD** | R2/R3 lesion ROI supervision | **Primary spatial candidate / R0 PASS; R1-P0 pending** | Pixel-level masks for MA, hemorrhage, hard exudate, soft exudate; archive inventory/hashes move to R1-P0 and negatives stay conservative |
+| **IDRiD** | R2/R3 lesion ROI supervision | **Primary spatial candidate / R0 PASS; R2/R3 preparation pending** | Pixel-level masks for MA, hemorrhage, hard exudate, soft exudate; archive inventory/hashes move to the R2/R3 gate and negatives stay conservative |
 | **DDR / OIA-DDR** | Secondary spatial source + historical global anchor | **NOT ADMITTED** | Reported five-grade fundus set plus lesion-localization subset, but official data terms and archive evidence are missing |
 | **EyePACS/Kaggle DR** | Large conventional-fundus robustness reference | **Deferred** | 0–4 grading, patient left/right naming, very large and restricted by competition terms |
 | **RFMiD** | Historical multi-disease reference | **Historical / not R1 grading source** | Useful for retinal multi-label evidence, not a clean 0–4 DR grading source |
@@ -27,7 +27,7 @@ The smallest useful dataset strategy for OcuForge is:
 | **FGADR** | Possible expanded lesion supervision | **Watchlist** | Strong lesion annotation potential, but access/version/license must be audited before admission |
 
 **Core R0 should not expand automatically.**  
-MMRDR-UWF + IDRiD are the minimum primary pair. DDR may be admitted only if its exact data terms, files, split semantics, and spatial annotations are verified and add value beyond IDRiD.
+MMRDR-UWF is the only R1 primary dataset; IDRiD remains the primary R2/R3 spatial candidate. DDR may be admitted only if its exact data terms, files, split semantics, and spatial annotations are verified and add value beyond IDRiD.
 
 ---
 
@@ -212,7 +212,7 @@ The completed OcuForge freeze record records:
 license_status = CC_BY_4.0_DISPLAYED_ON_OFFICIAL_IDRID_DATA_PAGE; IEEE_DATAPORT_ACCESS_REQUIRED
 ```
 
-The source-level access path is sufficient for planned acquisition. R1-P0 verifies authorized access, archive inventory, and local hashes.
+The source-level access path is sufficient for planned acquisition. The R2/R3 preparation gate verifies authorized access, archive inventory, and local hashes.
 
 ### Split limitation
 
@@ -470,7 +470,7 @@ DO_NOT_EXPAND_R0_CORE_WITHOUT_OWNER_DECISION
 
 # 5. R1 foundation-model overlap implications
 
-R0 audited **datasets and pretrained assets together**; R1-P0 later verifies the exact local bytes and access/load evidence.
+R0 audited **datasets and pretrained assets together**; each later acquisition gate verifies the exact local bytes and access/load evidence for its own scope.
 
 ## C0 — ConvNeXt V2-Tiny
 

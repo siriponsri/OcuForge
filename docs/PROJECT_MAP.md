@@ -4,7 +4,8 @@
 **Authority:** [`POC_MASTER_PLAN.md`](POC_MASTER_PLAN.md)
 
 OcuForge is a research and clinician-review foundation, not a diagnostic product. The current gate is R0 V3 `PASS`;
-R1-P0 is `READY_NOT_EXECUTED`; R1 is `READY_NOT_EXECUTED` with no champion. Execute R1-P0 before any R1 training.
+R1-P0 is `READY_NOT_EXECUTED`; R1 is `READY_NOT_EXECUTED` with no champion. Execute R1-P0 Global before any R1
+training; `PASS` or `PASS_WITH_WARNINGS` can unlock it only when no blocker remains.
 
 ## Ownership
 
@@ -26,7 +27,7 @@ on-premise. Public GPU accepts reviewed public/synthetic data only.
 |---|---|---|---|
 | 01 | `docs/POC_MASTER_PLAN.md` | V3 direction | owner/architect review |
 | 02 | `docs/R0_DATASET_SUPERVISION_FREEZE.md` | R0 V3 | PASS; scientific freeze complete |
-| 03 | `docs/R1_P0_ACQUISITION_PREFLIGHT.md` | R1-P0 | ready / not executed; acquire and verify frozen inputs |
+| 03 | `docs/R1_P0_ACQUISITION_PREFLIGHT.md` | R1-P0 Global | ready / not executed; acquire MMRDR and verify R1 inputs; IDRiD is deferred to R2/R3 |
 | 04 | `docs/R1_GLOBAL_MODEL_SELECTION.md` | C0/C1/C2 | run one candidate at a time after R1-P0 |
 | 05 | `docs/GUI_POC_INTEGRATION.md` | R4/R5 | integrate existing `templates/` through contracts |
 | 06 | `docs/GPU_EXECUTION_TH.md` | public/synthetic runtime | verify host only when authorized |

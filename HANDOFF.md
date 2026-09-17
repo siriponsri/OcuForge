@@ -13,8 +13,9 @@ R1_GLOBAL_BENCHMARK=READY_NOT_EXECUTED
 CURRENT_R1_CHAMPION=NONE
 ```
 
-R0 scientific evidence review passed. R1-P0 is the next and only permitted execution gate. It must pass before any
-candidate training; it does not authorize R1 training or cloud provisioning.
+R0 scientific evidence review passed. R1-P0 Global is the next and only permitted execution gate. Its allowed terminal
+outcomes are `PASS`, `PASS_WITH_WARNINGS`, and `BLOCKED`; `PASS` or `PASS_WITH_WARNINGS` unlocks candidate training only
+when no blocking finding remains. It does not authorize cloud provisioning or execute R1 itself.
 
 ## What was completed
 
@@ -28,16 +29,22 @@ candidate training; it does not authorize R1 training or cloud provisioning.
 - Recorded licenses, preprocessing, corpus/overlap status, deferred byte checks, taxonomy, negative ROI policy, and a
   provider-neutral future download manifest in `docs/RSC_R0_DATASET_TAXONOMY_FREEZE_v0.1.json`.
 - Reclassified byte-dependent findings into `docs/R1_P0_ACQUISITION_PREFLIGHT.json` without deleting warnings.
-- Updated active status documents, the R1 registry, and the offline validator for separate R0 and R1-P0 gates.
+- Decoupled IDRiD acquisition from the R1 critical path while preserving its source evidence and conservative negative
+  policy for R2/R3.
+- Added explicit P0 state/outcome rules, research/deployment license eligibility fields, artifact warning propagation,
+  and separate evidence-audit/gate-decision dates.
+- Updated active status documents, the R1 registry, report generator, tests, and offline validator for the simplified
+  R1-P0 Global gate.
 
 ## R1-P0 checks not yet executed
 
 See the machine-readable P0 contract. The short form is:
 
-- Dataset/archive SHA-256, integrity, extracted inventory, schema/split smoke, and duplicate checks.
+- MMRDR dataset/archive SHA-256, integrity, extracted inventory, schema/split smoke, and duplicate checks.
 - C0/C1/C2 local weight SHA-256, gated access, preprocessing smoke, and model loading.
 - Storage capacity, permissions, runtime readiness, and public/synthetic-only boundary.
-- IDRiD examples remain UNKNOWN/WEAK_NEGATIVE unless acquisition evidence supports clean negatives.
+- IDRiD acquisition, mask coverage, and image-level split checks are deferred to R2/R3; unannotated regions remain
+  `UNKNOWN`/`WEAK_NEGATIVE` unless acquisition evidence supports clean negatives.
 
 ## Important artifacts/files
 
@@ -52,7 +59,7 @@ See the machine-readable P0 contract. The short form is:
 
 ## Exact next action
 
-`git pull` -> execute R1-P0 acquisition preflight.
+`git pull` -> execute R1-P0 Global acquisition preflight.
 
 From a clean machine/session:
 
@@ -60,8 +67,9 @@ From a clean machine/session:
 git pull
 ```
 
-Then follow `docs/R1_P0_ACQUISITION_PREFLIGHT.md`. Do not execute R1-P0 and R1 in the same phase; after P0, stop for
-review and update this handoff with the evidence and final P0 status.
+Then follow `docs/R1_P0_ACQUISITION_PREFLIGHT.md`. Acquire only MMRDR and the approved C0/C1/C2 assets. Do not
+execute R1-P0 and R1 in the same phase; after P0, stop for review and update this handoff with the evidence and final
+P0 status. IDRiD acquisition belongs to the later R2/R3 gate.
 
 ## Resume commands/checks
 
@@ -76,12 +84,13 @@ python scripts/package_check.py
 git diff --check
 ```
 
-Inspect `git status --short --branch` before editing. Do not train or execute R1 as part of R1-P0.
+Inspect `git status --short --branch` before editing. Do not train or execute R1 as part of R1-P0. Training may begin
+only after P0 is `PASS` or `PASS_WITH_WARNINGS` with no blocker; copy P0 warnings to every R1 artifact.
 
 ## External dependencies/assets
 
 - MMRDR: `https://figshare.com/articles/dataset/MMRDR/29423747`, DOI `10.6084/m9.figshare.29423747.v2`.
-- IDRiD: `https://idrid.grand-challenge.org/Data/`, IEEE DOI `10.21227/H25W98`.
+- IDRiD R2/R3 source: `https://idrid.grand-challenge.org/Data/`, IEEE DOI `10.21227/H25W98`.
 - DDR/OIA-DDR: `https://github.com/nkicsl/DDR-dataset` (not admitted).
 - C0: official ConvNeXt V2 Tiny ImageNet-22K 384px checkpoint URL in the freeze record.
 - C1: `jusiro2/FLAIR`, revision `5f6bdd0a068353dc41a896ba3abdd7c0f6d35938`.
@@ -95,6 +104,6 @@ Inspect `git status --short --branch` before editing. Do not train or execute R1
   this handoff.
 - Do not convert MMRDR image-level lesion presence into ROI supervision.
 - Do not infer ordinal grades from binary `DR`/`no-DR` labels, or treat `no-DR` as adjudicated grade 0.
-- Do not treat unannotated IDRiD regions as verified negatives.
+- Do not treat unannotated IDRiD regions as verified negatives; this policy remains active for R2/R3.
 - Do not call foundation-model evaluation clean external evidence while overlap is unknown or contaminated.
 - Do not treat MIL attention as lesion localization or fundus/UWF evidence as OCT-confirmed DME.

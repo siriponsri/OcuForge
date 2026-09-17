@@ -2,7 +2,9 @@
   "schema_version": "r0_dataset_supervision_audit.v0.2",
   "record_type": "R0_V3_FREEZE_RECORD",
   "status": "R0_V3=PASS",
-  "audit_date": "2026-09-16",
+  "artifact_schema_version": "r0_dataset_supervision_audit_record.v1",
+  "evidence_audit_date": "2026-09-16",
+  "gate_decision_date": "2026-09-17",
   "decision_scope": "R0 V3 scientific evidence freeze completed; no dataset bytes or model weights downloaded",
   "authority": "docs/POC_MASTER_PLAN.md and docs/R0_DATASET_SUPERVISION_FREEZE.md",
   "supersedes_status": "R0_V2_RECORD_RETIRED_BY_V3_REPLAN",
@@ -110,13 +112,13 @@
       "known_limitations": [
         "Conventional 50-degree CFP is not UWF and is not a local-domain validation set.",
         "Only the localized lesion subset is eligible for ROI positives; exact mask coverage must be checked after download.",
-         "No public-cloud use for this CFP source; archive inventory and local SHA-256 are R1-P0 checks."
+         "No public-cloud use for this CFP source; archive inventory and local SHA-256 are R2/R3 preparation checks."
       ],
       "checksum_or_source_hash": "SOURCE_FILE_LAYOUT_RECORDED; LOCAL_SHA256_DEFERRED_TO_R1_P0",
       "limitations": [
         "Conventional 50-degree CFP is not UWF and is not a local-domain validation set.",
         "Only the localized lesion subset is eligible for ROI positives; exact mask coverage must be checked after download.",
-        "No public-cloud use for this CFP source; archive inventory and local SHA-256 are R1-P0 checks."
+        "No public-cloud use for this CFP source; archive inventory and local SHA-256 are R2/R3 preparation checks."
       ],
       "checksums": {
         "status": "LOCAL_SHA256_DEFERRED_TO_R1_P0",
@@ -133,8 +135,8 @@
     },
     "R2_R3_SPATIAL_ROI": {
       "dataset": "idrid_v1",
-      "decision": "ELIGIBLE_FOR_R1_P0",
-      "reason": "Official source/version, CFP modality, grading and four-class mask semantics, image-level split limitation, CC BY 4.0 access statement, frozen taxonomy, and conservative UNKNOWN/WEAK_NEGATIVE policy are defined. Local archive hashes and inventory checks belong to R1-P0."
+      "decision": "ELIGIBLE_FOR_R2_R3_PREPARATION",
+      "reason": "Official source/version, CFP modality, grading and four-class mask semantics, image-level split limitation, CC BY 4.0 access statement, frozen taxonomy, and conservative UNKNOWN/WEAK_NEGATIVE policy are defined. Local archive hashes and inventory checks belong to R2/R3 preparation and do not block R1."
     },
     "DDR_OIA_DDR": {
       "dataset": "DDR / OIA-DDR",
@@ -189,8 +191,8 @@
     },
     {
       "finding": "IDRiD official page defines the source, mask families, and CC BY 4.0 statement, while local archive bytes are absent.",
-      "gate": "R1_P0_ACQUISITION_PREFLIGHT",
-      "required_check": "Verify authorized archive inventory and SHA-256 after acquisition."
+      "gate": "R2_R3_PREPARATION",
+      "required_check": "Verify authorized archive inventory and SHA-256 before spatial ROI preparation."
     },
     {
       "finding": "IDRiD mask coverage is class-dependent and absence is not exhaustive evidence.",
@@ -215,6 +217,8 @@
     "datasets": [
       {
         "dataset_id": "mmrdr_uwf_v1",
+        "required_for": "R1_GLOBAL",
+        "blocks_r1": true,
         "source": "https://api.figshare.com/v2/articles/29423747",
         "access": "Download all nine MMRDR.zip.001 through MMRDR.zip.009 parts plus README.md; the multipart archive must be combined before extraction because the release is not UWF-only.",
         "files": "The ten file records and direct URLs are frozen under candidate_datasets[GLOBAL_DR].checksums.files.",
@@ -223,6 +227,8 @@
       },
       {
         "dataset_id": "idrid_v1",
+        "required_for": "R2_R3",
+        "blocks_r1": false,
         "source": "https://ieee-dataport.org/open-access/indian-diabetic-retinopathy-image-dataset-idrid",
         "access": "IEEE DataPort account or institutional access may be required; do not use a mirror as the source.",
         "files": [
@@ -384,7 +390,7 @@
     "baseline": "C0/C1/C2 controlled global benchmark with CE first and winner-only CE/CORN ablation",
     "dataset": "mmrdr_uwf_v1 only",
     "tiny_test_encoder": "TEST_ONLY",
-    "real_execution": "Requires R0 PASS plus R1-P0 PASS; no candidate may train before acquisition, hash, schema, preprocessing, access, storage, and loading checks pass",
+    "real_execution": "Requires R0 PASS plus R1-P0 PASS or PASS_WITH_WARNINGS with no blocking finding; no candidate may train before required R1 acquisition, hash, schema, preprocessing, access, storage, and loading checks are resolved",
     "gpu_policy": "Public or synthetic data only; no provisioning or spending in this commit"
   },
   "foundation_model_overlap_audit": [
@@ -422,7 +428,7 @@
     {
       "source": "IDRiD IEEE DataPort metadata",
       "url": "https://ieee-dataport.org/open-access/indian-diabetic-retinopathy-image-dataset-idrid",
-      "observed": "516 images, 413/103 release split, JPG/TIFF/CSV data format, DOI 10.21227/H25W98, and official CC BY 4.0 statement; local archive checks are deferred to R1-P0"
+      "observed": "516 images, 413/103 release split, JPG/TIFF/CSV data format, DOI 10.21227/H25W98, and official CC BY 4.0 statement; local archive checks are deferred to R2/R3 preparation"
     },
     {
       "source": "DDR/OIA-DDR official repository",

@@ -12,7 +12,8 @@ R1 C0/C1/C2 = READY_NOT_EXECUTED
 CURRENT_R1_CHAMPION = NONE
 ```
 
-การตรวจเอกสารรอบนี้ไม่ download dataset, ไม่ train model และไม่ provision cloud GPU; ขั้นถัดไปคือ R1-P0
+การตรวจเอกสารรอบนี้ไม่ download dataset, ไม่ train model และไม่ provision cloud GPU; ขั้นถัดไปคือ R1-P0 Global
+โดย IDRiD จะตรวจในช่วง R2/R3 และไม่ block การ train R1
 
 ## ลำดับการอ่าน
 
@@ -31,8 +32,9 @@ CURRENT_R1_CHAMPION = NONE
 .\.venv\Scripts\python.exe scripts\package_check.py
 ```
 
-Synthetic smoke ใช้ตรวจ engineering path เท่านั้น ไม่ใช่ผลวิจัยหรือผลทางคลินิก ก่อนรัน R1 ต้องให้ R1-P0 ตรวจ
-archive/hash, schema/split, preprocessing, asset loading และ runtime ให้ครบ
+Synthetic smoke ใช้ตรวจ engineering path เท่านั้น ไม่ใช่ผลวิจัยหรือผลทางคลินิก ก่อนรัน R1 ต้องให้ R1-P0 Global ตรวจ
+MMRDR archive/hash, schema/split, preprocessing, C0/C1/C2 asset loading และ runtime ให้ครบ โดยยอมรับ
+`PASS_WITH_WARNINGS` ได้เมื่อไม่มี blocking finding และต้องส่งต่อ warnings ไปยัง R1 artifacts
 
 ## กฎข้อมูล
 

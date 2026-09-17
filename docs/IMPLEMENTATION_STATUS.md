@@ -14,7 +14,7 @@ result.
 | Phase 2A local data foundation | IMPLEMENTED / VERIFIED | Local adapters and provenance safeguards exist. |
 | Phase 2B live Mongo acceptance | UNKNOWN / NOT RUN | Requires the target service; Phase 2 overall is not PASS. |
 | R0 V3 data/supervision/asset freeze | PASS | Scientific source/task/supervision/split/taxonomy/license/overlap freeze is complete; byte-dependent checks moved to R1-P0. |
-| R1-P0 acquisition preflight | READY_NOT_EXECUTED | Archive/weight hashes, inventories, schema/split smoke, preprocessing, access, loading, and runtime checks are pending. |
+| R1-P0 acquisition preflight | READY_NOT_EXECUTED | Uses the v2 state machine. `PASS` or `PASS_WITH_WARNINGS` unlocks R1 only when no blocking finding remains; archive/weight hashes, inventories, schema/split smoke, preprocessing, access, loading, and runtime checks are pending. IDRiD is deferred to R2/R3. |
 | R1 C0/C1/C2 benchmark | READY_NOT_EXECUTED | No candidate was trained or selected. |
 | Current R1 champion | NONE | Selection is forbidden before measured evidence. |
 
@@ -27,7 +27,7 @@ result.
 - CORN head contract with target encoding, conditional decoding, shapes, and synthetic unit coverage.
 - Versioned Global→ROI triage policy/input/decision contracts with unset threshold and reviewer override.
 - Existing labeler/CVAT bridge, local storage, and `templates/` customer-facing GUI reference.
-- V3 candidate registry, completed R0 overlap/dataset audit record, R1-P0 acquisition contract, validation tests, editorial SVG/HTML diagrams, and pinned diagram
+- V3 candidate registry with separate research/deployment eligibility, completed R0 overlap/dataset audit record, R1-P0 acquisition contract and state machine, validation tests, editorial SVG/HTML diagrams, and pinned diagram
   setup metadata.
 
 ## Planned, not executed
@@ -41,7 +41,7 @@ result.
 ## Unknown or external gates
 
 R1-P0 asset hashes and final access/load results; MMRDR archive checksums and schema/split smoke; IDRiD archive
-checksums/inventory and negative examples; FLAIR/DINOv3 source-image overlap; live Mongo/CVAT/Docker/host governance;
+checksums/inventory and negative examples for R2/R3; FLAIR/DINOv3 source-image overlap; live Mongo/CVAT/Docker/host governance;
 intended local inference hardware; and any scientific performance.
 
 ## Prohibited claims

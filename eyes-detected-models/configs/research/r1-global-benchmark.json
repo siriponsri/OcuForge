@@ -1,12 +1,48 @@
 {
-  "schema_version": "r1_global_benchmark.v3.0",
+  "schema_version": "r1_global_benchmark.v3.1",
+  "artifact_schema_version": "r1_experiment_artifact.v1",
   "status": "R1_GLOBAL_BENCHMARK=READY_NOT_EXECUTED",
+  "evidence_audit_date": null,
+  "gate_decision_date": null,
   "authority": "docs/POC_MASTER_PLAN.md",
   "r0_status": "R0_DATASET_TAXONOMY=PASS",
   "acquisition_preflight": {
     "status": "R1_P0_ACQUISITION_PREFLIGHT=READY_NOT_EXECUTED",
     "config": "docs/R1_P0_ACQUISITION_PREFLIGHT.json",
-    "required_before_training": true
+    "required_before_training": true,
+    "training_unlock_states": ["PASS", "PASS_WITH_WARNINGS"],
+    "requires_no_blocking_finding": true,
+    "warning_propagation": "COPY_P0_WARNINGS_TO_EVERY_R1_ARTIFACT"
+  },
+  "r1_dependencies": {
+    "required_datasets": ["mmrdr_uwf_v1"],
+    "required_candidates": ["C0", "C1", "C2"],
+    "required_model_assets": ["C0", "C1", "C2"],
+    "required_checks": [
+      "DATASET_ARCHIVE",
+      "DATASET_SCHEMA_SPLIT",
+      "MODEL_ASSET",
+      "PREPROCESSING",
+      "MODEL_LOADING",
+      "GATED_ACCESS",
+      "STORAGE_RUNTIME"
+    ],
+    "deferred_datasets": [
+      {
+        "dataset_id": "idrid_v1",
+        "required_for": "R2_R3",
+        "blocks_r1": false
+      }
+    ]
+  },
+  "artifact_contract": {
+    "required_p0_fields": [
+      "p0_gate_state",
+      "p0_outcome",
+      "p0_blockers",
+      "p0_warnings"
+    ],
+    "warning_propagation": "COPY_P0_WARNINGS_TO_EVERY_R1_ARTIFACT"
   },
   "selection_split": "VAL",
   "held_out_split": "TEST",
@@ -25,7 +61,7 @@
   "dataset": {
     "dataset_id": "mmrdr_uwf_v1",
     "role": "PRIMARY_R1_DOMAIN_HYPOTHESIS",
-    "eligibility": "R0_PASS_R1_P0_REQUIRED_BEFORE_EXECUTION",
+    "eligibility": "R0_PASS_R1_P0_PASS_OR_PASS_WITH_WARNINGS_REQUIRED_BEFORE_EXECUTION",
     "config": "eyes-detected-models/configs/datasets/mmrdr_uwf_v1.yaml",
     "selection_split": "VAL",
     "held_out_split": "TEST",
@@ -57,6 +93,9 @@
         "pretraining_corpus": "ImageNet-22K",
         "overlap_status_with_mmrdr_uwf": "UNKNOWN"
       },
+      "research_execution_eligible": true,
+      "research_execution_eligibility_basis": "Non-commercial research use is a candidate path pending P0 terms/access verification; deployment and commercial rights remain separate.",
+      "deployment_license_status": "RESTRICTED_REVIEW_REQUIRED",
       "execution_status": "READY_NOT_EXECUTED",
       "metrics_artifact_path": null,
       "deployment_artifact_path": null,
@@ -88,6 +127,9 @@
         "overlap_status_with_mmrdr_uwf": "UNKNOWN",
         "secondary_overlap_status": "CONFIRMED_OR_POTENTIAL"
       },
+      "research_execution_eligible": true,
+      "research_execution_eligibility_basis": "Research transfer is eligible for consideration pending P0 asset/hash/load verification; documented pretraining overlap limits claims.",
+      "deployment_license_status": "RESEARCH_USE_REVIEWED_DEPLOYMENT_REVIEW_REQUIRED",
       "execution_status": "READY_NOT_EXECUTED",
       "metrics_artifact_path": null,
       "deployment_artifact_path": null,
@@ -119,6 +161,9 @@
         "pretraining_corpus": "LVD-1689M web image corpus",
         "overlap_status_with_mmrdr_uwf": "UNKNOWN"
       },
+      "research_execution_eligible": true,
+      "research_execution_eligibility_basis": "Research candidate pending gated-access, license-acceptance, and P0 asset/hash/load verification.",
+      "deployment_license_status": "GATED_LICENSE_REVIEW_REQUIRED",
       "execution_status": "READY_NOT_EXECUTED",
       "metrics_artifact_path": null,
       "deployment_artifact_path": null,
@@ -131,7 +176,9 @@
     "human_in_the_loop": true,
     "one_candidate_per_run": true,
     "stop_after_each_candidate": true,
-    "current_champion": null
+    "current_champion": null,
+    "current_scientific_champion": null,
+    "current_deployment_champion": null
   },
   "winner_only_ordinal_ablation": {
     "status": "PLANNED_AFTER_ARCHITECTURE_DECISION",

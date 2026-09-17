@@ -1,6 +1,7 @@
 """Validate the checked-in R0 pre-execution and R1 benchmark contracts."""
 
 import json
+from datetime import date
 from pathlib import Path
 from pathlib import PurePosixPath
 
@@ -22,10 +23,45 @@ STORAGE_ENVS = {
     "cache_env": "OCUFORGE_CACHE_ROOT",
     "artifact_env": "OCUFORGE_ARTIFACT_ROOT",
 }
+P0_STATES = {
+    "READY_NOT_EXECUTED",
+    "RUNNING",
+    "PASS_WITH_WARNINGS",
+    "PASS",
+    "BLOCKED",
+}
+P0_OUTCOMES = {"PASS", "PASS_WITH_WARNINGS", "BLOCKED"}
+P0_CHECK_STATUSES = {
+    "NOT_EXECUTED",
+    "RUNNING",
+    "PASS",
+    "PASS_WITH_WARNINGS",
+    "BLOCKED",
+}
+R1_P0_REQUIRED_GATES = {
+    "DATASET_ARCHIVE",
+    "DATASET_SCHEMA_SPLIT",
+    "MODEL_ASSET",
+    "PREPROCESSING",
+    "MODEL_LOADING",
+    "GATED_ACCESS",
+    "STORAGE_RUNTIME",
+}
 
 
 def load_json(path):
     return json.loads(Path(path).read_text(encoding="utf-8"))
+
+
+def validate_iso_date(value, field, allow_null=True):
+    if value is None and allow_null:
+        return
+    if not isinstance(value, str):
+        raise ValueError(f"{field} must be an ISO date or null")
+    try:
+        date.fromisoformat(value)
+    except ValueError as exc:
+        raise ValueError(f"{field} must be an ISO date or null") from exc
 
 
 def relative_path(value):
@@ -43,6 +79,10 @@ def validate_freeze(data):
         raise ValueError("R0 V3 must be PASS or explicitly BLOCKED")
     if data.get("authority") != "docs/POC_MASTER_PLAN.md and docs/R0_DATASET_SUPERVISION_FREEZE.md":
         raise ValueError("R0 audit must name the V3 authority")
+    if data.get("artifact_schema_version") != "r0_dataset_supervision_audit_record.v1":
+        raise ValueError("R0 audit must name its artifact schema")
+    validate_iso_date(data.get("evidence_audit_date"), "R0 evidence audit date", allow_null=False)
+    validate_iso_date(data.get("gate_decision_date"), "R0 gate decision date", allow_null=False)
     selected = {row["role"]: row for row in data.get("candidate_datasets", [])}
     required_fields = {
         "source",
@@ -158,6 +198,7 @@ def validate_freeze(data):
             "R0_KNOWN_IDENTITY_LIMITATION",
             "R0_SATISFIED_CONSERVATIVE_NEGATIVE_POLICY",
             "R1_P0_ACQUISITION_PREFLIGHT",
+            "R2_R3_PREPARATION",
         }
         if any(row.get("gate") not in allowed_finding_gates for row in findings):
             raise ValueError("R0 findings must use R0 dispositions or R1-P0")
@@ -188,37 +229,122 @@ def validate_freeze(data):
 
 
 def validate_r1_p0(data, root=ROOT):
-    if data.get("status") != "R1_P0_ACQUISITION_PREFLIGHT=READY_NOT_EXECUTED":
-        raise ValueError("R1-P0 must be ready but not executed")
-    if data.get("schema_version") != "r1_p0_acquisition_preflight.v1":
-        raise ValueError("R1-P0 must use the v1 schema")
+    state = data.get("gate_state")
+    if state not in P0_STATES:
+        raise ValueError("R1-P0 must use a supported gate state")
+    if data.get("status") != f"R1_P0_ACQUISITION_PREFLIGHT={state}":
+        raise ValueError("R1-P0 status must match its gate state")
+    outcome = data.get("outcome")
+    if state in {"READY_NOT_EXECUTED", "RUNNING"}:
+        if outcome is not None:
+            raise ValueError("R1-P0 non-terminal states cannot claim an outcome")
+    elif outcome != state or outcome not in P0_OUTCOMES:
+        raise ValueError("R1-P0 terminal state must match a PASS, warning, or blocked outcome")
+    if data.get("schema_version") != "r1_p0_acquisition_preflight.v2":
+        raise ValueError("R1-P0 must use the v2 schema")
+    if data.get("artifact_schema_version") != "r1_p0_acquisition_preflight_record.v1":
+        raise ValueError("R1-P0 must name its artifact schema")
     if data.get("authority") != "docs/POC_MASTER_PLAN.md":
         raise ValueError("R1-P0 must name the canonical V3 plan")
     if data.get("r0_status") != "R0_DATASET_TAXONOMY=PASS":
         raise ValueError("R1-P0 requires a passing R0 taxonomy gate")
     if data.get("r1_status") != "R1_GLOBAL_BENCHMARK=READY_NOT_EXECUTED":
         raise ValueError("R1-P0 must preserve R1 readiness")
-    if data.get("training_unlock") != "FORBIDDEN_UNTIL_R1_P0_PASS":
-        raise ValueError("R1-P0 must block candidate training until it passes")
-    required_check_fields = {"check_id", "gate", "status", "evidence_required", "failure_action"}
+    if data.get("training_unlock") != "FORBIDDEN_UNTIL_PASS_OR_PASS_WITH_WARNINGS":
+        raise ValueError("R1-P0 must block candidate training until it passes or has warnings only")
+    validate_iso_date(data.get("evidence_audit_date"), "R1-P0 evidence audit date")
+    validate_iso_date(data.get("gate_decision_date"), "R1-P0 gate decision date")
+    if state in P0_OUTCOMES and data.get("gate_decision_date") is None:
+        raise ValueError("R1-P0 terminal state must record a gate decision date")
+    state_machine = data.get("state_machine")
+    if not isinstance(state_machine, dict):
+        raise ValueError("R1-P0 must define its state machine")
+    if state_machine.get("states") != [
+        "READY_NOT_EXECUTED",
+        "RUNNING",
+        "PASS_WITH_WARNINGS",
+        "PASS",
+        "BLOCKED",
+    ]:
+        raise ValueError("R1-P0 state machine states are incomplete")
+    if state_machine.get("initial_state") != "READY_NOT_EXECUTED":
+        raise ValueError("R1-P0 must start ready but not executed")
+    if state_machine.get("training_unlock_states") != ["PASS", "PASS_WITH_WARNINGS"]:
+        raise ValueError("R1-P0 training unlock states must include PASS and warning-only PASS")
+    if state_machine.get("requires_no_blocking_finding") is not True:
+        raise ValueError("R1-P0 training unlock must require no blocking finding")
+    policy = data.get("decision_policy")
+    if not isinstance(policy, dict) or policy.get("outcomes") != ["PASS", "PASS_WITH_WARNINGS", "BLOCKED"]:
+        raise ValueError("R1-P0 must define PASS, PASS_WITH_WARNINGS, and BLOCKED outcomes")
+    if policy.get("warning_record_field") != "warnings":
+        raise ValueError("R1-P0 must record warnings explicitly")
+    required_check_fields = {"check_id", "gate", "scope", "status", "evidence_required", "failure_action"}
     checks = data.get("checks")
     if not isinstance(checks, list) or not checks:
         raise ValueError("R1-P0 must define acquisition and runtime checks")
     if any(not required_check_fields.issubset(row) for row in checks):
         raise ValueError("R1-P0 check record is incomplete")
-    if any(row["status"] != "NOT_EXECUTED" for row in checks):
-        raise ValueError("R1-P0 readiness record cannot claim executed checks")
-    required_gates = {
-        "DATASET_ARCHIVE",
-        "DATASET_SCHEMA_SPLIT",
-        "MODEL_ASSET",
-        "PREPROCESSING",
-        "MODEL_LOADING",
-        "GATED_ACCESS",
-        "STORAGE_RUNTIME",
-    }
-    if {row["gate"] for row in checks} != required_gates:
+    if any(row["status"] not in P0_CHECK_STATUSES for row in checks):
+        raise ValueError("R1-P0 check status is not supported")
+    if {row["gate"] for row in checks} != R1_P0_REQUIRED_GATES:
         raise ValueError("R1-P0 must cover every required acquisition gate")
+    if any(row["scope"] != "R1_GLOBAL" for row in checks):
+        raise ValueError("R1-P0 required checks must be scoped to the R1 global benchmark")
+    if state == "READY_NOT_EXECUTED" and any(row["status"] != "NOT_EXECUTED" for row in checks):
+        raise ValueError("R1-P0 readiness record cannot claim executed checks")
+    if state == "PASS" and any(row["status"] != "PASS" for row in checks):
+        raise ValueError("R1-P0 PASS requires every required check to pass")
+    if state == "PASS_WITH_WARNINGS" and any(
+        row["status"] not in {"PASS", "PASS_WITH_WARNINGS"} for row in checks
+    ):
+        raise ValueError("R1-P0 warning-only PASS cannot contain a failed check")
+    if state in {"PASS", "PASS_WITH_WARNINGS"} and data.get("blockers"):
+        raise ValueError("R1-P0 PASS outcomes cannot retain blockers")
+    if state == "PASS_WITH_WARNINGS" and not data.get("warnings"):
+        raise ValueError("R1-P0 warning-only PASS must record warnings")
+    if state == "BLOCKED" and not data.get("blockers"):
+        raise ValueError("R1-P0 BLOCKED must record a blocking finding")
+    if state == "BLOCKED" and not any(row["status"] == "BLOCKED" for row in checks):
+        raise ValueError("R1-P0 BLOCKED must identify a blocked check")
+    if not isinstance(data.get("known_warnings"), list) or not isinstance(data.get("warnings"), list):
+        raise ValueError("R1-P0 must define known and executed warning records")
+    warning_fields = {"warning_id", "scope", "finding", "blocks_r1"}
+    for warning in data["known_warnings"] + data["warnings"]:
+        if not warning_fields.issubset(warning) or warning["blocks_r1"] is not False:
+            raise ValueError("R1-P0 warnings must be explicit and non-blocking")
+    dependencies = data.get("r1_dependencies")
+    if not isinstance(dependencies, dict):
+        raise ValueError("R1-P0 must define R1 dependencies")
+    if dependencies.get("required_datasets") != ["mmrdr_uwf_v1"]:
+        raise ValueError("R1-P0 R1 dependency set must require only MMRDR-UWF")
+    if dependencies.get("required_candidates") != ["C0", "C1", "C2"]:
+        raise ValueError("R1-P0 R1 dependency set must require C0, C1, and C2")
+    if dependencies.get("required_model_assets") != ["C0", "C1", "C2"]:
+        raise ValueError("R1-P0 R1 dependency set must require C0, C1, and C2 model assets")
+    if set(dependencies.get("required_checks", [])) != R1_P0_REQUIRED_GATES:
+        raise ValueError("R1-P0 R1 dependency checks are incomplete")
+    deferred = dependencies.get("deferred_datasets")
+    if not isinstance(deferred, list) or len(deferred) != 1:
+        raise ValueError("R1-P0 must preserve one deferred ROI dataset")
+    idrid = deferred[0]
+    if (
+        idrid.get("dataset_id") != "idrid_v1"
+        or idrid.get("required_for") != "R2_R3"
+        or idrid.get("blocks_r1") is not False
+    ):
+        raise ValueError("IDRiD must be deferred to R2/R3 without blocking R1")
+    artifact_contract = data.get("artifact_contract")
+    if not isinstance(artifact_contract, dict):
+        raise ValueError("R1-P0 must define the R1 artifact contract")
+    if artifact_contract.get("required_p0_fields") != [
+        "p0_gate_state",
+        "p0_outcome",
+        "p0_blockers",
+        "p0_warnings",
+    ]:
+        raise ValueError("R1 artifacts must carry the complete P0 decision record")
+    if artifact_contract.get("warning_propagation") != "COPY_P0_WARNINGS_TO_EVERY_R1_ARTIFACT":
+        raise ValueError("R1 artifacts must carry P0 warnings")
     manifest = data.get("manifest_reference")
     if manifest != "docs/RSC_R0_DATASET_TAXONOMY_FREEZE_v0.1.json#future_download_manifest":
         raise ValueError("R1-P0 must use the frozen R0 future download manifest")
@@ -235,8 +361,10 @@ def validate_r1_p0(data, root=ROOT):
 def validate_r1(data, root=ROOT):
     if data.get("status") != "R1_GLOBAL_BENCHMARK=READY_NOT_EXECUTED":
         raise ValueError("R1 benchmark must be ready but not executed")
-    if data.get("schema_version") != "r1_global_benchmark.v3.0":
-        raise ValueError("R1 benchmark must use the V3 schema")
+    if data.get("schema_version") != "r1_global_benchmark.v3.1":
+        raise ValueError("R1 benchmark must use the V3.1 schema")
+    if data.get("artifact_schema_version") != "r1_experiment_artifact.v1":
+        raise ValueError("R1 benchmark must name its artifact schema")
     if data.get("authority") != "docs/POC_MASTER_PLAN.md":
         raise ValueError("R1 benchmark must name the canonical V3 plan")
     if data.get("r0_status") != "R0_DATASET_TAXONOMY=PASS":
@@ -245,9 +373,40 @@ def validate_r1(data, root=ROOT):
     if not isinstance(preflight, dict):
         raise ValueError("R1 benchmark must reference the acquisition preflight")
     if preflight.get("status") != "R1_P0_ACQUISITION_PREFLIGHT=READY_NOT_EXECUTED":
-        raise ValueError("R1 benchmark must remain behind an unexecuted R1-P0 gate")
+        raise ValueError("R1 benchmark must remain unexecuted until its P0 gate is reviewed")
     if preflight.get("required_before_training") is not True:
         raise ValueError("R1 benchmark must require R1-P0 before training")
+    if preflight.get("training_unlock_states") != ["PASS", "PASS_WITH_WARNINGS"]:
+        raise ValueError("R1 benchmark must allow only PASS or warning-only P0 training unlock")
+    if preflight.get("requires_no_blocking_finding") is not True:
+        raise ValueError("R1 benchmark training unlock must require no blocking finding")
+    validate_iso_date(data.get("evidence_audit_date"), "R1 evidence audit date")
+    validate_iso_date(data.get("gate_decision_date"), "R1 gate decision date")
+    dependencies = data.get("r1_dependencies")
+    if not isinstance(dependencies, dict) or dependencies.get("required_datasets") != ["mmrdr_uwf_v1"]:
+        raise ValueError("R1 must require only MMRDR-UWF as a dataset")
+    if dependencies.get("required_candidates") != ["C0", "C1", "C2"]:
+        raise ValueError("R1 must require C0, C1, and C2")
+    if dependencies.get("required_model_assets") != ["C0", "C1", "C2"]:
+        raise ValueError("R1 must require C0, C1, and C2 model assets")
+    if set(dependencies.get("required_checks", [])) != R1_P0_REQUIRED_GATES:
+        raise ValueError("R1 required checks are incomplete")
+    if dependencies.get("deferred_datasets") != [{
+        "dataset_id": "idrid_v1",
+        "required_for": "R2_R3",
+        "blocks_r1": False,
+    }]:
+        raise ValueError("R1 must defer IDRiD to R2/R3")
+    artifact_contract = data.get("artifact_contract")
+    if not isinstance(artifact_contract, dict) or artifact_contract.get("required_p0_fields") != [
+        "p0_gate_state",
+        "p0_outcome",
+        "p0_blockers",
+        "p0_warnings",
+    ]:
+        raise ValueError("R1 artifacts must carry P0 warnings and blocker state")
+    if artifact_contract.get("warning_propagation") != "COPY_P0_WARNINGS_TO_EVERY_R1_ARTIFACT":
+        raise ValueError("R1 artifacts must carry P0 warnings")
     candidates = data.get("candidates", [])
     candidate_ids = [candidate.get("id") for candidate in candidates]
     if candidate_ids != ["C0", "C1", "C2"]:
@@ -265,12 +424,22 @@ def validate_r1(data, root=ROOT):
         "loss",
         "target_type",
         "license_access",
+        "research_execution_eligible",
+        "deployment_license_status",
         "execution_status",
         "metrics_artifact_path",
         "deployment_artifact_path",
     }
     if any(not required_candidate_fields.issubset(candidate) for candidate in candidates):
         raise ValueError("R1 candidate record is incomplete")
+    if any(not isinstance(candidate["research_execution_eligible"], bool) for candidate in candidates):
+        raise ValueError("R1 research execution eligibility must be explicit")
+    if any(
+        not isinstance(candidate["deployment_license_status"], str)
+        or not candidate["deployment_license_status"]
+        for candidate in candidates
+    ):
+        raise ValueError("R1 deployment license status must be explicit")
     if any(candidate["loss"] != "CE" for candidate in candidates):
         raise ValueError("Initial R1 architecture comparison must use CE for every candidate")
     if any(candidate["metrics_artifact_path"] is not None for candidate in candidates):

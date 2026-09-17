@@ -41,9 +41,10 @@ HL7_FHIR=PLANNED_AFTER_MODEL_GUI
 PUBLIC_GPU_PRIVATE_DATA=FORBIDDEN
 ```
 
-R0 V3 is scientifically complete and PASS. R1-P0 acquisition preflight is READY_NOT_EXECUTED; R1 is a three-candidate
-CE-first benchmark and is READY_NOT_EXECUTED. R1-P0 may acquire only the frozen public records and approved assets;
-do not train any candidate until R1-P0 passes or provision cloud compute. Use provider-neutral configurable storage roots.
+R0 V3 is scientifically complete and PASS. R1-P0 Global acquisition preflight is READY_NOT_EXECUTED; R1 is a
+three-candidate CE-first benchmark and is READY_NOT_EXECUTED. R1-P0 may acquire only the frozen MMRDR record and
+C0/C1/C2 assets; training may unlock after P0 `PASS` or `PASS_WITH_WARNINGS` only when no blocking finding remains.
+IDRiD is deferred to R2/R3 preparation and must not block R1. Use provider-neutral configurable storage roots.
 
 Before cross-package or cross-runtime work, read `docs/CTR_MODULE_CONTRACT.md`. Respect module ownership, dependency direction,
 and data/runtime boundaries. Phases define execution order; modules define architectural ownership. Use `docs/PROJECT_MAP.md`

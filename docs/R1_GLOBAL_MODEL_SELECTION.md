@@ -3,8 +3,9 @@
 **Status:** ACTIVE SUPPORTING PROTOCOL · `R1_P0_ACQUISITION_PREFLIGHT=READY_NOT_EXECUTED` · `R1_GLOBAL_BENCHMARK=READY_NOT_EXECUTED`
 **Authority:** [`POC_MASTER_PLAN.md`](POC_MASTER_PLAN.md)
 
-R1 selects a defensible global ordinal DR architecture after R0 and R1-P0 pass. It is not a training instruction for this
-reconciliation and it does not claim a current model result.
+R1 selects a defensible global ordinal DR architecture after R0 and R1-P0 reaches `PASS` or `PASS_WITH_WARNINGS`
+without a blocking finding. It is not a training instruction for this reconciliation and it does not claim a current
+model result.
 
 ## Target and candidates
 
@@ -17,10 +18,16 @@ Target: genuine ordinal diabetic-retinopathy grade 0–4. The active registry is
 | C1 | FLAIR image encoder | Does a retina-specialist representation transfer to the selected domain? | CE |
 | C2 | DINOv3 ViT-B/16 + high-resolution patch Attention MIL | Does local detail survive better than global resizing? | CE |
 
-All three records require explicit asset revision, preprocessing, license/access status, and hashes before execution.
-R1-P0 owns local weight hashes, access, preprocessing smoke, and model loading; no candidate may train before P0 passes.
+All three records require explicit asset revision, preprocessing, license/access status, research execution eligibility,
+deployment license status, and hashes before execution. R1-P0 owns local weight hashes, access, preprocessing smoke,
+and model loading; no candidate may train before P0 reaches `PASS` or `PASS_WITH_WARNINGS` with no blocker.
 C1 must not silently become a different foundation model if FLAIR cannot be loaded. C2 attention is model aggregation
 evidence only, never a lesion mask.
+
+Unknown foundation overlap, unavailable row-level patient IDs with the released split preserved, and deployment rights
+that need separate review are explicit warnings. They cap claims or deployment use but do not by themselves block a
+valid research execution. A wrong target, leakage, corrupt/incompatible asset, or failed required load/forward pass
+remains blocking.
 
 ## Controlled execution order
 
@@ -59,7 +66,13 @@ QWK/latency tolerance is allowed before measurement and intended-use discussion.
 Selection uses validation evidence. The test split remains sealed for final evaluation. External data are not clean
 generalization evidence when foundation-model pretraining overlap is confirmed or unresolved.
 
-## PASS condition
+## R1-P0 outcome condition
+
+`PASS` requires every required P0 check to pass. `PASS_WITH_WARNINGS` requires every required check to pass or carry a
+non-blocking warning, no blocker, explicit warning records, and warning propagation into every R1 artifact. `BLOCKED`
+is reserved for invalidating, unauthorized, corrupt, leaking, incompatible, or impossible R1 execution conditions.
+
+## R1 PASS condition
 
 R1 can pass only after real reviewed public data, authorized candidate assets, held-out evaluation, baseline comparison,
 selected architecture and rationale, artifact metadata, deployment-practicality measurements, exact reproducible

@@ -26,7 +26,8 @@ The exact findings and future download manifest are in the
 ![OcuForge R0 to R8 roadmap](docs/diagrams/ocuforge-r0-r8-roadmap.svg)
 
 R0 freezes source/version/access, supervision semantics, identity-safe splits, licenses, checksums, negative-ROI
-policy, and foundation-model pretraining overlap before execution. R1 compares exactly three global ordinal DR
+policy, and foundation-model pretraining overlap before execution. R1-P0 uses explicit `PASS`, `PASS_WITH_WARNINGS`,
+and `BLOCKED` outcomes; warnings are recorded and carried into R1 artifacts. R1 compares exactly three global ordinal DR
 architectures, all with cross-entropy first:
 
 | Candidate | Scientific question | Initial architecture |
@@ -80,7 +81,7 @@ Offline checks:
 .\.venv\Scripts\python.exe scripts\package_check.py
 ```
 
-These checks do not download data, access private assets, execute R0 or R1, or claim model performance.
+These checks do not download data, access private assets, execute R0/R1-P0/R1, or claim model performance.
 
 ## Active Plan
 

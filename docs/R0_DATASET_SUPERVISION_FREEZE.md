@@ -79,10 +79,10 @@ CURRENT_R1_CHAMPION=NONE
 ```
 
 MMRDR-UWF is eligible for R1-P0 as the primary R1 hypothesis; its released patient-level split and missing row-level
-patient IDs remain a documented limitation. IDRiD is eligible for R1-P0 as the primary spatial candidate; unannotated
-regions remain UNKNOWN/WEAK_NEGATIVE unless stronger evidence is obtained. DDR/OIA-DDR is not admitted. C0/C1/C2
-exact source revisions, licenses, preprocessing, overlap findings, and claim limits are recorded. P0 owns all local
-hash, archive, inventory, access, smoke, and loading checks.
+patient IDs remain a documented limitation. IDRiD is preserved as the primary spatial R2/R3 candidate and is outside
+the R1 critical path; unannotated regions remain UNKNOWN/WEAK_NEGATIVE unless stronger evidence is obtained. DDR/OIA-DDR
+is not admitted. C0/C1/C2 exact source revisions, licenses, preprocessing, overlap findings, and claim limits are
+recorded. P0 owns all R1 local hash, archive, inventory, access, smoke, and loading checks.
 
 ## R0 PASS evidence
 

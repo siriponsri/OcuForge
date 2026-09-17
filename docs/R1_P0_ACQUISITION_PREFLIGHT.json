@@ -1,17 +1,64 @@
 {
-  "schema_version": "r1_p0_acquisition_preflight.v1",
+  "schema_version": "r1_p0_acquisition_preflight.v2",
+  "artifact_schema_version": "r1_p0_acquisition_preflight_record.v1",
   "record_type": "R1_P0_ACQUISITION_PREFLIGHT_CONTRACT",
   "status": "R1_P0_ACQUISITION_PREFLIGHT=READY_NOT_EXECUTED",
+  "gate_state": "READY_NOT_EXECUTED",
+  "outcome": null,
+  "evidence_audit_date": null,
+  "gate_decision_date": null,
   "authority": "docs/POC_MASTER_PLAN.md",
   "r0_status": "R0_DATASET_TAXONOMY=PASS",
   "r1_status": "R1_GLOBAL_BENCHMARK=READY_NOT_EXECUTED",
-  "training_unlock": "FORBIDDEN_UNTIL_R1_P0_PASS",
+  "training_unlock": "FORBIDDEN_UNTIL_PASS_OR_PASS_WITH_WARNINGS",
+  "training_unlock_states": ["PASS", "PASS_WITH_WARNINGS"],
+  "requires_no_blocking_finding": true,
   "manifest_reference": "docs/RSC_R0_DATASET_TAXONOMY_FREEZE_v0.1.json#future_download_manifest",
-  "execution_scope": "Acquire only the frozen public dataset records and approved public model assets; do not train, benchmark, promote a champion, or provision cloud in R1-P0.",
+  "execution_scope": "Acquire and verify only the frozen MMRDR-UWF record and approved C0/C1/C2 public model assets needed by R1; do not train, benchmark, promote a champion, or provision cloud in R1-P0.",
+  "state_machine": {
+    "states": [
+      "READY_NOT_EXECUTED",
+      "RUNNING",
+      "PASS_WITH_WARNINGS",
+      "PASS",
+      "BLOCKED"
+    ],
+    "initial_state": "READY_NOT_EXECUTED",
+    "training_unlock_states": ["PASS", "PASS_WITH_WARNINGS"],
+    "requires_no_blocking_finding": true,
+    "allowed_transitions": {
+      "READY_NOT_EXECUTED": ["RUNNING"],
+      "RUNNING": ["PASS_WITH_WARNINGS", "PASS", "BLOCKED"],
+      "PASS_WITH_WARNINGS": ["PASS", "BLOCKED"],
+      "PASS": ["BLOCKED"],
+      "BLOCKED": ["RUNNING"]
+    }
+  },
+  "decision_policy": {
+    "outcomes": ["PASS", "PASS_WITH_WARNINGS", "BLOCKED"],
+    "warning_record_field": "warnings",
+    "blocking_rule": "Use BLOCKED only when continuing would invalidate the experiment, violate access/license/governance, create leakage, use corrupt or incompatible required R1 assets, or make R1 execution impossible.",
+    "warning_rule": "Warnings remain recorded and carried into R1 artifacts; they do not stop a valid R1 experiment when no blocking finding remains."
+  },
+  "blocking_examples": [
+    "Unauthorized required dataset or model access",
+    "Corrupt or incomplete required R1 data",
+    "Wrong or ambiguous ordinal target",
+    "Split leakage",
+    "Incompatible preprocessing",
+    "Candidate cannot load or forward-pass"
+  ],
+  "non_blocking_warning_examples": [
+    "Unknown foundation pretraining overlap",
+    "Unavailable row-level patient IDs while the official split is preserved",
+    "Deployment license restriction for a research-only candidate",
+    "External-generalization claim ceiling"
+  ],
   "checks": [
     {
       "check_id": "P0-DATA-ARCHIVE",
       "gate": "DATASET_ARCHIVE",
+      "scope": "R1_GLOBAL",
       "status": "NOT_EXECUTED",
       "evidence_required": [
         "Downloaded file manifest with source URLs, source IDs, byte sizes, SHA-256 values, and acquisition timestamp",
@@ -19,24 +66,29 @@
         "Extracted file inventory matched to the frozen manifest",
         "No PHI, local private data, or unapproved mirror content"
       ],
-      "failure_action": "STOP; do not create a training manifest or continue to schema checks."
+      "failure_action": "BLOCKED; do not create a training manifest or continue to schema checks.",
+      "blocking_conditions": ["Required MMRDR bytes are unauthorized, corrupt, incomplete, or do not match the frozen source record."],
+      "warning_conditions": ["Unknown pretraining overlap is recorded as a claim ceiling, not an archive failure."]
     },
     {
       "check_id": "P0-DATA-SCHEMA-SPLIT",
       "gate": "DATASET_SCHEMA_SPLIT",
+      "scope": "R1_GLOBAL",
       "status": "NOT_EXECUTED",
-      "status_rule": "Preserve MMRDR-UWF released train/test membership and IDRiD released image-level split; never invent patient IDs or reshuffle sealed test data.",
+      "status_rule": "Preserve MMRDR-UWF released train/test membership; never invent patient IDs or reshuffle sealed test data.",
       "evidence_required": [
-        "MMRDR UWF.csv schema and label value audit",
-        "IDRiD image/mask identity and class coverage audit",
+        "MMRDR UWF.csv schema and genuine ordinal label value audit",
         "Split counts and duplicate/near-duplicate checks",
         "Explicit ungradable handling and identity limitations"
       ],
-      "failure_action": "STOP; update the R0/R1-P0 record with the exact discrepancy and do not train."
+      "failure_action": "BLOCKED; update the R0/R1-P0 record with the exact discrepancy and do not train.",
+      "blocking_conditions": ["MMRDR target semantics, released split membership, or duplicate checks fail."],
+      "warning_conditions": ["Row-level patient IDs are unavailable while the released split is preserved."]
     },
     {
       "check_id": "P0-MODEL-ASSETS",
       "gate": "MODEL_ASSET",
+      "scope": "R1_GLOBAL",
       "status": "NOT_EXECUTED",
       "status_rule": "Acquire only the exact C0, C1, and C2 source/revision recorded by R0; no silent substitution.",
       "evidence_required": [
@@ -45,11 +97,14 @@
         "C1 overlap disclosure and C2 unknown-overlap disclosure",
         "Local asset path below the configured model root"
       ],
-      "failure_action": "STOP the affected candidate; do not replace it with another encoder or fallback."
+      "failure_action": "BLOCKED for the affected candidate; do not replace it with another encoder or fallback.",
+      "blocking_conditions": ["Required C0, C1, or C2 asset access is unauthorized or the local hash does not match the approved asset."],
+      "warning_conditions": ["Deployment or commercial rights remain restricted or require separate review for a research-eligible candidate."]
     },
     {
       "check_id": "P0-PREPROCESSING",
       "gate": "PREPROCESSING",
+      "scope": "R1_GLOBAL",
       "status": "NOT_EXECUTED",
       "status_rule": "Run preprocessing smoke on a permitted tiny public/synthetic sample and record the exact config hash.",
       "evidence_required": [
@@ -58,11 +113,14 @@
         "C2 224px patch transform plus frozen 1024/5x224 letterbox geometry result",
         "No image bytes committed to the repository"
       ],
-      "failure_action": "STOP; correct the asset-specific preprocessing contract before any training."
+      "failure_action": "BLOCKED; correct the asset-specific preprocessing contract before any training.",
+      "blocking_conditions": ["Required candidate preprocessing is incompatible with the approved asset or target input contract."],
+      "warning_conditions": ["A claim ceiling or unresolved overlap does not change the frozen preprocessing contract."]
     },
     {
       "check_id": "P0-MODEL-LOAD",
       "gate": "MODEL_LOADING",
+      "scope": "R1_GLOBAL",
       "status": "NOT_EXECUTED",
       "status_rule": "Each candidate must load its approved local asset and execute a smoke forward pass without a synthetic fallback.",
       "evidence_required": [
@@ -71,23 +129,29 @@
         "C2 DINOv3 local-repository load log",
         "Model revision, SHA-256, and preprocessing hash recorded together"
       ],
-      "failure_action": "STOP; mark the candidate asset unavailable or incompatible. Do not substitute TinyTestEncoder."
+      "failure_action": "BLOCKED for the affected candidate; mark the asset unavailable or incompatible. Do not substitute TinyTestEncoder.",
+      "blocking_conditions": ["A required candidate cannot load its approved local asset or execute a smoke forward pass."],
+      "warning_conditions": ["A deployment license review remains separate from research model loading."]
     },
     {
       "check_id": "P0-GATED-ACCESS",
       "gate": "GATED_ACCESS",
+      "scope": "R1_GLOBAL",
       "status": "NOT_EXECUTED",
-      "status_rule": "Complete and record only the access/terms steps required by the official source; no credentials or tokens enter Git.",
+      "status_rule": "Complete and record only the access/terms steps required by the official MMRDR and C0/C1/C2 sources; no credentials or tokens enter Git.",
       "evidence_required": [
-        "IDRiD authorized access confirmation",
+        "MMRDR authorized access and applicable terms confirmation",
         "C2 DINOv3 gated access and license acceptance confirmation when required",
         "Access terms stored outside the repository; only safe status metadata committed"
       ],
-      "failure_action": "STOP the affected acquisition; do not use mirrors, scraped weights, or copied credentials."
+      "failure_action": "BLOCKED for the affected acquisition; do not use mirrors, scraped weights, or copied credentials.",
+      "blocking_conditions": ["Required R1 data or model access is unauthorized or terms cannot be accepted and recorded safely."],
+      "warning_conditions": ["A separate deployment/commercial license review is required after research eligibility is established."]
     },
     {
       "check_id": "P0-STORAGE-RUNTIME",
       "gate": "STORAGE_RUNTIME",
+      "scope": "R1_GLOBAL",
       "status": "NOT_EXECUTED",
       "status_rule": "Verify provider-neutral roots, sufficient local capacity, runtime dependencies, and offline/restricted-egress behavior before acquisition.",
       "evidence_required": [
@@ -96,9 +160,76 @@
         "Runtime version and GPU/CPU class recorded where material",
         "Public/synthetic-only cloud boundary confirmed; no cloud provisioning in P0"
       ],
-      "failure_action": "STOP; repair storage/runtime configuration before downloading large archives."
+      "failure_action": "BLOCKED; repair storage/runtime configuration before downloading large archives.",
+      "blocking_conditions": ["Required roots, capacity, permissions, or runtime readiness are unavailable, or the public/synthetic boundary cannot be enforced."],
+      "warning_conditions": ["Provider choice is optional when the provider-neutral roots and governance boundary are satisfied."]
     }
   ],
+  "known_warnings": [
+    {
+      "warning_id": "P0-W001",
+      "scope": "C1_C2",
+      "finding": "Foundation pretraining overlap with MMRDR cannot be fully established from the available source records.",
+      "blocks_r1": false
+    },
+    {
+      "warning_id": "P0-W002",
+      "scope": "MMRDR_UWF",
+      "finding": "Row-level patient IDs are unavailable while the official released split is preserved; no stronger identity claim is allowed.",
+      "blocks_r1": false
+    },
+    {
+      "warning_id": "P0-W003",
+      "scope": "C0",
+      "finding": "C0 may be research-execution eligible under non-commercial terms, while deployment or commercial use remains restricted or review-required.",
+      "blocks_r1": false
+    },
+    {
+      "warning_id": "P0-W004",
+      "scope": "R1_GLOBAL",
+      "finding": "External-generalization claims remain capped until source-image membership and foundation pretraining overlap are resolved.",
+      "blocks_r1": false
+    }
+  ],
+  "warnings": [],
+  "blockers": [],
+  "r1_dependencies": {
+    "required_datasets": ["mmrdr_uwf_v1"],
+    "required_candidates": ["C0", "C1", "C2"],
+    "required_model_assets": ["C0", "C1", "C2"],
+    "required_checks": [
+      "DATASET_ARCHIVE",
+      "DATASET_SCHEMA_SPLIT",
+      "MODEL_ASSET",
+      "PREPROCESSING",
+      "MODEL_LOADING",
+      "GATED_ACCESS",
+      "STORAGE_RUNTIME"
+    ],
+    "deferred_datasets": [
+      {
+        "dataset_id": "idrid_v1",
+        "required_for": "R2_R3",
+        "blocks_r1": false,
+        "preserved_policy": "Keep unannotated regions UNKNOWN or WEAK_NEGATIVE unless exhaustive source evidence supports VERIFIED_TRUE_NEGATIVE."
+      }
+    ],
+    "deferred_checks": [
+      "IDRiD authorized access and terms",
+      "IDRiD archive/file hashes and inventory",
+      "IDRiD image/mask identity and class-specific coverage",
+      "IDRiD released image-level split and conservative negative policy"
+    ]
+  },
+  "artifact_contract": {
+    "required_p0_fields": [
+      "p0_gate_state",
+      "p0_outcome",
+      "p0_blockers",
+      "p0_warnings"
+    ],
+    "warning_propagation": "COPY_P0_WARNINGS_TO_EVERY_R1_ARTIFACT"
+  },
   "storage_roots": {
     "data_env": "OCUFORGE_DATA_ROOT",
     "model_env": "OCUFORGE_MODEL_ROOT",
@@ -114,6 +245,6 @@
   },
   "private_data_allowed": false,
   "cloud_provisioning": false,
-  "completion_rule": "R1_P0 passes only when every check has status PASS, every required evidence item is recorded, the frozen manifest is unchanged, and no governance or leakage finding remains.",
-  "next_gate": "R1_GLOBAL_BENCHMARK=READY_NOT_EXECUTED after R1-P0 PASS; operator still runs one candidate at a time and stops for human review."
+  "completion_rule": "R1-P0 is PASS when every required check is PASS and all evidence is recorded. It is PASS_WITH_WARNINGS when every required check is PASS or PASS_WITH_WARNINGS, all warnings are explicit with blocks_r1=false, no blocker remains, and the warning record is carried into every R1 artifact. It is BLOCKED only under the blocking rule.",
+  "next_gate": "R1_GLOBAL_BENCHMARK=READY_NOT_EXECUTED after R1-P0 PASS or PASS_WITH_WARNINGS with no blocking finding; operator still runs one candidate at a time and stops for human review."
 }

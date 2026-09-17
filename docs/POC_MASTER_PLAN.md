@@ -81,7 +81,8 @@ An overlapping pretraining corpus cannot be described as a clean external-genera
 MMRDR-UWF remains the primary R1 domain hypothesis only if R0 verifies genuine ordinal grades 0–4, released
 identity-safe split semantics, source/version/access, license compatibility, acceptable leakage risk, and usable image
 access. Its image-level lesion fields are auxiliary presence labels only and cannot become ROI coordinates or masks.
-DDR/IDRiD remain candidates for external anchoring or spatial R2/R3 work only after their own exact audits.
+IDRiD remains a spatial R2/R3 candidate and is outside the R1 critical path; its exact audit is required before that
+track executes. DDR remains deferred for separate external anchoring only after its own exact audit.
 
 R0 V3 passed on 2026-09-17. It establishes that the source/version, task/modality, label semantics, supervision,
 released split limitations, leakage policy, taxonomy, conservative negative policy, license/access path, overlap claim
@@ -91,8 +92,16 @@ inventories, schema smoke, preprocessing smoke, gated access, model loading, and
 
 ## R1-P0 - acquisition preflight
 
-R1-P0 is `READY_NOT_EXECUTED`. It is the only next gate. No candidate may train until every P0 check passes. P0 must
-not execute R1, provision cloud compute, or silently substitute datasets or model assets.
+R1-P0 is `READY_NOT_EXECUTED`. It is the only next gate. The allowed states are `READY_NOT_EXECUTED`, `RUNNING`,
+`PASS_WITH_WARNINGS`, `PASS`, and `BLOCKED`. Training may unlock after `PASS` or `PASS_WITH_WARNINGS` only when no
+blocking finding remains and all warnings are carried into R1 artifacts. `BLOCKED` is reserved for a finding that
+invalidates the experiment, violates access/license/governance, creates leakage, uses corrupt/incompatible required
+assets, or makes execution impossible. P0 must not execute R1, provision cloud compute, or silently substitute data
+or model assets.
+
+R1-P0 Global requires only MMRDR-UWF, the C0/C1/C2 assets, storage/runtime readiness, and preprocessing/model-load
+checks. IDRiD acquisition, mask coverage, image-level split verification, and its conservative negative policy are
+preserved for R2/R3 preparation and must not block R1 training.
 
 ## R1 — three architecture hypotheses
 
@@ -108,6 +117,10 @@ distribution, such as `P(any DR) = 1 - P(grade 0)`, but binary `DR`/`no-DR` expe
 
 All three are compared with CE first. No current champion is selected in configuration. C0/C1/C2 run one at a time;
 the operator stops after each run for owner/reviewer inspection of metrics, errors, cost, and asset provenance.
+
+Every candidate must distinguish research execution eligibility from deployment license status. A deployment or
+commercial restriction may remain a non-blocking warning for a research-eligible candidate. Scientific and deployment
+champions are separate decisions and neither is configured before evidence.
 
 After an architecture winner/finalist is chosen from validation evidence, the only planned ordinal ablation is:
 

@@ -1,4 +1,5 @@
 import copy
+import json
 from pathlib import Path
 
 import pytest
@@ -6,6 +7,7 @@ import torch
 
 from eyes_detected.mil.global_average import GlobalAveragePooling
 from scripts.validate_r0_r1 import load_json, validate_freeze, validate_r1, validate_r1_p0
+from scripts.r1_report import build_report
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -48,13 +50,89 @@ def test_r0_freeze_records_pass_and_reclassifies_acquisition_checks():
         validate_freeze(mutated)
 
 
-def test_r1_p0_blocks_training_and_stays_not_executed():
+def test_r1_p0_supports_warning_only_unlock_without_blocker():
+    preflight = load_json(ROOT / "docs/R1_P0_ACQUISITION_PREFLIGHT.json")
+    validate_r1_p0(preflight, ROOT)
+    mutated = copy.deepcopy(preflight)
+    mutated["gate_state"] = "PASS_WITH_WARNINGS"
+    mutated["status"] = "R1_P0_ACQUISITION_PREFLIGHT=PASS_WITH_WARNINGS"
+    mutated["outcome"] = "PASS_WITH_WARNINGS"
+    mutated["gate_decision_date"] = "2026-09-17"
+    mutated["warnings"] = copy.deepcopy(mutated["known_warnings"])
+    for check in mutated["checks"]:
+        check["status"] = "PASS"
+    validate_r1_p0(mutated, ROOT)
+
+
+def test_r1_p0_blocks_training_when_not_unlocked():
     preflight = load_json(ROOT / "docs/R1_P0_ACQUISITION_PREFLIGHT.json")
     validate_r1_p0(preflight, ROOT)
     mutated = copy.deepcopy(preflight)
     mutated["training_unlock"] = "ALLOWED"
     with pytest.raises(ValueError, match="block candidate training"):
         validate_r1_p0(mutated, ROOT)
+
+
+def test_r1_p0_blocked_requires_a_blocking_check():
+    preflight = load_json(ROOT / "docs/R1_P0_ACQUISITION_PREFLIGHT.json")
+    mutated = copy.deepcopy(preflight)
+    mutated["gate_state"] = "BLOCKED"
+    mutated["status"] = "R1_P0_ACQUISITION_PREFLIGHT=BLOCKED"
+    mutated["outcome"] = "BLOCKED"
+    mutated["gate_decision_date"] = "2026-09-17"
+    mutated["blockers"] = ["Required MMRDR archive is corrupt"]
+    mutated["checks"][0]["status"] = "BLOCKED"
+    validate_r1_p0(mutated, ROOT)
+
+
+def test_r1_p0_keeps_idrid_outside_r1_critical_path():
+    preflight = load_json(ROOT / "docs/R1_P0_ACQUISITION_PREFLIGHT.json")
+    validate_r1_p0(preflight, ROOT)
+    mutated = copy.deepcopy(preflight)
+    mutated["r1_dependencies"]["required_datasets"].append("idrid_v1")
+    with pytest.raises(ValueError, match="only MMRDR-UWF"):
+        validate_r1_p0(mutated, ROOT)
+
+
+def test_r1_candidates_separate_research_and_deployment_eligibility():
+    config = load_json(ROOT / "eyes-detected-models/configs/research/r1-global-benchmark.json")
+    validate_r1(config, ROOT)
+    assert all(candidate["research_execution_eligible"] for candidate in config["candidates"])
+    assert all(candidate["deployment_license_status"] for candidate in config["candidates"])
+    mutated = copy.deepcopy(config)
+    mutated["candidates"][0]["deployment_license_status"] = "RESTRICTED_REVIEW_REQUIRED"
+    validate_r1(mutated, ROOT)
+
+
+def test_r1_report_carries_p0_warnings(tmp_path):
+    preflight = load_json(ROOT / "docs/R1_P0_ACQUISITION_PREFLIGHT.json")
+    preflight["gate_state"] = "PASS_WITH_WARNINGS"
+    preflight["status"] = "R1_P0_ACQUISITION_PREFLIGHT=PASS_WITH_WARNINGS"
+    preflight["outcome"] = "PASS_WITH_WARNINGS"
+    preflight["gate_decision_date"] = "2026-09-17"
+    preflight["warnings"] = copy.deepcopy(preflight["known_warnings"])
+    for check in preflight["checks"]:
+        check["status"] = "PASS"
+    p0_path = tmp_path / "p0.json"
+    p0_path.write_text(json.dumps(preflight), encoding="utf-8")
+    evaluation = {
+        "model_manifest_id": "test-model",
+        "checkpoint_sha256": "a" * 64,
+        "task": "ordinal",
+        "split": "TEST",
+        "n": 1,
+        "labeled_n": 1,
+        "accuracy": 1.0,
+        "confusion_matrix": [[1]],
+        "qwk": 1.0,
+    }
+    evaluation_path = tmp_path / "evaluation.json"
+    evaluation_path.write_text(json.dumps(evaluation), encoding="utf-8")
+    report = build_report(evaluation_path, p0_path)
+    assert report["schema_version"] == "r1_evaluation_report.v0.2"
+    assert report["artifact_schema_version"] == "r1_experiment_artifact.v1"
+    assert report["p0_outcome"] == "PASS_WITH_WARNINGS"
+    assert report["p0_warnings"] == preflight["warnings"]
 
 
 def test_r1_registry_requires_r1_p0_before_training():
