@@ -197,3 +197,25 @@ Before claiming completion, report:
 Use concise imperative commit subjects. Do not commit generated artifacts, datasets, weights, credentials, or machine-local configuration.
 
 For multi-machine work, keep repository policy, `.codex/`, and safe templates in Git. Keep machine-specific Codex configuration and secrets outside the repository, using `.codex.example/` only as the tracked config template.
+
+## Experiment Evidence and Checkpoint Policy
+
+For bounded research and model-development work:
+
+1. Finish checkpoint validation before moving to the next major checkpoint.
+2. Commit and push only the intended feature-branch changes after each completed
+   bounded checkpoint.
+3. Preserve local structured evidence, including configs, manifests, hashes,
+   metrics, provenance, warnings, runtime/cost records, and handoff receipts.
+4. Log selected public-safe experiment metrics and review artifacts to
+   DagsHub/MLflow when configured.
+5. DagsHub/MLflow is an observability and evidence mirror, not the sole
+   authoritative store. Cloud logging failure alone is `PASS_WITH_WARNINGS`
+   when the experiment remains valid and complete local evidence exists.
+6. Never upload hospital/private data, PHI, secrets, credentials, private
+   predictions/embeddings, raw private images, or prohibited derived artifacts.
+7. Do not upload raw datasets or full model checkpoints by default. Keep large
+   campaign artifacts in approved persistent experiment storage and record their
+   manifest, checksum, and location.
+8. Git tracks only safe, reasonably small source/config/schema changes,
+   manifests, provenance, compact metrics, receipts, and reports.
