@@ -19,11 +19,11 @@
 <body>
 <main>
   <div class="eyebrow">OCUFORGE / R1 EXECUTION</div>
-  <h1>One candidate. One stop. One accountable decision.</h1>
-  <p>R1 is an evidence loop, not a leaderboard. A model is not promoted automatically and there is no current champion.</p>
+  <h1>One candidate. One validated checkpoint.</h1>
+  <p>R1 is an evidence loop, not a leaderboard. Headless execution continues after validated checkpoints; OWNER review occurs at the evidence freeze.</p>
   <svg viewBox="0 0 1200 650" role="img" aria-labelledby="loop-title loop-desc" xmlns="http://www.w3.org/2000/svg">
-    <title id="loop-title">OcuForge R1 human in the loop experiment workflow</title>
-    <desc id="loop-desc">The operator selects C0, C1, or C2, runs one candidate, stops, and brings metrics, errors, cost, and provenance to owner review. Review either advances to the next candidate or records a winner/finalist for the planned CE versus CORN ablation.</desc>
+    <title id="loop-title">OcuForge R1 checkpointed experiment workflow</title>
+    <desc id="loop-desc">The operator selects C0, C1, or C2, runs one candidate, validates its checkpoint, and continues when no blocker remains. OWNER review occurs at the evidence freeze; no automatic champion or CE versus CORN ablation is performed.</desc>
     <defs>
       <marker id="loop-arrow" markerWidth="9" markerHeight="7" refX="8" refY="3.5" orient="auto"><path d="M0 0 L9 3.5 L0 7 Z" fill="#4f5d75"/></marker>
       <marker id="loop-accent-arrow" markerWidth="9" markerHeight="7" refX="8" refY="3.5" orient="auto"><path d="M0 0 L9 3.5 L0 7 Z" fill="#eb6c36"/></marker>
@@ -47,11 +47,11 @@
 
     <g transform="translate(50 210)"><rect width="170" height="120" rx="8" class="box"/><text x="18" y="25" class="kicker">STEP 01</text><text x="18" y="53" class="title">Select candidate</text><text x="18" y="79" class="body">C0 - ConvNeXt</text><text x="18" y="97" class="body">C1 - FLAIR</text><text x="18" y="115" class="body">C2 - DINOv3 MIL</text></g>
     <g transform="translate(280 210)"><rect width="170" height="120" rx="8" class="focal"/><text x="18" y="25" class="kicker">STEP 02</text><text x="18" y="53" class="title">Run one</text><text x="18" y="79" class="body">CE objective</text><text x="18" y="97" class="body">authorized assets</text><text x="18" y="115" class="body">identity-safe split</text></g>
-    <g transform="translate(510 210)"><rect width="170" height="120" rx="8" class="focal"/><text x="18" y="25" class="kicker">STOP</text><text x="18" y="53" class="title">Do not chain</text><text x="18" y="79" class="body">capture artifacts</text><text x="18" y="97" class="body">record status</text><text x="18" y="115" class="body">wait for review</text></g>
+    <g transform="translate(510 210)"><rect width="170" height="120" rx="8" class="focal"/><text x="18" y="25" class="kicker">CHECKPOINT</text><text x="18" y="53" class="title">Validate before</text><text x="18" y="79" class="body">capture artifacts</text><text x="18" y="97" class="body">record status</text><text x="18" y="115" class="body">continue if valid</text></g>
     <g transform="translate(740 210)"><rect width="170" height="120" rx="8" class="box"/><text x="18" y="25" class="kicker">STEP 03</text><text x="18" y="53" class="title">Inspect evidence</text><text x="18" y="79" class="body">QWK + companions</text><text x="18" y="97" class="body">errors + calibration</text><text x="18" y="115" class="body">cost + provenance</text></g>
-    <polygon points="1010,210 1070,270 1010,330 950,270" class="box"/><text x="1010" y="265" text-anchor="middle" class="kicker">OWNER</text><text x="1010" y="283" text-anchor="middle" class="title" font-size="14">decision</text>
-    <g transform="translate(700 420)"><rect width="160" height="86" rx="8" class="box"/><text x="18" y="25" class="kicker">CONTINUE</text><text x="18" y="53" class="title">Next candidate</text><text x="18" y="74" class="body">review then run</text></g>
-    <g transform="translate(1000 420)"><rect width="160" height="86" rx="8" class="optional"/><text x="18" y="25" class="kicker">ADVANCE</text><text x="18" y="53" class="title">Winner / finalist</text><text x="18" y="74" class="body">evidence supports it</text></g>
+    <polygon points="1010,210 1070,270 1010,330 950,270" class="box"/><text x="1010" y="265" text-anchor="middle" class="kicker">EVIDENCE</text><text x="1010" y="283" text-anchor="middle" class="title" font-size="14">freeze</text>
+    <g transform="translate(700 420)"><rect width="160" height="86" rx="8" class="box"/><text x="18" y="25" class="kicker">CONTINUE</text><text x="18" y="53" class="title">Next candidate</text><text x="18" y="74" class="body">after validation</text></g>
+    <g transform="translate(1000 420)"><rect width="160" height="86" rx="8" class="optional"/><text x="18" y="25" class="kicker">OWNER GATE</text><text x="18" y="53" class="title">Morning review</text><text x="18" y="74" class="body">no auto champion</text></g>
     <g transform="translate(390 560)"><rect width="420" height="58" rx="8" class="optional"/><text x="20" y="25" class="kicker">ONLY AFTER SELECTION</text><text x="20" y="47" class="title" font-size="14">winner + CE  vs  winner + CORN</text></g>
     <text x="50" y="590" class="mono">CURRENT R1 CHAMPION: NONE</text>
   </svg>

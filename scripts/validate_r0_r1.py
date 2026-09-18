@@ -473,8 +473,18 @@ def validate_r1(data, root=ROOT):
     if roots["provider_required"]:
         raise ValueError("RunPod must remain optional")
     gate = data["public_gpu_gate"]
-    if gate["private_data_allowed"] or gate["provisioning"]:
-        raise ValueError("R1 public GPU gate permits unsafe data or provisioning")
+    if gate["private_data_allowed"]:
+        raise ValueError("R1 public GPU gate permits private data")
+    if gate.get("allowed_source_types") != ["PUBLIC", "SYNTHETIC"]:
+        raise ValueError("R1 public GPU gate must allow only public or synthetic sources")
+    if gate.get("provisioning") is not True or gate.get("provisioning_scope") != (
+        "OWNER_AUTHORIZED_PUBLIC_RUNPOD_P0_AND_UNLOCKED_R1_RESEARCH"
+    ):
+        raise ValueError("R1 public GPU gate must record owner-authorized public provisioning")
+    if gate.get("network_volume_allowed") is not False:
+        raise ValueError("R1 public GPU gate must forbid Network Volumes")
+    if gate.get("weights_must_be_local_and_hashed") is not True:
+        raise ValueError("R1 public GPU gate must require local hashed weights")
     for key in ["dataset", "candidate_training", "protocol"]:
         path = root / data["configs"].get(key, "")
         if not path.is_file():

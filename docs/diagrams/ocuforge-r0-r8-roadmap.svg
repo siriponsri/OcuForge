@@ -16,7 +16,7 @@
   </defs>
   <rect width="1200" height="620" fill="#f5f5f5"/>
   <text x="50" y="52" class="kicker">ORDER IS A CONTROL</text>
-  <text x="50" y="84" font-family="Georgia,serif" font-style="italic" font-size="17" fill="#2d3142">Every candidate run ends in a human review stop.</text>
+  <text x="50" y="84" font-family="Georgia,serif" font-style="italic" font-size="17" fill="#2d3142">Validate each candidate before automatic continuation; OWNER review follows the evidence freeze.</text>
   <path class="connector" d="M150 251 H164"/><path class="connector" d="M274 251 H288"/><path class="connector" d="M398 251 H412"/><path class="connector" d="M522 251 H536"/><path class="connector" d="M646 251 H660"/><path class="connector" d="M770 251 H784"/><path class="connector" d="M894 251 H908"/><path class="connector" d="M1018 251 H1032"/>
   <g transform="translate(40 170)"><rect width="110" height="162" rx="8" class="current"/><text x="16" y="25" class="kicker">R0</text><text x="16" y="57" class="title">Freeze</text><text x="16" y="83" class="body">data</text><text x="16" y="101" class="body">supervision</text><text x="16" y="119" class="body">splits</text><text x="16" y="137" class="body">licenses</text></g>
   <g transform="translate(164 170)"><rect width="110" height="162" rx="8" class="current"/><text x="16" y="25" class="kicker">R1</text><text x="16" y="57" class="title">Compare</text><text x="16" y="83" class="body">C0 / C1 / C2</text><text x="16" y="101" class="body">CE first</text><text x="16" y="119" class="body">metrics</text><text x="16" y="137" class="body">cost + errors</text></g>

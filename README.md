@@ -36,8 +36,9 @@ architectures, all with cross-entropy first:
 | C1 | Does retinal-domain pretraining transfer? | FLAIR image encoder |
 | C2 | Does high-resolution local detail matter? | DINOv3 ViT-B/16 + patch Attention MIL |
 
-Each candidate runs one at a time and stops for review. After a winner or finalist is selected from validation
-evidence, the planned ordinal ablation is winner + CE versus winner + CORN. No current champion is configured.
+Each candidate runs one at a time with checkpoint validation before automatic continuation. OWNER review occurs at the
+evidence freeze. After a winner or finalist is selected from validation evidence, the planned ordinal ablation is
+winner + CE versus winner + CORN. No current champion is configured.
 
 ## Global and ROI Workflow
 
