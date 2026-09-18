@@ -1,0 +1,100 @@
+{
+  "receipt_schema_version": "r2_r3_idrid_recovery_receipt.v1",
+  "record_type": "R2_R3_IDRID_RECOVERY_RECEIPT",
+  "recorded_at": "2026-09-19T02:45:00+07:00",
+  "branch": "agent/r2-r3-idrid-recovery",
+  "lane": "R2_R3_IDRID_RESEARCH_ONLY",
+  "dataset_scope": ["idrid_v1"],
+  "excluded_datasets": ["DDR", "OIA-DDR"],
+  "source_provenance": "OWNER_ACQUIRED_OFFICIAL_IDRID",
+  "worker_launcher": {
+    "path": "C:\\Users\\Siripon Sri\\bin\\maxplus-codex.cmd",
+    "invocation": "--help",
+    "result": "PASS"
+  },
+  "outcome": "BLOCKED_R3_RUNTIME",
+  "preflight": {
+    "outcome": "PASS_WITH_WARNINGS",
+    "official_drive_folder_id": "1JYKhcSf9IWjIItbGtq3mN4hTEl5Of_jp",
+    "official_drive_url": "https://drive.google.com/drive/folders/1JYKhcSf9IWjIItbGtq3mN4hTEl5Of_jp?usp=sharing",
+    "folder_http_status": 200,
+    "authenticated_owner_identity": "NOT_INDEPENDENTLY_VERIFIED_WARNING",
+    "same_name_directory_observed": "A. Segmentation/A. Segmentation",
+    "same_name_directory_id": "12RBkYtxMTLmig83078YIjkgwPiYGw7Ul",
+    "archive_crc": "PASS",
+    "archive_sha256": "f9a7fc0f7d228e326ca8ba61cfc99d54de689c52e44f52bde9917c78b07a1eaf",
+    "archive_members": 463,
+    "archive_files": 446,
+    "acquired_files": 365,
+    "acquired_bytes": 460390075,
+    "copy_sha256_match": "PASS",
+    "source_inventory_manifest": "local-state/campaigns/r2-r3-idrid-20260919/idrid_acquisition_manifest.json",
+    "included_paths": [
+      "A. Segmentation/A. Segmentation/1. Original Images/{a. Training Set,b. Testing Set}/*.jpg",
+      "A. Segmentation/A. Segmentation/2. All Segmentation Groundtruths/{a. Training Set,b. Testing Set}/{1. Microaneurysms,2. Haemorrhages,3. Hard Exudates,4. Soft Exudates}/*.tif",
+      "A. Segmentation/A. Segmentation/{CC-BY-4.0.txt,LICENSE.txt}"
+    ],
+    "excluded_paths": [
+      "B. Disease Grading/**",
+      "C. Localization/**",
+      "A. Segmentation/A. Segmentation/2. All Segmentation Groundtruths/**/5. Optic Disc/**"
+    ]
+  },
+  "split_and_leakage": {
+    "train_images": 54,
+    "test_images": 27,
+    "image_id_overlap": [],
+    "image_exact_cross_split_duplicate_groups": 0,
+    "image_hash_uniqueness": "81_OF_81",
+    "split_preserved_before_roi_derivation": true
+  },
+  "mask_identity_and_coverage": {
+    "image_dimensions": "4288x2848",
+    "mask_dimension_mismatches": 0,
+    "bbox_out_of_bounds": 0,
+    "supported_classes": [
+      "MICROANEURYSM",
+      "INTRARETINAL_HEMORRHAGE",
+      "HARD_EXUDATE",
+      "SOFT_EXUDATE"
+    ],
+    "mask_files": {
+      "MICROANEURYSM": 81,
+      "INTRARETINAL_HEMORRHAGE": 80,
+      "HARD_EXUDATE": 81,
+      "SOFT_EXUDATE": 40
+    },
+    "missing_mask_semantics": "UNKNOWN",
+    "present_empty_mask_semantics": "WEAK_NEGATIVE",
+    "no_supported_lesion_in_roi": "ROI_SCOPED_NOT_GLOBAL_NEGATIVE"
+  },
+  "r2": {
+    "outcome": "PASS_WITH_WARNINGS",
+    "roi_count": 282,
+    "method": "ONE_CLASS_LEVEL_FOREGROUND_BOUNDING_BOX_PER_NON_EMPTY_MASK",
+    "geometry_provenance": "EXACT_IDRID_PIXEL_MASK",
+    "manifest": "local-state/campaigns/r2-r3-idrid-20260919/r2_roi_manifest.json",
+    "geometry_qa": "PASS",
+    "limitation": "Connected components were not separated; each class mask yields one bounded ROI."
+  },
+  "r3": {
+    "outcome": "BLOCKED",
+    "blocker": "BLOCKED_R3_RUNTIME_AUTH_OR_TORCH",
+    "torch_installed": false,
+    "runpodctl_present": false,
+    "runpod_authenticated": false,
+    "mlflow_authenticated_probe": "NOT_EXECUTED_NO_CREDENTIALS",
+    "training_started": false,
+    "evaluation_started": false,
+    "checkpoint_created": false,
+    "estimated_cost_usd": 0
+  },
+  "governance": {
+    "ddr_or_oia_ddr_admitted": false,
+    "network_volume_created": false,
+    "private_data_uploaded": false,
+    "secrets_recorded": false,
+    "full_checkpoint_exported": false
+  },
+  "next_safe_gate": "Provide an authorized non-logging runtime and complete the required in-memory MLflow probe before R3 baseline training/evaluation."
+}

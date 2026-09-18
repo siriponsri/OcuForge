@@ -1,6 +1,6 @@
 # OcuForge Operational Handoff
 
-**Updated:** 2026-09-18
+**Updated:** 2026-09-19
 **Authority:** Operational state only. Contracts and the active master plan remain authoritative.
 
 ## Current gate/status
@@ -14,6 +14,9 @@ R1_P0_ACQUISITION_PREFLIGHT=BLOCKED
 R1_TRAINING_READY=NO
 R1_GLOBAL_BENCHMARK=READY_NOT_EXECUTED
 CURRENT_R1_CHAMPION=NONE
+R2_R3_IDRID_PREFLIGHT=PASS_WITH_WARNINGS
+R2_R3_IDRID_R2=PASS_WITH_WARNINGS
+R2_R3_IDRID_R3=BLOCKED_RUNTIME
 ```
 
 R0 scientific evidence review passed. R1-P0 Global is the active scientific unlock gate, while its acquisition/runtime
@@ -81,6 +84,27 @@ stdin-fed curl config, with no temporary file or logged value. The single restar
 but the post-restart sentinel was not verifiable after a bounded readiness wait; this is recorded as a non-blocking
 recovery-path warning under the revised runbook. `RUNPOD_AUTOMATION_SMOKE=PASS_WITH_WARNINGS`; long-run execution
 remains locked by R1-P0, not by the smoke result.
+
+## R2/R3 IDRiD recovery outcome — 2026-09-19
+
+The recovery worker inspected the owner-specified official Drive folder and verified the source-derived segmentation
+archive locally. It copied only the 81 segmentation images, four supported lesion-mask families, and two license files
+to ignored local campaign state; Disease Grading, Localization, and Optic Disc content were excluded. The archive CRC
+passed, the archive SHA-256 is `f9a7fc0f7d228e326ca8ba61cfc99d54de689c52e44f52bde9917c78b07a1eaf`, and all 365 acquired
+files matched their source-derived copies by byte size and SHA-256.
+
+The released segmentation split was preserved as 54 train / 27 test images with zero exact cross-split image hash
+duplicates. R2 derived 282 class-level foreground-bounding-box ROIs with image/mask SHA-256, dimensions, split, and
+normalized geometry provenance; missing masks remain `UNKNOWN`, present empty masks would remain `WEAK_NEGATIVE`, and
+`NO_SUPPORTED_LESION_IN_ROI` remains ROI-scoped. The detailed report and receipt are in
+`docs/RSC_R2_R3_IDRID_RECOVERY_REPORT_2026-09-19.md` and
+`docs/RSC_R2_R3_IDRID_RECOVERY_RECEIPT_2026-09-19.json`; complete file inventories remain ignored under
+`local-state/campaigns/r2-r3-idrid-20260919/`.
+
+R3 did not start: Torch is not installed, RunPod control is unauthenticated, and the required MLflow/DagsHub
+credentials are unavailable for an in-memory probe. No Pod, Network Volume, checkpoint, upload, or paid resource was
+created; estimated lane cost is USD 0. The next safe action is to restore an authorized non-logging runtime and run
+the required one-time in-memory MLflow probe before R3 baseline training/evaluation.
 
 ## Important artifacts/files
 
