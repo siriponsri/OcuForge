@@ -1,6 +1,6 @@
 # OcuForge Operational Handoff
 
-**Updated:** 2026-09-17
+**Updated:** 2026-09-18
 **Authority:** Operational state only. Contracts and the active master plan remain authoritative.
 
 ## Current gate/status
@@ -38,19 +38,37 @@ when no blocking finding remains. It does not authorize cloud provisioning or ex
 
 ## R1-P0 decision and checks
 
-The campaign cannot proceed: R1 is locked by R1-P0 `BLOCKED`. The requested RunPod IDRiD lane is separately blocked
-by the frozen R0 `cloud_eligible=false` policy; that policy does not add IDRiD as an R1-P0 blocker.
+The campaign cannot proceed: R1 remains locked by R1-P0 `BLOCKED`. The owner-authorized RunPod lifecycle smoke
+verified creation/readiness, remote execution, exact C2 metadata access, Pod roots, local sentinel export/hash, stop,
+termination, and confirmation that no Pod remained. The prior stop/start probe failed only because the provider had
+insufficient GPU capacity; under the revised runbook this is recovery-path evidence and the infrastructure result is
+`RUNPOD_AUTOMATION_SMOKE=PASS_WITH_WARNINGS`. The rotated HF credential was not placed in Pod metadata/environment
+or exposed by the retry path. Owner governance authorizes IDRiD research-only RunPod execution under the public-data
+boundary; IDRiD remains deferred to R2/R3 and is not an R1-P0 blocker.
 
 See the machine-readable P0 contract and its redacted execution receipt. The short form is:
 
-- `BLOCKED`: C0/C1/C2 local model assets and required gated access. No model or data bytes were downloaded; exact C2
-  resolution returned HTTP 401 `GatedRepo`, and Hugging Face auth reported `Not logged in`.
-- `BLOCKED`: storage/runtime readiness. The four local OcuForge roots are unset and the intended Python runtime lacks
-  `torch`; local C volume free space and the MMRDR multipart total are recorded in the receipt.
+- `PASS`: exact C2 gated metadata access inside the Pod at revision
+  `5931719e67bbdb9737e363e781fb0c67687896bc`; no model or data bytes were downloaded.
+- `PASS`: Pod-side provider-neutral roots, remote command execution, sentinel export, and matching SHA-256.
+- `PASS_WITH_WARNINGS`: `RUNPOD_AUTOMATION_SMOKE`; normal-path controls passed and the recovery-only stop/start probe
+  was not a mandatory success condition. The Pod was terminated and confirmed gone.
+- `PASS`: credential safety; the rotated HF credential was propagated only after SSH connection through a non-logging
+  stdin path and was not placed in Pod metadata/environment or recorded in repository evidence.
 - `NOT_EXECUTED`: MMRDR dataset/archive integrity, extracted inventory, schema/split smoke, and duplicate checks.
 - `NOT_EXECUTED`: preprocessing and model loading because no bytes were acquired.
 - IDRiD acquisition, mask coverage, and image-level split checks are deferred to R2/R3; unannotated regions remain
   `UNKNOWN`/`WEAK_NEGATIVE` unless acquisition evidence supports clean negatives.
+
+The prior uncommitted smoke evidence remains preserved as historical evidence. The 2026-09-18 retry used Pod
+`jinjh504k0b9gm` without an HF token in Pod metadata or environment. It passed create/readiness, remote command,
+exact C2 metadata access at revision `5931719e67bbdb9737e363e781fb0c67687896bc`, writable Pod roots, local export,
+remote/local hash match (`8ea23673cc8a936b490a8b8c7c1c88de721959ab92833b0a64acbbe0319438a1`), stop, termination, and
+confirmation that no Pod remained. The rotated HF credential was propagated only after SSH connection through a
+stdin-fed curl config, with no temporary file or logged value. The single restart attempt returned provider success,
+but the post-restart sentinel was not verifiable after a bounded readiness wait; this is recorded as a non-blocking
+recovery-path warning under the revised runbook. `RUNPOD_AUTOMATION_SMOKE=PASS_WITH_WARNINGS`; long-run execution
+remains locked by R1-P0, not by the smoke result.
 
 ## Important artifacts/files
 
@@ -65,9 +83,9 @@ See the machine-readable P0 contract and its redacted execution receipt. The sho
 
 ## Exact owner-resolvable next action
 
-Before a new preflight, authenticate and accept the exact gated C2 asset through the official Hugging Face path,
-configure sufficient local OcuForge roots/runtime, and obtain an explicit governance decision for any IDRiD compute
-location. Do not ask for or place a secret in this handoff.
+The HF credential has been rotated and the secure post-connect path is now required. Do not ask for or place a secret
+in this handoff. Acquire only the frozen MMRDR and C0/C1/C2 inputs after R1-P0 is authorized; do not train during
+the preflight.
 
 From a clean machine/session:
 
@@ -107,7 +125,8 @@ only after P0 is `PASS` or `PASS_WITH_WARNINGS` with no blocker; copy P0 warning
 
 ## Do-not-do / governance reminders
 
-- Do not train models, execute R1, or provision cloud GPU during R1-P0.
+- Do not train models, execute R1, or create a long-run Pod during R1-P0. The owner-authorized short lifecycle smoke
+  is infrastructure evidence only.
 - Acquire only the frozen public records/assets through official paths; do not use mirrors or silently substitute.
 - Do not put hospital images, PHI, credentials, secrets, private data, model weights, or machine-local secrets in Git or
   this handoff.

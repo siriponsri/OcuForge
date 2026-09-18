@@ -23,19 +23,36 @@ TRAINING_UNLOCK=FORBIDDEN_UNTIL_PASS_OR_PASS_WITH_WARNINGS
 `PASS` requires every required check to pass. `PASS_WITH_WARNINGS` permits only `PASS` or
 `PASS_WITH_WARNINGS` checks, requires no blocker, and requires every warning to be recorded and copied into R1
 artifacts. `BLOCKED` is reserved for an invalidating, unauthorized, corrupt, leaking, incompatible, or impossible
-R1 execution condition. `RUNNING` is not an unlock state. The 2026-09-17 receipt records `BLOCKED` for
-`MODEL_ASSET`, `GATED_ACCESS`, and `STORAGE_RUNTIME`; `DATASET_ARCHIVE`, `DATASET_SCHEMA_SPLIT`,
-`PREPROCESSING`, and `MODEL_LOADING` remain `NOT_EXECUTED` because no data or model bytes were acquired.
+R1 execution condition. `RUNNING` is not an unlock state. The 2026-09-18 receipt records the infrastructure smoke as
+`PASS_WITH_WARNINGS`; `MODEL_ASSET`, `DATASET_ARCHIVE`, `DATASET_SCHEMA_SPLIT`, `PREPROCESSING`, and
+`MODEL_LOADING` remain blocked or `NOT_EXECUTED` because no data or model bytes were acquired.
 
 ## Current decision
 
-R1 cannot proceed because R1-P0 is `BLOCKED`. The exact C2 resolution returned HTTP 401 `GatedRepo`, Hugging Face
-authentication reported `Not logged in`, the four local OcuForge roots are unset, and the intended local Python
-runtime lacks `torch`. No model or data bytes were downloaded. The structured, redacted execution receipt is stored in
-the machine-readable contract; it contains no secrets, tokens, PHI, image bytes, or private artifacts.
+R1 cannot proceed because R1-P0 is `BLOCKED`. Authenticated access to the exact C2 revision was verified inside one
+short-lived RunPod, all four Pod-side OcuForge roots were writable, and no model or data bytes were downloaded. The
+normal smoke path passed; the prior stop/start probe failed only because RunPod reported insufficient free GPUs and
+the retry's sentinel persistence was not verified. Under the revised runbook this is a non-blocking recovery-path
+warning, so `RUNPOD_AUTOMATION_SMOKE=PASS_WITH_WARNINGS`. The rotated credential was propagated only after
+connection through a non-logging stdin path and was not placed in Pod metadata/environment. The structured,
+redacted execution receipt contains no secret values, PHI, image bytes, or private artifacts.
 
-The requested RunPod IDRiD lane is separately blocked by the frozen R0 `cloud_eligible=false` policy. This does not
-add IDRiD as an R1-P0 blocker, and IDRiD remains deferred to R2/R3.
+Owner governance now authorizes IDRiD research-only RunPod execution under the public-data boundary. This does not
+add IDRiD as an R1-P0 blocker; IDRiD remains deferred to the R2/R3 preflight.
+
+## Latest lifecycle smoke retry
+
+The prior uncommitted smoke evidence remains preserved. The 2026-09-18 retry used one short-lived secure RTX 4090
+Pod with no HF token in Pod metadata or environment. Post-connect C2 metadata access passed for the exact DINOv3
+revision; the token traveled only through an SSH stdin-fed curl config, was not written to a temporary file, and was
+not logged. Remote command, writable roots, sentinel export, matching SHA-256, stop, termination, and confirmation
+that no Pod remained all passed. The one restart attempt returned provider success, but the sentinel was not verifiable
+after a bounded readiness wait; this is recorded as the allowed recovery-path warning. Therefore
+`RUNPOD_AUTOMATION_SMOKE=PASS_WITH_WARNINGS` with no smoke blocker.
+
+R1 training remains forbidden. Do not start long-run Pods until a later owner-authorized smoke proves the required
+normal path and R1-P0 acquisition, integrity, schema/split, preprocessing, model-load, and forward-pass checks reach
+`PASS` or `PASS_WITH_WARNINGS` with no blocker.
 
 ## Required sequence
 
@@ -44,7 +61,7 @@ add IDRiD as an R1-P0 blocker, and IDRiD remains deferred to R2/R3.
 3. Authenticate and accept the exact gated C2 asset through the official Hugging Face path, without placing credentials
    or tokens in Git.
 4. Configure sufficient local runtime dependencies and roots before acquiring large archives.
-5. Obtain an explicit governance decision for any IDRiD compute location before a new preflight.
+5. Preserve the owner decision authorizing IDRiD research-only RunPod execution under the public-data boundary.
 6. Acquire only the frozen MMRDR-UWF record and the exact C0/C1/C2 assets through their official access paths.
 7. Compute and record archive/file SHA-256 values, integrity results, and extracted inventories locally.
 8. Run MMRDR schema, split, identity, duplicate, and preprocessing smoke checks. IDRiD acquisition and mask-coverage
@@ -87,5 +104,6 @@ and claim ceilings as non-blocking warnings.
 - Treat unannotated IDRiD regions as `UNKNOWN` or `WEAK_NEGATIVE` unless a verified source rule supports clean negatives.
 - Do not convert MMRDR image-level lesion presence into ROI geometry.
 - Do not silently substitute model assets or use a TinyTestEncoder fallback.
-- Do not upload private data or derived artifacts; no cloud provisioning occurs in P0.
+- Do not upload private data or derived artifacts. The owner-authorized lifecycle smoke is infrastructure evidence
+  only; it does not provision a long-run campaign Pod.
 - Do not execute R1 during P0; P0 only determines whether R1 may unlock.

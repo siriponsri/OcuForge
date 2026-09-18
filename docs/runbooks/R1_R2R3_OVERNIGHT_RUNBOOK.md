@@ -8,6 +8,7 @@
 **Cloud boundary:** Public/synthetic data only; no hospital/private data or derived private artifacts  
 **Network volume:** Not used by default  
 **Termination policy:** Automatic only after verified export; otherwise stop and preserve the Pod
+**Experiment mirror:** DagsHub/MLflow — `https://dagshub.com/siriponsri/OcuForge/experiments`
 
 ---
 
@@ -181,14 +182,22 @@ Important:
 
 ## 7. Mandatory RunPod lifecycle smoke gate
 
-Before any long-run Pod is created, prove that the agent can automatically:
+Before any long-run Pod is created, prove the normal overnight lifecycle path:
 
 ```text
-create -> detect ready -> connect -> write sentinel -> export sentinel
--> stop -> start -> verify -> terminate -> confirm gone
+create -> detect ready -> connect -> secure gated-asset access
+-> write sentinel -> export sentinel -> hash verify
+-> terminate -> confirm gone
 ```
 
-Use one short-lived smoke Pod with the intended PyTorch/Jupyter-capable template family. It must not download datasets or model weights and must not train.
+Use one short-lived smoke Pod with the intended PyTorch/Jupyter-capable template family. It must not download full datasets, full model checkpoints, or train.
+
+Credential safety is part of the smoke:
+
+- never place `HF_TOKEN` or `RUNPOD_API_KEY` in Git, notebooks, DagsHub artifacts, receipts, or command output;
+- do not use a Pod configuration/inspection path that reveals secret values in normal output;
+- prefer secure post-connect secret propagation (for example SSH/stdin or an equivalent non-logging mechanism);
+- if a secret is exposed in output, treat it as `BLOCKED_CREDENTIAL_SAFETY`, revoke/rotate it, and do not continue with that credential.
 
 Inside `/workspace` create:
 
@@ -198,38 +207,32 @@ ocuforge_smoke/
 └── sentinel.txt
 ```
 
-`lifecycle.json` records campaign ID, Pod ID, timestamps, GPU type, base Git SHA, and sentinel SHA-256.
-
 Required positive evidence:
 
-1. create request returns exactly one Pod ID;
-2. Pod reaches usable running state;
-3. remote command/terminal succeeds;
-4. sentinel is created under `/workspace`;
-5. sentinel is exported to the local machine;
-6. local and remote SHA-256 match;
-7. automatic stop succeeds;
-8. automatic start succeeds and the same `/workspace` sentinel remains readable;
-9. automatic terminate/delete succeeds;
+1. create returns exactly one Pod ID;
+2. the Pod reaches a usable running state;
+3. remote command succeeds;
+4. exact gated C2 access is verified without exposing credentials;
+5. all four OcuForge roots are writable;
+6. the sentinel is created under `/workspace`;
+7. the sentinel is exported to the OWNER workstation;
+8. local and remote SHA-256 match;
+9. terminate/delete succeeds;
 10. a subsequent query confirms the smoke Pod is gone.
 
-Outcome:
+A single `stop -> start` persistence attempt may be performed as a **recovery-path probe**, but it is not a mandatory success condition for the normal overnight path. If restart fails only because the provider reports insufficient GPU capacity, record `PASS_WITH_WARNINGS` when all normal-path controls above have passed and no required evidence is lost.
+
+If export is uncertain during a real campaign, stop the Pod and preserve it for OWNER recovery review; do not terminate it.
+
+Valid outcomes:
 
 ```text
 RUNPOD_AUTOMATION_SMOKE=PASS
-```
-
-Use `PASS_WITH_WARNINGS` only when automation itself is positively proven and any warning is non-blocking.
-
-If any required lifecycle mutation cannot be automated, or cleanup state is uncertain:
-
-```text
+RUNPOD_AUTOMATION_SMOKE=PASS_WITH_WARNINGS
 RUNPOD_AUTOMATION_SMOKE=BLOCKED
 ```
 
-Then do not create either long-run Pod. Preserve the smoke receipt, report any possibly-live resource, and stop for OWNER review.
-
-**No long-run experiment may begin without a positive lifecycle-smoke pass.**
+No long-run experiment may begin without `PASS` or `PASS_WITH_WARNINGS` and no remaining blocker.
 
 ---
 
@@ -237,11 +240,20 @@ Then do not create either long-run Pod. Preserve the smoke receipt, report any p
 
 R1 training remains locked until R1-P0 reaches `PASS` or `PASS_WITH_WARNINGS` with no blocking finding.
 
-Follow the current R1-P0 contract exactly.
+For this OWNER-authorized campaign, RunPod may be used for **infrastructure smoke and R1-P0 runtime/acquisition validation** using reviewed public/model assets. This does not authorize model training before P0 unlock.
 
-If current authority still forbids cloud provisioning during R1-P0, complete R1-P0 before the lifecycle smoke and long-run Pod creation.
+The intended order is:
 
-The lifecycle smoke is infrastructure validation only. It does not count as R1-P0 evidence unless an authoritative contract explicitly says so.
+```text
+infrastructure smoke
+-> R1-P0 acquisition/runtime checks on the intended RunPod environment
+-> R1-P0 PASS / PASS_WITH_WARNINGS with no blocker
+-> C0 -> C1 -> C2
+```
+
+The lifecycle smoke is infrastructure evidence, not scientific P0 evidence.
+
+If the authoritative main branch still states that no cloud provisioning is allowed during R1-P0, the coordinator must make the smallest documentation-only alignment required to encode the OWNER decision before paid P0 execution. Do not weaken dataset, split, target, model-asset, leakage, or license rules.
 
 Warnings from R1-P0 must propagate into every R1 artifact.
 
@@ -274,45 +286,48 @@ Every Task must state `TARGET`, `CHANGE`, `CONSTRAINTS`, `OWNERSHIP`, and `OBSER
 
 ## 10. Notebook-first execution contract
 
-Notebooks are first-class review artifacts. Reusable logic stays in Python modules.
+The authoritative training/evaluation execution should use durable project Python modules/scripts under process supervision such as `tmux`. JupyterLab is not required to stay open.
 
-Each important notebook should contain:
+Notebooks are required **reproducibility and review artifacts**, not necessarily the process that performed the authoritative training.
 
-1. objective;
-2. scientific question/gate;
-3. environment and Git identity;
-4. dataset/model provenance;
-5. QC summary;
-6. exact configuration;
-7. execution;
-8. metrics;
-9. figures;
-10. error analysis/caveats;
-11. gate result;
-12. artifact locations;
-13. next allowed action.
-
-Preserve:
+For every completed research stage, preserve:
 
 ```text
-source notebook
-executed notebook with outputs
-HTML render when practical
-compact result JSON
+1. authoritative script/module config + structured run artifacts
+2. clean Colab-ready reproduction notebook using the same project modules/config
+3. executed results/report notebook populated from authoritative run artifacts
+4. HTML render when practical
+5. compact machine-readable result JSON
 ```
 
-Long-running notebook execution must not depend on an open browser.
+Do not run a headless experiment and later represent a reconstructed report notebook as if it were the original training execution.
 
-Preferred:
+Colab-ready notebooks must avoid duplicating model logic. They should call the same reusable modules/configs used by RunPod and include environment/install, exact data/config inputs, exact model/revision identity, secure token instructions without embedded secrets, training/evaluation entry points, resume paths, metrics rendering, and export instructions.
+
+Suggested R1 notebook outputs:
 
 ```text
-tmux -> papermill if available
-     -> otherwise jupyter nbconvert --execute
+notebooks/r1/colab/
+├── C0_ConvNeXtV2_Tiny_COLAB.ipynb
+├── C1_FLAIR_COLAB.ipynb
+└── C2_DINOv3_MIL_COLAB.ipynb
+
+notebooks/r1/reports/
+└── R1_RESULTS_REPORT.ipynb
 ```
 
-JupyterLab is for human inspection, not process durability.
+Suggested R2/R3 notebook outputs:
 
-Never overwrite a previous executed notebook.
+```text
+notebooks/r2_r3/colab/
+├── R2_IDRID_ROI_BUILD_COLAB.ipynb
+└── R3_LESION_CLASSIFIER_COLAB.ipynb
+
+notebooks/r2_r3/reports/
+└── R2_R3_RESULTS_REPORT.ipynb
+```
+
+Never overwrite a previous executed report notebook.
 
 ---
 
@@ -337,17 +352,7 @@ comparison/calibration/error-analysis evidence freeze
 
 No automatic champion. No CE-vs-CORN. No IDRiD in R1.
 
-Suggested notebooks:
-
-```text
-notebooks/r1/
-├── 00_environment.ipynb
-├── 01_p0_evidence_summary.ipynb
-├── 02_c0_convnext_v2_tiny.ipynb
-├── 03_c1_flair.ipynb
-├── 04_c2_dinov3_patch_attention_mil.ipynb
-└── 05_compare_calibrate_error_analysis.ipynb
-```
+Required notebook deliverables follow the reproduction/report contract in Section 10. The authoritative training code remains in reusable project modules/scripts.
 
 Required evidence where applicable:
 
@@ -390,17 +395,7 @@ IDRiD acquisition/preflight
 
 R2 is dataset/spatial construction, not a model.
 
-Suggested notebooks:
-
-```text
-notebooks/r2_r3/
-├── 00_environment.ipynb
-├── 01_idrid_preflight.ipynb
-├── 02_r2_spatial_roi_build.ipynb
-├── 03_r2_geometry_provenance_qa.ipynb
-├── 04_r3_roi_classifier_train.ipynb
-└── 05_r3_roi_classifier_evaluate.ipynb
-```
+Required notebook deliverables follow the reproduction/report contract in Section 10. R2/R3 construction, training, and evaluation remain implemented through reusable project modules/scripts.
 
 Supported R3 lesion classes:
 
@@ -444,7 +439,20 @@ A DagsHub/MLflow logging failure alone is `PASS_WITH_WARNINGS` if the experiment
 
 ## 14. DagsHub / MLflow
 
-Preferred experiments:
+Canonical experiment store:
+
+```text
+DagsHub repository:
+https://dagshub.com/siriponsri/OcuForge
+
+Experiments:
+https://dagshub.com/siriponsri/OcuForge/experiments
+
+MLflow tracking URI:
+https://dagshub.com/siriponsri/OcuForge.mlflow
+```
+
+Preferred experiment names:
 
 ```text
 ocuforge-r1-global
@@ -452,7 +460,13 @@ ocuforge-r2-spatial
 ocuforge-r3-roi
 ```
 
-Useful tags/params:
+Every bounded model/data checkpoint should attempt to create or update a corresponding DagsHub/MLflow run. Use stable run names such as:
+
+```text
+<campaign_id>__<lane>__<stage>__<candidate-or-task>
+```
+
+Required tags/params where applicable:
 
 ```text
 campaign_id
@@ -468,13 +482,38 @@ warning_count
 execution_host
 pod_id
 gpu_type
+runtime_seconds
+estimated_cost_usd
 ```
 
-Log public-safe compact evidence only.
+Log public-safe compact evidence such as metrics JSON/CSV, plots, confusion matrices, calibration figures, compact reports, and artifact manifests when appropriate.
 
 Do not upload hospital/private data, PHI, credentials, raw private images, private predictions/embeddings, prohibited private-derived artifacts, raw datasets by default, or full checkpoints by default.
 
-DagsHub/MLflow is an evidence/observability mirror, not the sole authoritative store.
+DagsHub/MLflow is the campaign observability/evidence mirror. Local structured artifacts and Git-tracked source/config/provenance remain authoritative. A DagsHub/MLflow outage alone is `PASS_WITH_WARNINGS` when local evidence is complete.
+
+---
+
+## 14A. Optional Colab MCP standby lane
+
+After the infrastructure preflight passes and before the long run, the coordinator may configure `googlecolab/colab-mcp` as an **optional reproduction/fallback lane**.
+
+Colab-ready reproduction notebooks are maintained through:
+
+- Colab MCP: `https://github.com/googlecolab/colab-mcp`;
+- OWNER shared Drive folder: `https://drive.google.com/drive/folders/1zfYxkamwA15N9l7Wwof0sWGkis20rh2h?usp=sharing`;
+- headless Drive synchronization: `https://github.com/glotlabs/gdrive`.
+
+Rules:
+
+- Colab MCP is not an R1/R2/R3 scientific dependency;
+- failure to configure it does not block RunPod when the RunPod path is valid;
+- do not consume Colab GPU merely to keep the connection alive;
+- use it for Colab-ready notebook smoke, reproduction, debugging, or later demo work;
+- do not upload hospital/private data or secrets;
+- record `COLAB_MCP=PASS`, `PASS_WITH_WARNINGS`, or `NOT_CONFIGURED`.
+
+The authoritative overnight experiment remains the RunPod execution recorded by Git artifacts plus DagsHub/MLflow evidence.
 
 ---
 
@@ -502,7 +541,9 @@ Update after each major stage.
 
 ## 16. Mandatory local export contract
 
-Because no Network Volume is used, local export is mandatory before Pod termination.
+Because no Network Volume is used, verified local export is mandatory before Pod termination.
+
+The OWNER workstation is CPU-only with limited disk. Therefore the default export policy is **small, reviewable, reproducible artifacts first**.
 
 Default OWNER-workstation destination:
 
@@ -512,37 +553,45 @@ Default OWNER-workstation destination:
 
 `local-state/` must remain Git-ignored.
 
-Each lane creates a bounded export bundle containing, where applicable:
+Export by default:
 
 ```text
-executed notebooks
-HTML notebook renders
+Colab-ready reproduction notebooks
+executed results/report notebooks
+HTML report renders
 metrics JSON/CSV
 figures
 artifact_manifest.json
 campaign_state.json
 stage_state.json
-small logs needed for audit
+small audit logs
 exact configs
-compact reports
-selected trained model artifact needed for local continuation
-model manifest/hash
+label mappings
+preprocessing contract
+calibration artifacts
+backbone source/revision/hash metadata
+lightweight trained head weights when scientifically valid
 ```
 
-Do not copy raw public datasets back merely for redundancy unless required by OWNER. Do not export secrets.
+Do **not** export raw public datasets or duplicate large backbone checkpoints merely for redundancy.
 
-Large trained model artifacts required for continuation go to approved local/on-prem model storage, never Git, with path and SHA-256 recorded.
+For a large backbone/model asset that can be deterministically reacquired from an approved official source, record its exact source, revision, hash, preprocessing contract, and loading instructions instead of copying it to the limited local disk.
+
+Export a full trained checkpoint only when it is uniquely required for continuation and local capacity has been positively verified.
+
+For demo preparation, a lightweight head artifact may be exported when the corresponding backbone/feature contract is explicit. A head alone must never be represented as a standalone model if it requires a remote or separately loaded backbone.
 
 Before termination verify:
 
 1. local export path exists;
 2. export manifest parses;
-3. required files exist locally;
-4. hashes match Pod manifest;
+3. every required exported file exists locally;
+4. hashes match the Pod manifest;
 5. source branch is pushed;
 6. no intended Git change exists only on the Pod;
-7. DagsHub/MLflow status is recorded, including warnings;
-8. no active process still owns required output.
+7. DagsHub/MLflow run/status is recorded, including warnings;
+8. no active process still owns required output;
+9. large non-exported artifacts are reproducibly referenced by source/revision/hash or explicitly declared disposable.
 
 Only then set:
 
@@ -678,7 +727,7 @@ docs/runbooks/R1_R2R3_OVERNIGHT_RUNBOOK.md first.
 
 Act only as the Main Reporter/Coordinator. Use supervised Orca workers launched through MaxPlus Codex + Luna Max.
 
-Follow the runbook exactly: satisfy R1-P0 and protocol alignment; prove automatic RunPod create/start/stop/terminate with the mandatory short lifecycle smoke; if automation cannot be proven, mark BLOCKED and do not start long Pods; then run independent exp/r1-global and exp/r2-r3-roi notebook-first lanes; checkpoint/commit/push, export results locally, mirror public-safe evidence to DagsHub/MLflow, and use no Network Volume.
+Follow the runbook exactly: satisfy R1-P0 and protocol alignment; prove automatic RunPod create/start/stop/terminate with the mandatory short lifecycle smoke; if automation cannot be proven, mark BLOCKED and do not start long Pods; then run independent exp/r1-global and exp/r2-r3-roi lanes using durable headless project execution plus Colab-ready reproduction notebooks and executed results reports; checkpoint/commit/push, export results locally, mirror public-safe evidence to DagsHub/MLflow, and use no Network Volume.
 
 After verified local export, automatically terminate long-run Pods. If export or lifecycle safety is uncertain, stop the affected Pod and wait for OWNER review.
 
@@ -708,6 +757,8 @@ Inspect existing Tasks, Dispatches, worktrees, RunPod resources, Git branches, l
 [ ] HANDOFF points to the correct next execution path
 [ ] RunPod automation exists locally without exposing secrets
 [ ] DagsHub/MLflow credentials remain outside Git
+[ ] DagsHub target is siriponsri/OcuForge experiments
+[ ] local CPU/limited-disk export policy is accepted
 [ ] local-state/ is Git-ignored
 [ ] no existing OcuForge Pod will be duplicated
 [ ] budget guard is accepted

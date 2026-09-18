@@ -5,8 +5,8 @@
   "status": "R1_P0_ACQUISITION_PREFLIGHT=BLOCKED",
   "gate_state": "BLOCKED",
   "outcome": "BLOCKED",
-  "evidence_audit_date": "2026-09-17",
-  "gate_decision_date": "2026-09-17",
+  "evidence_audit_date": "2026-09-18",
+  "gate_decision_date": "2026-09-18",
   "authority": "docs/POC_MASTER_PLAN.md",
   "r0_status": "R0_DATASET_TAXONOMY=PASS",
   "r1_status": "R1_GLOBAL_BENCHMARK=READY_NOT_EXECUTED",
@@ -191,20 +191,39 @@
       "blocks_r1": false
     }
   ],
-  "warnings": [],
+  "warnings": [
+    {
+      "warning_id": "P0-W005",
+      "scope": "RUNPOD_AUTOMATION_SMOKE",
+      "finding": "Normal-path controls passed; stop/start persistence remains recovery-path evidence only and was not verified in the retry.",
+      "blocks_r1": false
+    }
+  ],
   "blockers": [
-    "MODEL_ASSET: No approved local C0/C1/C2 model bytes were acquired; the exact C2 resolution returned HTTP 401 GatedRepo.",
-    "GATED_ACCESS: Hugging Face auth whoami reported Not logged in; required gated C2 access/terms acceptance is not recorded, and no credential or token was recorded.",
-    "STORAGE_RUNTIME: The four provider-neutral OcuForge roots are unset and the intended local Python runtime lacks torch; local C volume free space is 39.93 GB for MMRDR multipart parts totaling 18,610,317,731 bytes before extraction."
+    "MODEL_ASSET: No approved C0/C1/C2 model bytes were acquired; the short smoke verified only authenticated metadata access for exact C2 revision 5931719e67bbdb9737e363e781fb0c67687896bc.",
+    "P0_ACQUISITION: MMRDR integrity/schema-split, preprocessing, and model-load/forward-pass checks remain NOT_EXECUTED because no approved data or model bytes were acquired."
   ],
   "execution_receipt": {
     "receipt_schema_version": "r1_p0_execution_receipt.v1",
-    "recorded_date": "2026-09-17",
-    "base_git_sha": "c63821d",
+    "recorded_date": "2026-09-18",
+    "base_git_sha": "3afb7d6",
     "data_or_model_bytes_downloaded": false,
     "observations": {
-      "hf_auth_status": "Not logged in",
-      "c2_exact_resolution": "HTTP 401 GatedRepo",
+      "hf_auth_status": "Authenticated metadata access verified inside the Pod; credential value not recorded",
+      "c2_exact_resolution": "PASS inside Pod; exact revision 5931719e67bbdb9737e363e781fb0c67687896bc returned with gated=manual",
+      "runpod_cli": "runpodctl 2.14.0-dd55bcf; official release checksum verified",
+      "runpod_initial_pod_list": "empty list",
+      "runpod_smoke_pod_id": "svm5ndav2ueabx",
+      "runpod_smoke_create_ready": "PASS; secure RTX 4090 Pod, no Network Volume",
+      "runpod_remote_command": "PASS; roots and sentinel command completed without credential exposure",
+      "runpod_storage_roots": "PASS; all four OcuForge roots present and writable in Pod process",
+      "runpod_sentinel_remote_sha256": "edc6383590955ae14743c8e4c581ceb74f0bc5660ce9b10d3d49e8c9007beb0a",
+      "runpod_sentinel_local_sha256": "edc6383590955ae14743c8e4c581ceb74f0bc5660ce9b10d3d49e8c9007beb0a",
+      "runpod_export": "PASS; local-state/campaigns/r1-p0-smoke/runpod/ocuforge-p0-smoke-sentinel.txt",
+      "runpod_stop": "PASS",
+      "runpod_start": "BLOCKED; provider reported insufficient free GPUs",
+      "runpod_terminate": "PASS; follow-up get returned not_found and pod list was empty",
+      "runpod_credential_safety": "PASS; rotated credential propagated only after SSH connection through a non-logging stdin path; no Pod metadata/environment exposure",
       "local_roots_configured": false,
       "intended_local_python_torch_available": false,
       "local_c_volume_free_space": "39.93 GB",
@@ -222,12 +241,33 @@
       "private_data_or_artifacts_recorded": false,
       "secrets_or_tokens_recorded": false,
       "phi_or_image_bytes_recorded": false,
-      "cloud_provisioning_performed": false,
-      "idrid_cloud_eligible": false,
+      "cloud_provisioning_performed": true,
+      "cloud_provisioning_scope": "OWNER_AUTHORIZED_SHORT_LIVED_RUNPOD_LIFECYCLE_SMOKE_ONLY; no dataset or model bytes downloaded and no training",
+      "idrid_cloud_eligible": true,
       "idrid_r1_p0_blocker": false,
-      "requested_runpod_idrid_lane": "BLOCKED_BY_FROZEN_CLOUD_ELIGIBLE_FALSE_POLICY"
+      "requested_runpod_idrid_lane": "AUTHORIZED_FOR_R2_R3_RESEARCH_EXECUTION; R2_R3_PREFLIGHT_NOT_EXECUTED"
     },
-    "owner_resolvable_next_action": "Authenticate and accept the exact gated C2 asset through the official Hugging Face path, configure sufficient local OcuForge roots and runtime, and obtain an explicit governance decision for any IDRiD compute location before a new preflight."
+    "owner_resolvable_next_action": "Acquire and verify the frozen R1 inputs through the approved secure path; do not train until R1-P0 reaches PASS or PASS_WITH_WARNINGS with no blocker."
+  },
+  "latest_smoke_reassessment": {
+    "recorded_date": "2026-09-18",
+    "outcome": "RUNPOD_AUTOMATION_SMOKE=PASS_WITH_WARNINGS",
+    "pod_id": "jinjh504k0b9gm",
+    "create_ready": "PASS; secure RTX 4090 Pod; no Network Volume; no HF token in Pod metadata or environment",
+    "secure_c2_access": "PASS; exact C2 revision metadata accessed only after SSH connection via stdin-fed curl config; no token value recorded",
+    "remote_command": "PASS; lifecycle files and sentinel created",
+    "storage_roots": "PASS; all four provider-neutral roots writable in the Pod",
+    "remote_sentinel_sha256": "8ea23673cc8a936b490a8b8c7c1c88de721959ab92833b0a64acbbe0319438a1",
+    "local_sentinel_sha256": "8ea23673cc8a936b490a8b8c7c1c88de721959ab92833b0a64acbbe0319438a1",
+    "local_export": "PASS; local-state/campaigns/r1-p0-smoke-retry-20260918/runpod/ocuforge-p0-smoke-sentinel.txt",
+    "stop": "PASS",
+    "single_restart_attempt": "RECOVERY_PATH_WARNING; provider success response but sentinel persistence not verified after bounded SSH readiness wait",
+    "terminate": "PASS",
+    "no_pod_confirmation": "PASS; follow-up lookup was not_found and Pod list was empty",
+    "prior_smoke_evidence_preserved": true,
+    "training_allowed": false,
+    "long_run_allowed": false,
+    "warning": "Stop/start persistence is recovery-path evidence only under the revised runbook; normal-path smoke controls passed."
   },
   "r1_dependencies": {
     "required_datasets": ["mmrdr_uwf_v1"],
