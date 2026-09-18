@@ -32,6 +32,22 @@ is ready.
   command/local MCP config entry was detected.
 - Secret safety: no authentication was attempted and no credential value was read, printed, or stored.
 
+## Public reference verification
+
+On 2026-09-19, metadata-only checks verified the runbook's public references without authentication or artifact
+download:
+
+- `https://github.com/googlecolab/colab-mcp.git`: `HEAD` and `refs/heads/main` resolved to
+  `b9ab3899e0f1fa493390b1fd6d54aa2e464ecdf1`.
+- `https://github.com/glotlabs/gdrive.git`: `HEAD` and `refs/heads/main` resolved to
+  `855155649a5911565c9134eac6a1f9b9bf235494`.
+- OWNER Drive reference from the runbook: `https://drive.google.com/drive/folders/1zfYxkamwA15N9l7Wwof0sWGkis20rh2h?usp=sharing`
+  returned HTTP `200` for a metadata-only `HEAD` request. No folder contents were listed or downloaded.
+
+The validator intentionally does not inspect generic local MCP configuration files: those files may contain
+credentials. It checks only dedicated Colab MCP config paths by file presence, so `NOT_CONFIGURED` remains the
+conservative result until an owner-approved named integration is configured and separately smoke-tested.
+
 ## Validation
 
 Run from the repository root:

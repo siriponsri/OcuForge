@@ -74,23 +74,15 @@ def validate_notebook(path: Path = NOTEBOOK) -> dict[str, Any]:
 
 
 def _local_mcp_config_present() -> bool:
-    """Detect a named Colab MCP entry without exposing local config contents."""
+    """Detect a dedicated local Colab MCP config path without reading its contents."""
 
     config_paths = (
-        Path.home() / ".codex/config.toml",
-        Path.home() / ".config/claude/claude_desktop_config.json",
-        Path.home() / ".config/mcp.json",
+        Path.home() / ".config/colab-mcp",
+        Path.home() / ".config/colab-mcp/config.json",
+        Path.home() / ".config/googlecolab",
+        Path.home() / ".config/googlecolab/config.json",
     )
-    for path in config_paths:
-        if not path.is_file():
-            continue
-        try:
-            text = path.read_text(encoding="utf-8")
-        except (OSError, UnicodeError):
-            continue
-        if "colab-mcp" in text.lower() or "googlecolab" in text.lower():
-            return True
-    return False
+    return any(path.is_file() for path in config_paths)
 
 
 def assess_integrations() -> dict[str, Any]:
