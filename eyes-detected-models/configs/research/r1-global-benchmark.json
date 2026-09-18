@@ -175,7 +175,8 @@
     "initial_loss": "CE",
     "human_in_the_loop": true,
     "one_candidate_per_run": true,
-    "stop_after_each_candidate": true,
+    "stop_after_each_candidate": false,
+    "checkpoint_validation_before_continuation": true,
     "current_champion": null,
     "current_scientific_champion": null,
     "current_deployment_champion": null

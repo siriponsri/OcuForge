@@ -1,24 +1,21 @@
 # OcuForge V3 - จุดเริ่มต้น
 
 OcuForge เป็นโครงงานวิจัยและระบบช่วย review ภาพจอตา ไม่ใช่ผลิตภัณฑ์วินิจฉัยโรค แผนที่ใช้งานอยู่มีเพียง
-[`POC_MASTER_PLAN.md`](POC_MASTER_PLAN.md) โดย R0 ผ่านแล้ว แต่ R1-P0 และ R1 ยังไม่รัน
+[`POC_MASTER_PLAN.md`](POC_MASTER_PLAN.md) โดย R0 ผ่านแล้ว R1-P0 ตรวจ runtime แล้วแต่ยังติด blocker เรื่อง
+duplicate ข้าม released split และ R1 ยังไม่รัน
 
 ## สถานะปัจจุบัน
 
 ```text
 R0_V3 = PASS
-CAMPAIGN_START_READY = YES
 R1_P0_EXECUTION_READY = YES
 R1_P0_ACQUISITION_PREFLIGHT = BLOCKED
-R1_TRAINING_READY = NO
-R1 C0/C1/C2 = READY_NOT_EXECUTED
+R1 C0/C1/C2 = READY_NOT_EXECUTED (P0 BLOCKED)
 CURRENT_R1_CHAMPION = NONE
 ```
 
-R1-P0 acquisition/runtime checks completed but remain `BLOCKED` by two exact MMRDR duplicate-content groups crossing the
-released `tr`/train and `ts`/test split. Do not train R1, reshuffle the released split, or silently exclude rows until
-the owner resolves the protocol. The authorized P0 runtime used public data only; IDRiD remains an independent R2/R3
-lane and does not resolve this R1 blocker.
+R1-P0 ตรวจ archive, schema/split, preprocessing, model load และ runtime แล้ว แต่พบ exact duplicate-content groups
+ข้าม train/test boundary จึงยังห้าม train R1 หรือรัน benchmark; IDRiD เป็น lane อิสระสำหรับ R2/R3
 
 ## ลำดับการอ่าน
 

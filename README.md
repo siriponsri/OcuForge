@@ -11,18 +11,14 @@ product. The only active direction is [`docs/POC_MASTER_PLAN.md`](docs/POC_MASTE
 
 ```text
 R0_V3 = PASS
-CAMPAIGN_START_READY = YES
-R1_P0_EXECUTION_READY = YES
 R1_P0_ACQUISITION_PREFLIGHT = BLOCKED
-R1_TRAINING_READY = NO
 R1 C0/C1/C2 = READY_NOT_EXECUTED
 CURRENT_R1_CHAMPION = NONE
 ```
 
-R0 scientific evidence review is complete. The authorized R1-P0 acquisition/runtime checks completed, but the gate is
-blocked by two exact MMRDR duplicate-content groups crossing the released train/test split. No model was trained and
-the R1 benchmark remains locked; preserve the official split and review the exact finding before training. The full
-P0 decision and future download manifest are in the [`P0 record`](docs/R1_P0_ACQUISITION_PREFLIGHT.json) and
+R0 scientific evidence review is complete. R1-P0 acquired only approved public data/model assets on a short-lived
+RunPod; no model was trained and no R1 benchmark was executed. P0 is blocked by two exact MMRDR duplicate-content
+groups crossing the released `tr`/train and `ts`/test split. The exact findings and future download manifest are in the
 [`R0 freeze record`](docs/RSC_R0_DATASET_TAXONOMY_FREEZE_v0.1.json).
 
 ## New Direction
@@ -40,8 +36,9 @@ architectures, all with cross-entropy first:
 | C1 | Does retinal-domain pretraining transfer? | FLAIR image encoder |
 | C2 | Does high-resolution local detail matter? | DINOv3 ViT-B/16 + patch Attention MIL |
 
-Each candidate runs one at a time with a validated checkpoint. After a winner or finalist is selected from validation
-evidence, the planned ordinal ablation is winner + CE versus winner + CORN. No current champion is configured.
+Each candidate runs one at a time with checkpoint validation before automatic continuation. OWNER review occurs at the
+evidence freeze. After a winner or finalist is selected from validation evidence, the planned ordinal ablation is
+winner + CE versus winner + CORN. No current champion is configured.
 
 ## Global and ROI Workflow
 

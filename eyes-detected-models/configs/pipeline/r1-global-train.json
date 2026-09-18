@@ -5,7 +5,7 @@
   "authority": "docs/POC_MASTER_PLAN.md",
   "initial_loss": "CE",
   "target_type": "GENUINE_ORDINAL_0_TO_4_AS_5_CLASS_CE",
-  "execution_policy": "ONE_CANDIDATE_PER_RUN_STOP_FOR_HUMAN_REVIEW",
+  "execution_policy": "ONE_CANDIDATE_PER_RUN_CHECKPOINT_VALIDATE_BEFORE_CONTINUATION",
   "task": "ordinal",
   "pooling": "global_average",
   "device": "cuda",

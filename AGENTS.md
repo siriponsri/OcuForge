@@ -22,7 +22,6 @@ POC_PRIMARY=MODEL_INTERACTIVE_GUI
 MODEL_TRAINING_PRIORITY=HIGH
 R0_V3=PASS
 R1_P0_ACQUISITION_PREFLIGHT=BLOCKED
-R1_TRAINING_READY=NO
 GLOBAL_MODEL=EVIDENCE_SELECTED_AFTER_R1
 GLOBAL_MODEL_LEADING_CANDIDATE=NONE_BEFORE_R1
 R1=THREE_CANDIDATE_CE_FIRST_BENCHMARK
@@ -42,12 +41,11 @@ HL7_FHIR=PLANNED_AFTER_MODEL_GUI
 PUBLIC_GPU_PRIVATE_DATA=FORBIDDEN
 ```
 
-R0 V3 is scientifically complete and PASS. R1-P0 Global acquisition/runtime validation completed but is BLOCKED by
-two exact MMRDR duplicate-content groups crossing the released `tr`/train and `ts`/test split. R1 remains a
-three-candidate CE-first benchmark and is READY_NOT_EXECUTED; training stays locked until the owner resolves the
-split protocol and P0 reaches `PASS` or `PASS_WITH_WARNINGS` with no blocker. Preserve the official split: do not
-reshuffle rows or silently exclude either duplicate group. IDRiD is deferred to R2/R3 preparation and must not block
-R1. Use provider-neutral configurable storage roots.
+R0 V3 is scientifically complete and PASS. R1-P0 Global acquisition/runtime validation is complete but
+`BLOCKED` on released-split duplicate leakage; R1 is a three-candidate CE-first benchmark and remains
+`READY_NOT_EXECUTED`. P0 may acquire only the frozen MMRDR record and C0/C1/C2 assets; training may unlock after P0
+`PASS` or `PASS_WITH_WARNINGS` only when no blocking finding remains. IDRiD is deferred to R2/R3 preparation and
+must not block R1. Use provider-neutral configurable storage roots.
 
 Before cross-package or cross-runtime work, read `docs/CTR_MODULE_CONTRACT.md`. Respect module ownership, dependency direction,
 and data/runtime boundaries. Phases define execution order; modules define architectural ownership. Use `docs/PROJECT_MAP.md`
