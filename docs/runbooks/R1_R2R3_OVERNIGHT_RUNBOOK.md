@@ -302,6 +302,11 @@ Use Orca structured Tasks/Dispatches and lifecycle receipts.
 
 Every Task must state `TARGET`, `CHANGE`, `CONSTRAINTS`, `OWNERSHIP`, and `OBSERVABLE ACCEPTANCE`.
 
+When OWNER assigns a redesign or recovery task, its supervised coordinator may inspect and modify the isolated R1,
+R2/R3, and Colab worker worktrees, including the R1 worker. This permission does not permit a shared writable
+worktree, duplicate workers or resources, R1 training while P0 is blocked, or bypassing the lane's checkpoint and
+evidence gates. Preserve useful worker commits and report every touched branch/worktree.
+
 Parallel execution policy:
 
 ```text
@@ -762,7 +767,9 @@ Run the OcuForge campaign from current clean main using docs/runbooks/R1_R2R3_OV
 
 Read AGENTS.md, HANDOFF.md, docs/POC_MASTER_PLAN.md, docs/R1_P0_ACQUISITION_PREFLIGHT.{md,json}, docs/R1_GLOBAL_MODEL_SELECTION.md, docs/GPU_EXECUTION_TH.md, and the runbook.
 
-Act as Main Reporter/Coordinator only. Launch experiment workers only through C:\Users\Siripon Sri\bin\maxplus-codex.cmd.
+Act as Main Reporter/Coordinator. An OWNER-assigned redesign/recovery coordinator may also inspect and modify all
+isolated worker lanes, including R1, while preserving the lane gates and worktree isolation. Launch experiment workers
+only through C:\Users\Siripon Sri\bin\maxplus-codex.cmd.
 
 OWNER authorizes three concurrent workstreams:
 
