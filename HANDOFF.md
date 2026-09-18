@@ -71,6 +71,12 @@ but the post-restart sentinel was not verifiable after a bounded readiness wait;
 recovery-path warning under the revised runbook. `RUNPOD_AUTOMATION_SMOKE=PASS_WITH_WARNINGS`; long-run execution
 remains locked by R1-P0, not by the smoke result.
 
+The 2026-09-18 `agent/r1-p0-execution` worker attempt stopped before provisioning. The required RunPod control plane
+was unavailable in the session: `runpodctl` was not installed, `RUNPOD_API_KEY` was unavailable, and no alternate
+approved local control path was found. The accepted smoke evidence was reused; no Pod was created, no paid resource
+was mutated, no HF credential was propagated, and no R1-P0 acquisition or runtime check executed. This is recorded as
+`BLOCKED_RUNPOD_AUTOMATION` in the machine-readable P0 evidence. No secret value was inspected, recorded, or requested.
+
 ## Important artifacts/files
 
 - `docs/RSC_R0_DATASET_TAXONOMY_FREEZE_v0.1.json` - authoritative R0 evidence record and future manifest.

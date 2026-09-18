@@ -204,7 +204,8 @@
   ],
   "blockers": [
     "MODEL_ASSET: No approved C0/C1/C2 model bytes were acquired; the short smoke verified only authenticated metadata access for exact C2 revision 5931719e67bbdb9737e363e781fb0c67687896bc.",
-    "P0_ACQUISITION: MMRDR integrity/schema-split, preprocessing, and model-load/forward-pass checks remain NOT_EXECUTED because no approved data or model bytes were acquired."
+    "P0_ACQUISITION: MMRDR integrity/schema-split, preprocessing, and model-load/forward-pass checks remain NOT_EXECUTED because no approved data or model bytes were acquired.",
+    "BLOCKED_RUNPOD_AUTOMATION: This worker session has no runpodctl binary, no RUNPOD_API_KEY, and no alternate approved RunPod control path; no Pod was created and no acquisition/runtime checks were executed."
   ],
   "execution_receipt": {
     "receipt_schema_version": "r1_p0_execution_receipt.v1",
@@ -273,6 +274,27 @@
     "r1_p0_execution_ready": true,
     "r1_training_ready": false,
     "warning": "Stop/start persistence is recovery-path evidence only under the revised runbook; normal-path smoke controls passed."
+  },
+  "worker_execution_attempt": {
+    "attempt_id": "r1-p0-execution-worker-20260918",
+    "recorded_date": "2026-09-18",
+    "branch": "agent/r1-p0-execution",
+    "base_git_sha": "5f9187d3d474dc4315d09c0079339082c3fa436e",
+    "outcome": "BLOCKED_RUNPOD_AUTOMATION",
+    "runpod_automation_smoke_reused": "PASS_WITH_WARNINGS",
+    "control_plane": {
+      "runpodctl": "UNAVAILABLE_NOT_INSTALLED",
+      "runpod_api_key": "UNAVAILABLE_IN_SESSION",
+      "alternate_approved_control_path": "NOT_FOUND"
+    },
+    "pod_state": "NOT_CREATED; no paid resource mutation attempted",
+    "p0_checks_executed": [],
+    "credential_safety": {
+      "hf_credential_propagated": false,
+      "runpod_credential_propagated": false,
+      "secret_values_recorded": false
+    },
+    "next_action": "Restore approved RunPod control-plane access without sharing secrets in chat, then rerun R1-P0 from the worker branch."
   },
   "r1_dependencies": {
     "required_datasets": ["mmrdr_uwf_v1"],
