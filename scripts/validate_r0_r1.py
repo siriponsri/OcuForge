@@ -374,8 +374,9 @@ def validate_r1(data, root=ROOT):
     preflight = data.get("acquisition_preflight")
     if not isinstance(preflight, dict):
         raise ValueError("R1 benchmark must reference the acquisition preflight")
-    if preflight.get("status") != "R1_P0_ACQUISITION_PREFLIGHT=READY_NOT_EXECUTED":
-        raise ValueError("R1 benchmark must remain unexecuted until its P0 gate is reviewed")
+    allowed_preflight_statuses = {f"R1_P0_ACQUISITION_PREFLIGHT={state}" for state in P0_STATES}
+    if preflight.get("status") not in allowed_preflight_statuses:
+        raise ValueError("R1 benchmark must reference a supported P0 gate state")
     if preflight.get("required_before_training") is not True:
         raise ValueError("R1 benchmark must require R1-P0 before training")
     if preflight.get("training_unlock_states") != ["PASS", "PASS_WITH_WARNINGS"]:
@@ -472,8 +473,18 @@ def validate_r1(data, root=ROOT):
     if roots["provider_required"]:
         raise ValueError("RunPod must remain optional")
     gate = data["public_gpu_gate"]
-    if gate["private_data_allowed"] or gate["provisioning"]:
-        raise ValueError("R1 public GPU gate permits unsafe data or provisioning")
+    if gate["private_data_allowed"]:
+        raise ValueError("R1 public GPU gate permits private data")
+    if gate.get("allowed_source_types") != ["PUBLIC", "SYNTHETIC"]:
+        raise ValueError("R1 public GPU gate must allow only public or synthetic sources")
+    if gate.get("provisioning") is not True or gate.get("provisioning_scope") != (
+        "OWNER_AUTHORIZED_PUBLIC_RUNPOD_P0_AND_UNLOCKED_R1_RESEARCH"
+    ):
+        raise ValueError("R1 public GPU gate must record owner-authorized public provisioning")
+    if gate.get("network_volume_allowed") is not False:
+        raise ValueError("R1 public GPU gate must forbid Network Volumes")
+    if gate.get("weights_must_be_local_and_hashed") is not True:
+        raise ValueError("R1 public GPU gate must require local hashed weights")
     for key in ["dataset", "candidate_training", "protocol"]:
         path = root / data["configs"].get(key, "")
         if not path.is_file():

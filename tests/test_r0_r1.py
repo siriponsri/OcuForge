@@ -59,6 +59,7 @@ def test_r1_p0_supports_warning_only_unlock_without_blocker():
     mutated["outcome"] = "PASS_WITH_WARNINGS"
     mutated["gate_decision_date"] = "2026-09-17"
     mutated["warnings"] = copy.deepcopy(mutated["known_warnings"])
+    mutated["blockers"] = []
     for check in mutated["checks"]:
         check["status"] = "PASS"
     validate_r1_p0(mutated, ROOT)
@@ -111,6 +112,7 @@ def test_r1_report_carries_p0_warnings(tmp_path):
     preflight["outcome"] = "PASS_WITH_WARNINGS"
     preflight["gate_decision_date"] = "2026-09-17"
     preflight["warnings"] = copy.deepcopy(preflight["known_warnings"])
+    preflight["blockers"] = []
     for check in preflight["checks"]:
         check["status"] = "PASS"
     p0_path = tmp_path / "p0.json"
@@ -149,6 +151,23 @@ def test_r1_freeze_requires_provider_neutral_storage():
     mutated = copy.deepcopy(config)
     mutated["storage_roots"]["provider_required"] = True
     with pytest.raises(ValueError, match="RunPod must remain optional"):
+        validate_r1(mutated, ROOT)
+
+
+def test_r1_public_gpu_gate_requires_scoped_owner_authorization():
+    config = load_json(ROOT / "eyes-detected-models/configs/research/r1-global-benchmark.json")
+    validate_r1(config, ROOT)
+    mutated = copy.deepcopy(config)
+    mutated["public_gpu_gate"]["private_data_allowed"] = True
+    with pytest.raises(ValueError, match="private data"):
+        validate_r1(mutated, ROOT)
+    mutated = copy.deepcopy(config)
+    mutated["public_gpu_gate"]["provisioning_scope"] = "UNSCOPED"
+    with pytest.raises(ValueError, match="owner-authorized public provisioning"):
+        validate_r1(mutated, ROOT)
+    mutated = copy.deepcopy(config)
+    mutated["public_gpu_gate"]["network_volume_allowed"] = True
+    with pytest.raises(ValueError, match="Network Volumes"):
         validate_r1(mutated, ROOT)
 
 
