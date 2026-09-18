@@ -374,8 +374,9 @@ def validate_r1(data, root=ROOT):
     preflight = data.get("acquisition_preflight")
     if not isinstance(preflight, dict):
         raise ValueError("R1 benchmark must reference the acquisition preflight")
-    if preflight.get("status") != "R1_P0_ACQUISITION_PREFLIGHT=READY_NOT_EXECUTED":
-        raise ValueError("R1 benchmark must remain unexecuted until its P0 gate is reviewed")
+    allowed_preflight_statuses = {f"R1_P0_ACQUISITION_PREFLIGHT={state}" for state in P0_STATES}
+    if preflight.get("status") not in allowed_preflight_statuses:
+        raise ValueError("R1 benchmark must reference a supported P0 gate state")
     if preflight.get("required_before_training") is not True:
         raise ValueError("R1 benchmark must require R1-P0 before training")
     if preflight.get("training_unlock_states") != ["PASS", "PASS_WITH_WARNINGS"]:

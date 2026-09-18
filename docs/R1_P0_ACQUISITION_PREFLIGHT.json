@@ -62,7 +62,7 @@
       "check_id": "P0-DATA-ARCHIVE",
       "gate": "DATASET_ARCHIVE",
       "scope": "R1_GLOBAL",
-      "status": "NOT_EXECUTED",
+      "status": "PASS",
       "evidence_required": [
         "Downloaded file manifest with source URLs, source IDs, byte sizes, SHA-256 values, and acquisition timestamp",
         "Archive integrity result for every archive or multipart reconstruction",
@@ -77,7 +77,7 @@
       "check_id": "P0-DATA-SCHEMA-SPLIT",
       "gate": "DATASET_SCHEMA_SPLIT",
       "scope": "R1_GLOBAL",
-      "status": "NOT_EXECUTED",
+      "status": "BLOCKED",
       "status_rule": "Preserve MMRDR-UWF released train/test membership; never invent patient IDs or reshuffle sealed test data.",
       "evidence_required": [
         "MMRDR UWF.csv schema and genuine ordinal label value audit",
@@ -92,7 +92,7 @@
       "check_id": "P0-MODEL-ASSETS",
       "gate": "MODEL_ASSET",
       "scope": "R1_GLOBAL",
-      "status": "BLOCKED",
+      "status": "PASS",
       "status_rule": "Acquire only the exact C0, C1, and C2 source/revision recorded by R0; no silent substitution.",
       "evidence_required": [
         "Local SHA-256 for every candidate checkpoint",
@@ -108,7 +108,7 @@
       "check_id": "P0-PREPROCESSING",
       "gate": "PREPROCESSING",
       "scope": "R1_GLOBAL",
-      "status": "NOT_EXECUTED",
+      "status": "PASS",
       "status_rule": "Run preprocessing smoke on a permitted tiny public/synthetic sample and record the exact config hash.",
       "evidence_required": [
         "C0 384px ImageNet preprocessing result",
@@ -124,7 +124,7 @@
       "check_id": "P0-MODEL-LOAD",
       "gate": "MODEL_LOADING",
       "scope": "R1_GLOBAL",
-      "status": "NOT_EXECUTED",
+      "status": "PASS",
       "status_rule": "Each candidate must load its approved local asset and execute a smoke forward pass without a synthetic fallback.",
       "evidence_required": [
         "C0 checkpoint load log",
@@ -140,7 +140,7 @@
       "check_id": "P0-GATED-ACCESS",
       "gate": "GATED_ACCESS",
       "scope": "R1_GLOBAL",
-      "status": "BLOCKED",
+      "status": "PASS",
       "status_rule": "Complete and record only the access/terms steps required by the official MMRDR and C0/C1/C2 sources; no credentials or tokens enter Git.",
       "evidence_required": [
         "MMRDR authorized access and applicable terms confirmation",
@@ -155,7 +155,7 @@
       "check_id": "P0-STORAGE-RUNTIME",
       "gate": "STORAGE_RUNTIME",
       "scope": "R1_GLOBAL",
-      "status": "BLOCKED",
+      "status": "PASS",
       "status_rule": "Verify provider-neutral roots, sufficient local capacity, runtime dependencies, and offline/restricted-egress behavior before acquisition.",
       "evidence_required": [
         "OCUFORGE_DATA_ROOT, OCUFORGE_MODEL_ROOT, OCUFORGE_CACHE_ROOT, and OCUFORGE_ARTIFACT_ROOT resolved",
@@ -200,17 +200,22 @@
       "scope": "RUNPOD_AUTOMATION_SMOKE",
       "finding": "Normal-path controls passed; stop/start persistence remains recovery-path evidence only and was not verified in the retry.",
       "blocks_r1": false
+    },
+    {
+      "warning_id": "P0-W006",
+      "scope": "DAGSHUB_MLFLOW",
+      "finding": "Read-only authenticated MLflow connectivity remained unresolved; complete local evidence is authoritative.",
+      "blocks_r1": false
     }
   ],
   "blockers": [
-    "MODEL_ASSET: No approved C0/C1/C2 model bytes were acquired; the short smoke verified only authenticated metadata access for exact C2 revision 5931719e67bbdb9737e363e781fb0c67687896bc.",
-    "P0_ACQUISITION: MMRDR integrity/schema-split, preprocessing, and model-load/forward-pass checks remain NOT_EXECUTED because no approved data or model bytes were acquired."
+    "DATASET_SCHEMA_SPLIT: Two exact duplicate-content groups cross the released MMRDR tr/train and ts/test split boundary: tr003656.jpg/ts002433.jpg and tr007667.jpg/ts002038.jpg. Preserve the official split; do not reshuffle or silently exclude rows until OWNER resolves the leakage protocol."
   ],
   "execution_receipt": {
     "receipt_schema_version": "r1_p0_execution_receipt.v1",
     "recorded_date": "2026-09-18",
-    "base_git_sha": "3afb7d6",
-    "data_or_model_bytes_downloaded": false,
+    "base_git_sha": "5f9187d3d474dc4315d09c0079339082c3fa436e",
+    "data_or_model_bytes_downloaded": true,
     "observations": {
       "hf_auth_status": "Authenticated metadata access verified inside the Pod; credential value not recorded",
       "c2_exact_resolution": "PASS inside Pod; exact revision 5931719e67bbdb9737e363e781fb0c67687896bc returned with gated=manual",
@@ -238,20 +243,31 @@
         "cuda": "12.8",
         "market": "stock Low",
         "rate_usd_per_hour": 0.34
-      }
+      },
+      "r1_p0_acquisition": "PASS_WITH_BLOCKING_SPLIT_FINDING; compact redacted evidence exported and hash verified",
+      "mmrdr_archive_integrity": "PASS; official Figshare multipart archive tested",
+      "mmrdr_extracted_inventory": "PASS; 10404 UWF rows/images",
+      "mmrdr_schema_split": "BLOCKED; grades 0..4 and released tr/ts split verified, two exact cross-split duplicates found",
+      "model_asset_hashes": "PASS; exact C0/C1/C2 assets recorded in redacted evidence",
+      "model_loading_forward": "PASS; official C0/C1 loaders and local C2 loader passed CUDA synthetic forward",
+      "preprocessing": "PASS; asset-specific C0/C1/C2 preprocessing and geometry smoke passed",
+      "gated_access": "PASS; exact C2 revision and approved C1 revision accessed without recording credentials",
+      "storage_runtime": "PASS; four provider-neutral roots writable and approximately 39.47 GiB free",
+      "local_compact_export": "PASS; local-state/campaigns/ocuforge-r1-p0-20260918/r1-p0 with remote/local SHA-256 matches",
+      "runpod_active_after_export": "0"
     },
     "governance": {
       "private_data_or_artifacts_recorded": false,
       "secrets_or_tokens_recorded": false,
       "phi_or_image_bytes_recorded": false,
       "cloud_provisioning_performed": true,
-      "cloud_provisioning_scope": "OWNER_AUTHORIZED_SHORT_LIVED_RUNPOD_LIFECYCLE_SMOKE_ONLY; no dataset or model bytes downloaded and no training",
+      "cloud_provisioning_scope": "OWNER_AUTHORIZED_SHORT_LIVED_RUNPOD_P0_ACQUISITION_RUNTIME_VALIDATION; no training",
       "cloud_provisioning_authorized": true,
       "idrid_cloud_eligible": true,
       "idrid_r1_p0_blocker": false,
       "requested_runpod_idrid_lane": "AUTHORIZED_FOR_R2_R3_RESEARCH_EXECUTION; R2_R3_PREFLIGHT_NOT_EXECUTED"
     },
-    "owner_resolvable_next_action": "Acquire and verify the frozen R1 inputs through the approved secure path; do not train until R1-P0 reaches PASS or PASS_WITH_WARNINGS with no blocker."
+    "owner_resolvable_next_action": "Review the exact cross-split duplicate groups and resolve the leakage protocol; do not reshuffle or silently exclude rows and do not train until R1-P0 reaches PASS or PASS_WITH_WARNINGS with no blocker."
   },
   "latest_smoke_reassessment": {
     "recorded_date": "2026-09-18",
@@ -327,5 +343,5 @@
   "private_data_allowed": false,
   "cloud_provisioning_authorized": true,
   "completion_rule": "R1-P0 is PASS when every required check is PASS and all evidence is recorded. It is PASS_WITH_WARNINGS when every required check is PASS or PASS_WITH_WARNINGS, all warnings are explicit with blocks_r1=false, no blocker remains, and the warning record is carried into every R1 artifact. It is BLOCKED only under the blocking rule.",
-  "next_gate": "Execute R1-P0 on the authorized public RunPod runtime. After PASS or PASS_WITH_WARNINGS with no blocking finding, continue automatically through C0 -> C1 -> C2 with validated checkpoints and stop at the evidence freeze."
+  "next_gate": "OWNER review of the released-split duplicate leakage. After resolution and PASS or PASS_WITH_WARNINGS with no blocker, continue automatically through C0 -> C1 -> C2 with validated checkpoints and stop at the evidence freeze."
 }

@@ -25,21 +25,23 @@ TRAINING_UNLOCK=FORBIDDEN_UNTIL_PASS_OR_PASS_WITH_WARNINGS
 `PASS_WITH_WARNINGS` checks, requires no blocker, and requires every warning to be recorded and copied into R1
 artifacts. `BLOCKED` is reserved for an invalidating, unauthorized, corrupt, leaking, incompatible, or impossible
 R1 execution condition. `RUNNING` is not an unlock state. The 2026-09-18 receipt records the infrastructure smoke as
-`PASS_WITH_WARNINGS`; `MODEL_ASSET`, `DATASET_ARCHIVE`, `DATASET_SCHEMA_SPLIT`, `PREPROCESSING`, and
-`MODEL_LOADING` remain blocked or `NOT_EXECUTED` because no data or model bytes were acquired.
+`PASS_WITH_WARNINGS`; archive integrity, schema, exact model assets, preprocessing, gated access, model loading, and
+storage/runtime checks executed. `DATASET_SCHEMA_SPLIT` is `BLOCKED` because two exact duplicate-content groups cross
+the released `tr`/train and `ts`/test boundary.
 
 ## Current decision
 
-R1 training cannot proceed because R1-P0 is `BLOCKED`; P0 execution itself is authorized. Authenticated access to the exact C2 revision was verified inside one
-short-lived RunPod, all four Pod-side OcuForge roots were writable, and no model or data bytes were downloaded. The
-normal smoke path passed; the prior stop/start probe failed only because RunPod reported insufficient free GPUs and
-the retry's sentinel persistence was not verified. Under the revised runbook this is a non-blocking recovery-path
-warning, so `RUNPOD_AUTOMATION_SMOKE=PASS_WITH_WARNINGS`. The rotated credential was propagated only after
-connection through a non-logging stdin path and was not placed in Pod metadata/environment. The structured,
-redacted execution receipt contains no secret values, PHI, image bytes, or private artifacts.
+R1 training cannot proceed because R1-P0 is `BLOCKED`; P0 execution itself completed on the authorized public RunPod
+runtime. MMRDR archive/inventory/schema/split checks, exact C0/C1/C2 asset hashes, official loaders and forward
+passes, preprocessing, gated access, and provider-neutral storage/runtime checks are recorded in compact ignored local
+evidence. Two exact duplicate-content groups cross the released train/test split; the official split is preserved and
+no rows were reshuffled or silently excluded. The accepted normal smoke remains `RUNPOD_AUTOMATION_SMOKE=PASS_WITH_WARNINGS`
+under the revised recovery-path semantics. The secure credential path did not place HF credentials in Pod metadata,
+environment, logs, or receipts. The DagsHub/MLflow probe is connectivity-unresolved and non-blocking with complete
+local evidence.
 
-Owner governance now authorizes IDRiD research-only RunPod execution under the public-data boundary. This does not
-add IDRiD as an R1-P0 blocker; IDRiD remains deferred to the R2/R3 preflight.
+Owner governance authorizes IDRiD research-only RunPod execution under the public-data boundary. IDRiD remains an
+independent R2/R3 preflight and is not an R1-P0 dependency or resolution for this blocker.
 
 ## Latest lifecycle smoke retry
 
@@ -51,8 +53,8 @@ that no Pod remained all passed. The one restart attempt returned provider succe
 after a bounded readiness wait; this is recorded as the allowed recovery-path warning. Therefore
 `RUNPOD_AUTOMATION_SMOKE=PASS_WITH_WARNINGS` with no smoke blocker.
 
-R1 training remains forbidden. Do not start long-run training until R1-P0 acquisition, integrity, schema/split,
-preprocessing, model-load, and forward-pass checks reach `PASS` or `PASS_WITH_WARNINGS` with no blocker. The accepted
+R1 training remains forbidden. Do not start long-run training until the released-split duplicate leakage is resolved
+under the governing protocol and R1-P0 reaches `PASS` or `PASS_WITH_WARNINGS` with no blocker. The accepted
 infrastructure smoke is already `PASS_WITH_WARNINGS` and does not need to be repeated unless materially invalidated.
 
 ## Required sequence

@@ -59,6 +59,7 @@ def test_r1_p0_supports_warning_only_unlock_without_blocker():
     mutated["outcome"] = "PASS_WITH_WARNINGS"
     mutated["gate_decision_date"] = "2026-09-17"
     mutated["warnings"] = copy.deepcopy(mutated["known_warnings"])
+    mutated["blockers"] = []
     for check in mutated["checks"]:
         check["status"] = "PASS"
     validate_r1_p0(mutated, ROOT)
@@ -111,6 +112,7 @@ def test_r1_report_carries_p0_warnings(tmp_path):
     preflight["outcome"] = "PASS_WITH_WARNINGS"
     preflight["gate_decision_date"] = "2026-09-17"
     preflight["warnings"] = copy.deepcopy(preflight["known_warnings"])
+    preflight["blockers"] = []
     for check in preflight["checks"]:
         check["status"] = "PASS"
     p0_path = tmp_path / "p0.json"

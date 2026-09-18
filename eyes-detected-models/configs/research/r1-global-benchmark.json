@@ -7,7 +7,7 @@
   "authority": "docs/POC_MASTER_PLAN.md",
   "r0_status": "R0_DATASET_TAXONOMY=PASS",
   "acquisition_preflight": {
-    "status": "R1_P0_ACQUISITION_PREFLIGHT=READY_NOT_EXECUTED",
+    "status": "R1_P0_ACQUISITION_PREFLIGHT=BLOCKED",
     "config": "docs/R1_P0_ACQUISITION_PREFLIGHT.json",
     "required_before_training": true,
     "training_unlock_states": ["PASS", "PASS_WITH_WARNINGS"],

@@ -36,28 +36,34 @@ does not authorize training or execute R1 itself.
   and separate evidence-audit/gate-decision dates.
 - Updated active status documents, the R1 registry, report generator, tests, and offline validator for the simplified
   R1-P0 Global gate.
+- Executed the authorized R1-P0 acquisition/runtime checks on RunPod. MMRDR archive integrity, extracted inventory,
+  schema, released split, model-asset hashes, official C0/C1/C2 loading, synthetic preprocessing, gated access,
+  and storage/runtime checks are recorded in the redacted local evidence under `local-state/campaigns/`.
 
 ## R1-P0 decision and checks
 
-R1 training cannot proceed because R1-P0 remains `BLOCKED`. The owner-authorized RunPod lifecycle smoke
-verified creation/readiness, remote execution, exact C2 metadata access, Pod roots, local sentinel export/hash, stop,
-termination, and confirmation that no Pod remained. The prior stop/start probe failed only because the provider had
-insufficient GPU capacity; under the revised runbook this is recovery-path evidence and the infrastructure result is
-`RUNPOD_AUTOMATION_SMOKE=PASS_WITH_WARNINGS`. The rotated HF credential was not placed in Pod metadata/environment
-or exposed by the retry path. Owner governance authorizes IDRiD research-only RunPod execution under the public-data
-boundary; IDRiD remains deferred to R2/R3 and is not an R1-P0 blocker.
+R1 training cannot proceed because R1-P0 remains `BLOCKED`. The acquisition/runtime checks passed except for a released
+MMRDR split-leakage finding: two exact duplicate-content groups cross the documented `tr`/train and `ts`/test
+boundary. The official split is preserved; no rows were reshuffled or silently excluded. This is a blocking finding
+until OWNER resolves the split protocol. The accepted lifecycle result remains `RUNPOD_AUTOMATION_SMOKE=PASS_WITH_WARNINGS`
+because the normal path passed and stop/start persistence is recovery-path evidence only. The secure credential path
+did not place the HF token in Pod metadata/environment or evidence. DagsHub/MLflow connectivity remains unresolved
+and is non-blocking because complete local evidence exists. IDRiD research-only RunPod execution is authorized for
+R2/R3, but its independent preflight remains pending authorized archive access.
 
 See the machine-readable P0 contract and its redacted execution receipt. The short form is:
 
-- `PASS`: exact C2 gated metadata access inside the Pod at revision
-  `5931719e67bbdb9737e363e781fb0c67687896bc`; no model or data bytes were downloaded.
-- `PASS`: Pod-side provider-neutral roots, remote command execution, sentinel export, and matching SHA-256.
+- `PASS`: MMRDR archive integrity and extracted inventory; 10,404 UWF rows/images with grades `0`-`4`, and the
+  released `tr`/`ts` split preserved as 7,807/2,597.
+- `PASS`: exact C0/C1/C2 asset hashes, gated access, official model loading, synthetic preprocessing, and CUDA
+  forward passes. C0/C1/C2 outputs are recorded without exporting full checkpoints.
+- `PASS`: Pod-side provider-neutral roots, remote execution, compact local evidence export, and matching SHA-256.
+- `BLOCKED`: two exact duplicate-content groups cross the released MMRDR train/test split; R1 training remains locked.
 - `PASS_WITH_WARNINGS`: `RUNPOD_AUTOMATION_SMOKE`; normal-path controls passed and the recovery-only stop/start probe
   was not a mandatory success condition. The Pod was terminated and confirmed gone.
 - `PASS`: credential safety; the rotated HF credential was propagated only after SSH connection through a non-logging
   stdin path and was not placed in Pod metadata/environment or recorded in repository evidence.
-- `NOT_EXECUTED`: MMRDR dataset/archive integrity, extracted inventory, schema/split smoke, and duplicate checks.
-- `NOT_EXECUTED`: preprocessing and model loading because no bytes were acquired.
+- `PASS_WITH_WARNINGS`: DagsHub/MLflow read-only connectivity probe remained unresolved; local evidence is authoritative.
 - IDRiD acquisition, mask coverage, and image-level split checks are deferred to R2/R3; unannotated regions remain
   `UNKNOWN`/`WEAK_NEGATIVE` unless acquisition evidence supports clean negatives.
 
@@ -81,12 +87,14 @@ remains locked by R1-P0, not by the smoke result.
 - `eyes-detected-models/configs/research/r1-global-benchmark.json` - R1 C0/C1/C2 readiness registry; no measured result.
 - `R0_DATASET_COMPARISON_AND_SOURCE_GUIDE.md` - research companion, not authority.
 - `validation/FINAL_DELIVERY_REPORT.md` - repository validation report.
+- `local-state/campaigns/ocuforge-r1-p0-20260918/r1-p0/` - ignored, compact P0 evidence and hash-verified export.
 
 ## Exact owner-resolvable next action
 
-The HF credential has been rotated and the secure post-connect path is now required. Do not ask for or place a secret
-in this handoff. Acquire only the frozen MMRDR and C0/C1/C2 inputs after R1-P0 is authorized; do not train during
-the preflight.
+The immediate owner action is to review the two exact duplicate-content groups crossing the released MMRDR train/test
+split. Do not ask for or place a secret in this handoff. Until the split-leakage finding is resolved in the governing
+protocol, do not train R1 or create another long-run Pod. IDRiD remains an independent R2/R3 lane and DDR/OIA-DDR
+remains not admitted.
 
 From a clean machine/session:
 
@@ -94,10 +102,8 @@ From a clean machine/session:
 git pull
 ```
 
-Then follow `docs/R1_P0_ACQUISITION_PREFLIGHT.md`. Acquire only MMRDR and the approved C0/C1/C2 assets. Do not
-execute R1-P0 and R1 in the same phase; after the new preflight, stop for review and update this handoff with the
-evidence and final P0 status. IDRiD acquisition belongs to the later R2/R3 gate and its compute location requires
-explicit governance clearance.
+Then review `docs/R1_P0_ACQUISITION_PREFLIGHT.md` and the compact local evidence. Do not bypass the split-leakage
+blocker, reshuffle the released split, or start R1 until OWNER approves a protocol-level resolution.
 
 ## Resume commands/checks
 
@@ -112,8 +118,8 @@ python scripts/package_check.py
 git diff --check
 ```
 
-Inspect `git status --short --branch` before editing. Execute R1-P0 acquisition/runtime validation on the authorized
-public RunPod path, but do not train or execute R1 as part of P0. Training may begin only after P0 is `PASS` or
+Inspect `git status --short --branch` before editing. The R1-P0 acquisition/runtime validation is complete and its
+blocking split finding must be resolved before training. Training may begin only after P0 is `PASS` or
 `PASS_WITH_WARNINGS` with no blocker; copy P0 warnings to every R1 artifact.
 
 ## External dependencies/assets

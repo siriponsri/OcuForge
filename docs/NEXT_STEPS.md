@@ -1,15 +1,14 @@
 # Next steps — V3 handoff
 
-R0 V3 is `R0_DATASET_TAXONOMY=PASS`. The next manual action is to execute
-[`R1_P0_ACQUISITION_PREFLIGHT.json`](R1_P0_ACQUISITION_PREFLIGHT.json). Do not begin R1 training in the same task.
+R0 V3 is `R0_DATASET_TAXONOMY=PASS`. R1-P0 executed and is `BLOCKED` by two exact MMRDR duplicate-content groups
+crossing the released `tr`/train and `ts`/test split. Do not begin R1 training or reshuffle the released split.
 
-After approval, the sequence is:
+The immediate owner action is to review and resolve the split-leakage finding. After resolution, the sequence is:
 
-1. `git pull` and execute R1-P0 Global: verify MMRDR archive/file hashes, inventory, schema/split, preprocessing,
-   gated access, C0/C1/C2 model loading, and storage/runtime readiness. Record `PASS`, `PASS_WITH_WARNINGS`, or
-   `BLOCKED` using the P0 contract; IDRiD acquisition is deferred to R2/R3.
-2. If R1-P0 is `PASS` or `PASS_WITH_WARNINGS` with no blocker, run R1 one candidate at a time: C0, C1, C2. Stop
-   after each run for human review and carry P0 warnings into every artifact.
+1. Re-run only the affected R1-P0 split decision under the approved protocol and update the P0 contract; preserve the
+   existing acquisition/model evidence and warnings. IDRiD acquisition is deferred to R2/R3.
+2. If R1-P0 is `PASS` or `PASS_WITH_WARNINGS` with no blocker, continue R1 one candidate at a time: C0, C1, C2,
+   carrying P0 warnings into every artifact.
 3. Select a finalist from validation evidence, then run only the winner CE versus CORN ablation.
 4. Calibrate the global model and select a versioned Global→ROI threshold from validation evidence.
 5. Benchmark local/on-prem CPU inference and integrate the existing `templates/` workspace through contracts.

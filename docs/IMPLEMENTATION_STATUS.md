@@ -1,7 +1,7 @@
 # Implementation status — OcuForge V3
 
 **Authority:** [`POC_MASTER_PLAN.md`](POC_MASTER_PLAN.md)
-**As of:** 2026-09-17
+**As of:** 2026-09-18
 
 This page separates implemented, verified, planned, and unknown work. It does not turn preparation into a research
 result.
@@ -14,16 +14,17 @@ result.
 | Phase 2A local data foundation | IMPLEMENTED / VERIFIED | Local adapters and provenance safeguards exist. |
 | Phase 2B live Mongo acceptance | UNKNOWN / NOT RUN | Requires the target service; Phase 2 overall is not PASS. |
 | R0 V3 data/supervision/asset freeze | PASS | Scientific source/task/supervision/split/taxonomy/license/overlap freeze is complete; byte-dependent checks moved to R1-P0. |
-| R1-P0 acquisition preflight | BLOCKED | R1 is locked by P0. Model assets, gated access, and storage/runtime are blocked by the 2026-09-17 receipt; archive/schema, preprocessing, and model loading remain not executed because no bytes were acquired. IDRiD is deferred to R2/R3. |
+| R1-P0 acquisition preflight | BLOCKED | R1 is locked by two exact MMRDR duplicate-content groups crossing the released `tr`/train and `ts`/test split. Archive integrity, schema, asset hashes, gated access, preprocessing, official C0/C1/C2 loading, and storage/runtime checks passed. |
 | R1 C0/C1/C2 benchmark | READY_NOT_EXECUTED | Campaign cannot proceed while P0 is blocked; no candidate was trained or selected. |
 | Current R1 champion | NONE | Selection is forbidden before measured evidence. |
 
-The campaign cannot proceed: R1 is locked by R1-P0 `BLOCKED`. The requested RunPod IDRiD lane is separately blocked
-by the frozen R0 `cloud_eligible=false` policy; this does not make IDRiD an R1-P0 dependency or blocker.
+The campaign cannot proceed on the R1 lane: R1 is locked by R1-P0 `BLOCKED` until OWNER resolves the released-split
+duplicate leakage. IDRiD research-only RunPod execution is authorized independently, but its R2/R3 preflight remains
+pending authorized archive access and does not make IDRiD an R1-P0 dependency or resolution.
 
-The owner-resolvable next action is to authenticate and accept the exact gated C2 asset through the official Hugging
-Face path, configure sufficient local OcuForge roots/runtime, and obtain an explicit governance decision for any IDRiD
-compute location before a new preflight. No secret is requested or recorded here.
+The owner-resolvable next action is to review the two exact cross-split duplicate groups and resolve the leakage
+protocol without reshuffling or silently excluding rows. DagsHub/MLflow connectivity is an evidence-mirror warning only;
+no secret is requested or recorded here.
 
 ## Implemented and verified
 
@@ -36,10 +37,12 @@ compute location before a new preflight. No secret is requested or recorded here
 - Existing labeler/CVAT bridge, local storage, and `templates/` customer-facing GUI reference.
 - V3 candidate registry with separate research/deployment eligibility, completed R0 overlap/dataset audit record, R1-P0 acquisition contract and state machine, validation tests, editorial SVG/HTML diagrams, and pinned diagram
   setup metadata.
+- R1-P0 public acquisition/runtime evidence: MMRDR archive/inventory, schema/split audit, exact C0/C1/C2 hashes,
+  official loader/forward checks, asset-specific preprocessing, gated access, and storage/runtime validation.
 
 ## Planned, not executed
 
-- Recovery and re-execution of R1-P0 acquisition preflight after its blockers are resolved.
+- OWNER resolution and, if accepted, recovery/re-execution of R1-P0 after the released-split leakage blocker is resolved.
 - R1 C0, C1, and C2 runs, model comparison, calibration, and winner-only CORN ablation.
 - R2 spatial ROI dataset construction and R3 lesion classifier.
 - R4 Label Studio Community live QA validation and R5 contract/API integration into the existing GUI.
@@ -47,9 +50,8 @@ compute location before a new preflight. No secret is requested or recorded here
 
 ## Unknown or external gates
 
-R1-P0 asset hashes and final access/load results; MMRDR archive checksums and schema/split smoke; IDRiD archive
-checksums/inventory and negative examples for R2/R3; FLAIR/DINOv3 source-image overlap; live Mongo/CVAT/Docker/host governance;
-intended local inference hardware; and any scientific performance.
+IDRiD archive checksums/inventory and negative examples for R2/R3; FLAIR/DINOv3 source-image overlap; DagsHub/MLflow
+connectivity; live Mongo/CVAT/Docker/host governance; intended local inference hardware; and any scientific performance.
 
 ## Prohibited claims
 
