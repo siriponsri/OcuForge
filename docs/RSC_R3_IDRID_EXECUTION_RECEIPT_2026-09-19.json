@@ -1,0 +1,61 @@
+{
+  "receipt_schema_version": "r3_idrid_execution_receipt.v1",
+  "record_type": "R3_IDRID_ENGINEERING_EXECUTION_RECEIPT",
+  "recorded_at": "2026-09-19T04:42:22+07:00",
+  "branch": "agent/r3-roi-execution",
+  "lane": "R3_IDRID_ROI_RESEARCH_ONLY",
+  "status": "PASS_WITH_WARNINGS",
+  "outcome": "R3_ENGINEERING_EVIDENCE_COMPLETE",
+  "source_provenance": "OWNER_ACQUIRED_OFFICIAL_IDRID",
+  "dataset_id": "idrid_v1",
+  "r2_evidence": {
+    "source_inventory": "local-state/campaigns/r2-r3-idrid-20260919/idrid_acquisition_manifest.json",
+    "roi_manifest": "local-state/campaigns/r2-r3-idrid-20260919/r2_roi_manifest.json",
+    "source_images": 81,
+    "train_images": 54,
+    "test_images": 27,
+    "cross_split_image_hash_duplicates": 0,
+    "roi_rows": 282,
+    "geometry_qa": "PASS"
+  },
+  "execution": {
+    "model_type": "R3_MASKED_LINEAR_RGB_BASELINE",
+    "host": "LOCAL_CPU",
+    "train_split": "TRAIN",
+    "evaluation_split": "TEST",
+    "input_rows": 282,
+    "target_rows": 282,
+    "train_rows": 187,
+    "test_rows": 95,
+    "supported_classes": [
+      "MICROANEURYSM",
+      "INTRARETINAL_HEMORRHAGE",
+      "HARD_EXUDATE",
+      "SOFT_EXUDATE"
+    ],
+    "negative_rows_created": 0,
+    "scientific_result_eligible": false,
+    "claims_permitted": ["ENGINEERING_PIPELINE_EXECUTION_ONLY"]
+  },
+  "local_evidence": {
+    "output_root": "local-state/campaigns/r2-r3-idrid-20260919/r3-execution-20260919-final/",
+    "artifact_manifest": "artifact_manifest.json",
+    "model_checkpoint": "LOCAL_ONLY_NOT_TRACKED",
+    "raw_data_tracked": false
+  },
+  "observed_test_rows": {
+    "MICROANEURYSM": 27,
+    "INTRARETINAL_HEMORRHAGE": 27,
+    "HARD_EXUDATE": 27,
+    "SOFT_EXUDATE": 14
+  },
+  "mlflow_dagshub": "HTTP_404_READ_ONLY_NO_WRITE",
+  "runpod": "NOT_USED_LOCAL_BASELINE_COMPLETED",
+  "estimated_cost_usd": 0,
+  "warnings": [
+    "All rows are positive mask-derived ROIs; no negatives were invented.",
+    "Missing or unannotated masks remain UNKNOWN and are excluded from supervision.",
+    "Observed TEST accuracy is not a scientific performance result because the observed subsets are positive-only.",
+    "R1-P0 remains BLOCKED by the accepted MMRDR released-split duplicate groups."
+  ]
+}

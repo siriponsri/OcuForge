@@ -16,7 +16,7 @@ R1_GLOBAL_BENCHMARK=READY_NOT_EXECUTED
 CURRENT_R1_CHAMPION=NONE
 R2_R3_IDRID_PREFLIGHT=PASS_WITH_WARNINGS
 R2_R3_IDRID_R2=PASS_WITH_WARNINGS
-R2_R3_IDRID_R3=IMPLEMENTED_NOT_EXECUTED
+R2_R3_IDRID_R3=PASS_WITH_WARNINGS_ENGINEERING_EVIDENCE_COMPLETE
 R2_R3_IDRID_R3_IMPLEMENTATION=PASS
 ```
 
@@ -73,8 +73,9 @@ See the machine-readable P0 contract and its redacted execution receipt. The sho
 - `PASS`: credential safety; the rotated HF credential was propagated only after SSH connection through a non-logging
   stdin path and was not placed in Pod metadata/environment or recorded in repository evidence.
 - `PASS_WITH_WARNINGS`: DagsHub/MLflow read-only connectivity probe remained unresolved; local evidence is authoritative.
-- IDRiD acquisition, mask coverage, and image-level split checks are deferred to R2/R3; unannotated regions remain
-  `UNKNOWN`/`WEAK_NEGATIVE` unless acquisition evidence supports clean negatives.
+- IDRiD acquisition, mask coverage, image-level split checks, R2 geometry/provenance QA, and one bounded R3
+  engineering checkpoint are recorded as `PASS_WITH_WARNINGS`; unannotated regions remain `UNKNOWN`/`WEAK_NEGATIVE`
+  unless acquisition evidence supports clean negatives.
 
 The prior uncommitted smoke evidence remains preserved as historical evidence. The 2026-09-18 retry used Pod
 `jinjh504k0b9gm` without an HF token in Pod metadata or environment. It passed create/readiness, remote command,
@@ -86,7 +87,7 @@ but the post-restart sentinel was not verifiable after a bounded readiness wait;
 recovery-path warning under the revised runbook. `RUNPOD_AUTOMATION_SMOKE=PASS_WITH_WARNINGS`; long-run execution
 remains locked by R1-P0, not by the smoke result.
 
-## R2/R3 IDRiD recovery outcome — 2026-09-19
+## R2/R3 IDRiD recovery outcome - 2026-09-19
 
 The recovery worker inspected the owner-specified official Drive folder and verified the source-derived segmentation
 archive locally. It copied only the 81 segmentation images, four supported lesion-mask families, and two license files
@@ -102,15 +103,16 @@ normalized geometry provenance; missing masks remain `UNKNOWN`, present empty ma
 `docs/RSC_R2_R3_IDRID_RECOVERY_RECEIPT_2026-09-19.json`; complete file inventories remain ignored under
 `local-state/campaigns/r2-r3-idrid-20260919/`.
 
-R3 did not start. The coordinator's official RunPod REST read-only probe returned HTTP 200 with zero active Pods, and
-the one required credentialed MLflow read-only GET for `ocuforge-r3-roi` returned HTTP 404 without a write. The exact
-implementation audit found no committed R3 supported-lesion classifier train/eval entrypoint, R3 config, ROI image
-manifest, or supported-lesion target manifest; only the generic global DR MIL train/evaluate path exists, and its
-feature-indexed `ImageManifest` plus `dr_grade`/`binary_dr` contract is incompatible with the R2 spatial ROI manifest.
-Torch is absent locally but is secondary because there is no executable R3 path to run in an approved PyTorch Pod.
-No model, metric, checkpoint, DagsHub run, Pod, Network Volume, upload, or export was created; runtime and estimated
-lane cost remain zero, and Pod termination is not applicable. The next safe action is an owner-approved R3 classifier
-implementation and compatible input contract; do not invent that scientific pipeline in this recovery checkpoint.
+The owner-approved R3 implementation was then exercised once from the accepted R2 evidence. The separate NumPy
+`R3_MASKED_LINEAR_RGB_BASELINE` completed locally with 282 inputs/targets, 187 TRAIN rows, and 95 TEST rows. No Pod,
+upload, DagsHub write, or full checkpoint export was used; estimated lane cost remains zero. The public-safe execution
+report and receipt are in `docs/RSC_R3_IDRID_EXECUTION_REPORT_2026-09-19.md` and
+`docs/RSC_R3_IDRID_EXECUTION_RECEIPT_2026-09-19.json`; full local output remains ignored under
+`local-state/campaigns/r2-r3-idrid-20260919/r3-execution-20260919-final/`.
+
+All rows are positive mask-derived ROIs, so no negative rows were invented. The observed TEST accuracy is therefore
+not a scientific performance result. R3 remains `scientific_result_eligible=false`; a future scientific checkpoint
+requires appropriate negative/unknown coverage and a predeclared evaluation contract.
 
 ## R3 implementation checkpoint — 2026-09-19
 
@@ -121,9 +123,9 @@ unannotated rows cannot become negatives; `WEAK_NEGATIVE_FOR_SUPPORTED_CLASS` re
 `NO_SUPPORTED_LESION_IN_ROI` requires complete four-class coverage and explicit clean-negative ROI provenance.
 
 The separate NumPy `R3_MASKED_LINEAR_RGB_BASELINE` and `eyes-models r3-train`/`r3-evaluate` entrypoints are covered by
-offline synthetic tests. The baseline is not MIL attention, does not use the global DR trainer, and remains
-`scientific_result_eligible=false`. No IDRiD data, model, checkpoint, Pod, MLflow run, or metric was executed or added.
-R3 runtime training/evaluation and scientific evidence remain not executed.
+offline synthetic tests. The bounded IDRiD checkpoint used the same separate baseline, is not MIL attention, does not
+use the global DR trainer, and remains `scientific_result_eligible=false`. The model checkpoint and full local output
+remain outside Git.
 
 ## Important artifacts/files
 
@@ -138,6 +140,7 @@ R3 runtime training/evaluation and scientific evidence remain not executed.
 - `eyes-detected-contracts/src/eyes_contracts/r3.py` - R3 input/target contracts and split/semantic validator.
 - `eyes-detected-models/docs/R3_IDRID_ROI_IMPLEMENTATION.md` - R3 implementation and execution boundary.
 - `eyes-detected-models/configs/research/r3-idrid-roi-baseline.json` - safe baseline configuration.
+- `docs/RSC_R3_IDRID_EXECUTION_REPORT_2026-09-19.md` and `.json` - bounded R3 engineering execution evidence.
 - `local-state/campaigns/ocuforge-r1-p0-20260918/r1-p0/` - ignored, compact P0 evidence and hash-verified export.
 
 ## Exact owner-resolvable next action
