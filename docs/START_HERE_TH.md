@@ -7,13 +7,18 @@ OcuForge เป็นโครงงานวิจัยและระบบ�
 
 ```text
 R0_V3 = PASS
-R1_P0_ACQUISITION_PREFLIGHT = READY_NOT_EXECUTED
+CAMPAIGN_START_READY = YES
+R1_P0_EXECUTION_READY = YES
+R1_P0_ACQUISITION_PREFLIGHT = BLOCKED
+R1_TRAINING_READY = NO
 R1 C0/C1/C2 = READY_NOT_EXECUTED
 CURRENT_R1_CHAMPION = NONE
 ```
 
-การตรวจเอกสารรอบนี้ไม่ download dataset, ไม่ train model และไม่ provision cloud GPU; ขั้นถัดไปคือ R1-P0 Global
-โดย IDRiD จะตรวจในช่วง R2/R3 และไม่ block การ train R1
+R1-P0 acquisition/runtime checks completed but remain `BLOCKED` by two exact MMRDR duplicate-content groups crossing the
+released `tr`/train and `ts`/test split. Do not train R1, reshuffle the released split, or silently exclude rows until
+the owner resolves the protocol. The authorized P0 runtime used public data only; IDRiD remains an independent R2/R3
+lane and does not resolve this R1 blocker.
 
 ## ลำดับการอ่าน
 
