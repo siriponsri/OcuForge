@@ -1,0 +1,52 @@
+{
+  "schema_version": "0.1",
+  "status": "PASS_WITH_WARNINGS",
+  "branch": "siriponsri/exp-colab-mcp-utility",
+  "commit_checked": "a0accc0c018a7480bea13397f1e0792bece60712",
+  "baseline_commit_inspected": "a0accc0",
+  "commits_inspected": [
+    "a0accc0 Align campaign execution gate semantics",
+    "09d4f99 Align headless R1 checkpoint continuation",
+    "707efd5 Align current R1 P0 execution state",
+    "88f9735 Record R1 P0 split leakage blocker",
+    "5f9187d Authorize RunPod R1-P0 execution"
+  ],
+  "files_inspected": [
+    "AGENTS.md",
+    "HANDOFF.md",
+    "docs/POC_MASTER_PLAN.md",
+    "docs/CTR_MODULE_CONTRACT.md",
+    "docs/runbooks/R1_R2R3_OVERNIGHT_RUNBOOK.md",
+    "notebooks/colab/OCUFORGE_REPRO_SMOKE.ipynb",
+    "scripts/synthetic_roundtrip.py",
+    "scripts/validate_colab_lane.py"
+  ],
+  "scope": "non-blocking public/synthetic Colab reproduction utility; no scientific gate dependency",
+  "checks": {
+    "notebook": {
+      "status": "PASS",
+      "path": "notebooks/colab/OCUFORGE_REPRO_SMOKE.ipynb",
+      "cells": 5,
+      "execution": "structural-only; no Colab runtime was started"
+    },
+    "integrations": {
+      "colab_mcp": {
+        "status": "NOT_CONFIGURED",
+        "reason": "No Colab MCP command or named local MCP config entry was detected."
+      },
+      "drive_sync": {
+        "status": "NOT_CONFIGURED",
+        "reason": "No configured headless Drive sync command and config were detected."
+      },
+      "maxplus_launcher": {
+        "status": "PASS",
+        "reason": "Required MaxPlus launcher presence checked without invoking a child agent."
+      },
+      "security": {
+        "auth_attempted": false,
+        "credential_values_logged": false
+      }
+    }
+  },
+  "next_safe_action": "If needed, configure googlecolab/colab-mcp and headless Drive sync using owner-approved local auth; rerun this validator and perform a small public/synthetic notebook smoke. Do not upload private data or keep a Colab GPU running for standby."
+}

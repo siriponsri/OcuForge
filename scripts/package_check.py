@@ -42,6 +42,7 @@ ALLOWED = {
     ".html",
     ".css",
     ".xml",
+    ".ipynb",
 }
 BINARY_ALLOWLIST = {
     "templates/assets/fundus-retinopathy-eda03.jpg",
