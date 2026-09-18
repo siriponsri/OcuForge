@@ -41,10 +41,11 @@ HL7_FHIR=PLANNED_AFTER_MODEL_GUI
 PUBLIC_GPU_PRIVATE_DATA=FORBIDDEN
 ```
 
-R0 V3 is scientifically complete and PASS. R1-P0 Global acquisition/runtime validation is complete but
-`BLOCKED` on released-split duplicate leakage; R1 is a three-candidate CE-first benchmark and remains
+R0 V3 is scientifically complete and PASS. R1-P0 Global is currently `BLOCKED` on released-split duplicate leakage;
+the owner-authorized P0 acquisition/runtime path may start or resume on public RunPod, while R1 training remains
 `READY_NOT_EXECUTED`. P0 may acquire only the frozen MMRDR record and C0/C1/C2 assets; training may unlock after P0
-`PASS` or `PASS_WITH_WARNINGS` only when no blocking finding remains. IDRiD is deferred to R2/R3 preparation and
+`PASS` or `PASS_WITH_WARNINGS` only when no blocking finding remains. A `BLOCKED` or not-yet-executed P0 gate locks
+training but does not refuse campaign start or authorized P0 execution. IDRiD is deferred to R2/R3 preparation and
 must not block R1. Use provider-neutral configurable storage roots.
 
 Before cross-package or cross-runtime work, read `docs/CTR_MODULE_CONTRACT.md`. Respect module ownership, dependency direction,

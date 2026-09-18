@@ -6,7 +6,10 @@ The current planning authority is [`docs/POC_MASTER_PLAN.md`](../docs/POC_MASTER
 
 ```text
 R0_V3 = PASS
-R1_P0_ACQUISITION_PREFLIGHT = READY_NOT_EXECUTED
+CAMPAIGN_START_READY = YES
+R1_P0_EXECUTION_READY = YES
+R1_P0_ACQUISITION_PREFLIGHT = BLOCKED
+R1_TRAINING_READY = NO
 R1 C0/C1/C2 = READY_NOT_EXECUTED
 CURRENT_R1_CHAMPION = NONE
 ```
@@ -18,8 +21,8 @@ or generalization claim.
 
 The R0 evidence gate passed as `R0_DATASET_TAXONOMY=PASS`. MMRDR-UWF remains the primary R1 hypothesis, IDRiD
 remains the primary spatial candidate, DDR/OIA-DDR is not admitted, and R1 remains `READY_NOT_EXECUTED` with no
-champion. Byte-dependent checks are reclassified to R1-P0. Exact findings, asset revisions, overlap limits, and the
-future download manifest are recorded in the
+champion. R1-P0 is an authorized executable gate whose current `BLOCKED` outcome locks training; it does not refuse
+campaign start or P0 execution. Exact findings, asset revisions, overlap limits, and the future download manifest are recorded in the
 [machine-readable freeze](../docs/RSC_R0_DATASET_TAXONOMY_FREEZE_v0.1.json).
 
 ## Reconciliation scope
@@ -33,8 +36,10 @@ future download manifest are recorded in the
 
 ## Not executed
 
-No dataset was downloaded, no hospital/private data was inspected or uploaded, no model was trained, no approved
-foundation weights were loaded, and no RunPod, Vast, Vercel, DICOM, MongoDB, CVAT, or clinical service was provisioned.
+No R1 candidate was trained, no R1 benchmark was executed, and no hospital/private data was inspected or uploaded.
+The accepted short RunPod smoke and prior P0 acquisition/runtime evidence remain infrastructure/gate evidence only;
+they do not unlock training while the P0 blocker remains. No long-run R1 Pod, Vast, Vercel, DICOM, MongoDB, CVAT, or
+clinical service was provisioned by this repository validation report.
 
 ## Validation evidence
 
