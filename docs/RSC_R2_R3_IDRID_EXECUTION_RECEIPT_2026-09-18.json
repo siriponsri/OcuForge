@@ -1,0 +1,87 @@
+{
+  "receipt_schema_version": "r2_r3_idrid_execution_receipt.v1",
+  "record_type": "R2_R3_IDRID_EXECUTION_RECEIPT",
+  "recorded_at": "2026-09-18T18:31:39.8803074+07:00",
+  "branch": "agent/r2-r3-idrid-execution",
+  "base_git_sha": "5f9187d",
+  "lane": "R2_R3_IDRID_RESEARCH_ONLY",
+  "dataset_scope": ["idrid_v1"],
+  "excluded_datasets": ["DDR", "OIA-DDR"],
+  "outcome": "BLOCKED",
+  "blocker": {
+    "id": "BLOCKED_RUNPOD_AUTOMATION",
+    "summary": "Required RunPod control plane and current RunPod credential are unavailable on this worker.",
+    "evidence": [
+      "runpodctl executable was not found on PATH.",
+      "No RunPod MCP control tool is connected in this session.",
+      "The local RunPod config file exists, but its apikey value is empty.",
+      "RUNPOD_API_KEY is not present in the worker environment.",
+      "The authenticated RunPod REST v2 Pod inventory probe could not run because no credential was available."
+    ],
+    "failure_action": "Do not install tooling, request or print a secret, provision a Pod, or fake evidence."
+  },
+  "source_metadata_checks": [
+    {
+      "check_id": "IDRID-OFFICIAL-SOURCE",
+      "status": "PASS_WITH_WARNINGS",
+      "source_urls": [
+        "https://idrid.grand-challenge.org/Data/",
+        "https://ieee-dataport.org/open-access/indian-diabetic-retinopathy-image-dataset-idrid"
+      ],
+      "observed": [
+        "Grand Challenge page returned HTTP 200 and displayed the CC BY 4.0 statement.",
+        "Grand Challenge page described four lesion mask families: microaneurysms, haemorrhages, hard exudates, and soft exudates.",
+        "IEEE DataPort page returned HTTP 200 and described 516 images with a 413-image train and 103-image test release split.",
+        "IEEE DataPort page described JPG fundus images and TIF lesion groundtruth files and exposed a login/account-mediated download route."
+      ],
+      "warning": "Source-page metadata is not archive/file integrity, extracted inventory, or authenticated access evidence."
+    },
+    {
+      "check_id": "IDRID-ACCESS-TERMS",
+      "status": "BLOCKED",
+      "observed": "Public source pages were reachable, but no authenticated IEEE DataPort account or current external dataset credential was available to this worker.",
+      "required_next": "Owner must provide an already-authorized secure access path outside repository evidence before archive acquisition."
+    }
+  ],
+  "byte_dependent_checks": [
+    {"check_id": "IDRID-ARCHIVE-FILE-HASHES", "status": "NOT_EXECUTED", "reason": "No authorized archive bytes acquired."},
+    {"check_id": "IDRID-EXTRACTED-INVENTORY", "status": "NOT_EXECUTED", "reason": "No authorized archive bytes acquired."},
+    {"check_id": "IDRID-IMAGE-MASK-IDENTITY", "status": "NOT_EXECUTED", "reason": "No image or mask bytes acquired."},
+    {"check_id": "IDRID-CLASS-COVERAGE", "status": "NOT_EXECUTED", "reason": "No image or mask bytes acquired."},
+    {"check_id": "IDRID-RELEASED-SPLIT", "status": "NOT_EXECUTED", "reason": "The 413/103 split is source metadata only until the release inventory is acquired and verified."},
+    {"check_id": "IDRID-DUPLICATE-LEAKAGE", "status": "NOT_EXECUTED", "reason": "No acquired image inventory or hashes available."},
+    {"check_id": "IDRID-NEGATIVE-POLICY", "status": "PRESERVED_NOT_EXECUTED", "policy": "Unannotated regions remain UNKNOWN or WEAK_NEGATIVE; no hard negative is created without exhaustive source evidence and verified geometry."}
+  ],
+  "r2_r3_stages": [
+    {"stage": "R2_SPATIAL_ROI_CONSTRUCTION", "status": "LOCKED", "reason": "IDRiD preflight did not pass."},
+    {"stage": "R2_GEOMETRY_PROVENANCE_QA", "status": "LOCKED", "reason": "IDRiD preflight did not pass."},
+    {"stage": "R3_SUPPORTED_LESION_TRAIN_EVAL", "status": "LOCKED", "reason": "IDRiD preflight did not pass."},
+    {"stage": "R3_EVIDENCE_FREEZE", "status": "LOCKED", "reason": "IDRiD preflight did not pass."}
+  ],
+  "governance": {
+    "private_data_or_phi_used": false,
+    "private_artifacts_used": false,
+    "credentials_recorded": false,
+    "credential_values_printed": false,
+    "pod_created_by_worker": false,
+    "network_volume_created": false,
+    "dataset_bytes_downloaded": false,
+    "model_weights_downloaded": false,
+    "r1_p0_waited_on_or_modified": false,
+    "ddr_or_oia_ddr_admitted": false,
+    "old_hf_credential_inspected_or_used": false
+  },
+  "pod_state": {
+    "worker_created_pods": [],
+    "account_inventory": "NOT_VERIFIED_UNAUTHENTICATED",
+    "termination_action": "NOT_APPLICABLE",
+    "estimated_lane_cost_usd": 0
+  },
+  "offline_validation": {
+    "python_scripts_validate_r0_r1": "PASS",
+    "python_m_pytest": "NOT_RUN_MISSING_PYTEST",
+    "python_m_ruff_check": "NOT_RUN_MISSING_RUFF",
+    "git_diff_check": "PASS"
+  },
+  "next_action": "Restore an authorized non-logging RunPod control path and an authorized external IDRiD access path, then rerun only the IDRiD preflight. Do not proceed to R2/R3 construction until preflight is PASS or PASS_WITH_WARNINGS with no blocker."
+}

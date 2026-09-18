@@ -11,7 +11,27 @@ R0_DATASET_TAXONOMY=PASS
 R1_P0_ACQUISITION_PREFLIGHT=BLOCKED
 R1_GLOBAL_BENCHMARK=READY_NOT_EXECUTED
 CURRENT_R1_CHAMPION=NONE
+R2_R3_IDRID_PREFLIGHT=BLOCKED
+R2_R3_IDRID_EXECUTION=STOPPED_SAFELY
 ```
+
+## R2/R3 IDRiD worker outcome — 2026-09-18
+
+The independent IDRiD research-only lane stopped before acquisition. The official Grand Challenge and IEEE
+DataPort source pages were reachable and their source metadata was recorded, but the worker had no usable RunPod
+control plane or current RunPod credential: `runpodctl` was absent, no RunPod MCP control tool was connected, the
+local RunPod config had an empty `apikey`, and `RUNPOD_API_KEY` was absent. No Pod, Network Volume, dataset bytes,
+model weights, private data, PHI, or credential value was used. The account-wide Pod inventory remains unverified
+because the control plane was unauthenticated; no Pod was created by this worker.
+
+Archive/file hashes, extracted inventory, image/mask identity, class coverage, released split verification,
+duplicate/leakage checks, R2/R3 construction, and training/evaluation remain unexecuted. The conservative
+`UNKNOWN`/`WEAK_NEGATIVE` policy remains in force. DDR/OIA-DDR remains not admitted, and R1-P0 was neither awaited
+nor modified.
+
+See [`docs/RSC_R2_R3_IDRID_EXECUTION_REPORT_2026-09-18.md`](docs/RSC_R2_R3_IDRID_EXECUTION_REPORT_2026-09-18.md) and
+the matching JSON receipt for the exact checks and blocker. The next action is to restore an authorized non-logging
+RunPod control path and authorized external IDRiD access, then rerun only the IDRiD preflight.
 
 R0 scientific evidence review passed. R1-P0 Global is the next and only permitted execution gate. Its allowed terminal
 outcomes are `PASS`, `PASS_WITH_WARNINGS`, and `BLOCKED`; `PASS` or `PASS_WITH_WARNINGS` unlocks candidate training only
