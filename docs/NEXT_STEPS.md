@@ -1,7 +1,9 @@
 # Next steps — V3 handoff
 
-R0 V3 is `R0_DATASET_TAXONOMY=PASS`. R1-P0 executed and is `BLOCKED` by two exact MMRDR duplicate-content groups
-crossing the released `tr`/train and `ts`/test split. Do not begin R1 training or reshuffle the released split.
+R0 V3 is `R0_DATASET_TAXONOMY=PASS`. `CAMPAIGN_START_READY=YES` and `R1_P0_EXECUTION_READY=YES`.
+R1-P0 executed and is `BLOCKED` by two exact MMRDR duplicate-content groups crossing the released `tr`/train and
+`ts`/test split. `R1_TRAINING_READY=NO`: do not begin R1 training or reshuffle the released split. The P0 blocker locks
+training; it does not refuse independent R2/R3 or Colab work.
 
 The immediate owner action is to review and resolve the split-leakage finding. After resolution, the sequence is:
 

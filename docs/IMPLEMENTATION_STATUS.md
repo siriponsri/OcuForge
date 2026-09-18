@@ -10,17 +10,20 @@ result.
 
 | Gate | Status | Meaning |
 |---|---|---|
+| Campaign start readiness | YES | Owner authorization permits R1-P0 acquisition/runtime validation and independent R2/R3 and Colab lanes. |
+| R1-P0 execution readiness | YES | The authorized public RunPod P0 runtime path is available; current P0 evidence is recorded. |
 | Repository foundation and CPU contracts | IMPLEMENTED / VERIFIED | Offline tests and synthetic checks cover the reusable foundation. |
 | Phase 2A local data foundation | IMPLEMENTED / VERIFIED | Local adapters and provenance safeguards exist. |
 | Phase 2B live Mongo acceptance | UNKNOWN / NOT RUN | Requires the target service; Phase 2 overall is not PASS. |
 | R0 V3 data/supervision/asset freeze | PASS | Scientific source/task/supervision/split/taxonomy/license/overlap freeze is complete; byte-dependent checks moved to R1-P0. |
 | R1-P0 acquisition preflight | BLOCKED | R1 is locked by two exact MMRDR duplicate-content groups crossing the released `tr`/train and `ts`/test split. Archive integrity, schema, asset hashes, gated access, preprocessing, official C0/C1/C2 loading, and storage/runtime checks passed. |
-| R1 C0/C1/C2 benchmark | READY_NOT_EXECUTED | Campaign cannot proceed while P0 is blocked; no candidate was trained or selected. |
+| R1 training readiness | NO | Training remains forbidden while P0 is `BLOCKED`; no candidate was trained or selected. |
+| R1 C0/C1/C2 benchmark | READY_NOT_EXECUTED | The benchmark remains locked by the P0 leakage finding, not by campaign-start or runtime authorization. |
 | Current R1 champion | NONE | Selection is forbidden before measured evidence. |
 
-The campaign cannot proceed on the R1 lane: R1 is locked by R1-P0 `BLOCKED` until OWNER resolves the released-split
-duplicate leakage. IDRiD research-only RunPod execution is authorized independently, but its R2/R3 preflight remains
-pending authorized archive access and does not make IDRiD an R1-P0 dependency or resolution.
+The R1 training lane cannot proceed: R1 is locked by R1-P0 `BLOCKED` until OWNER resolves the released-split duplicate
+leakage. IDRiD research-only RunPod execution is authorized independently, but its R2/R3 preflight remains pending
+authorized archive access and does not make IDRiD an R1-P0 dependency or resolution.
 
 The owner-resolvable next action is to review the two exact cross-split duplicate groups and resolve the leakage
 protocol without reshuffling or silently excluding rows. DagsHub/MLflow connectivity is an evidence-mirror warning only;

@@ -8,15 +8,20 @@
 ```text
 R0_V3=PASS
 R0_DATASET_TAXONOMY=PASS
+CAMPAIGN_START_READY=YES
+R1_P0_EXECUTION_READY=YES
 R1_P0_ACQUISITION_PREFLIGHT=BLOCKED
+R1_TRAINING_READY=NO
 R1_GLOBAL_BENCHMARK=READY_NOT_EXECUTED
 CURRENT_R1_CHAMPION=NONE
 ```
 
-R0 scientific evidence review passed. R1-P0 Global is the next and only permitted execution gate. Its allowed terminal
+R0 scientific evidence review passed. R1-P0 Global is the active scientific unlock gate, while its acquisition/runtime
+execution is authorized and complete. Its allowed terminal
 outcomes are `PASS`, `PASS_WITH_WARNINGS`, and `BLOCKED`; `PASS` or `PASS_WITH_WARNINGS` unlocks candidate training only
-when no blocking finding remains. Owner authorization permits P0 acquisition/runtime validation on public RunPod; it
-does not authorize training or execute R1 itself.
+when no blocking finding remains. `BLOCKED` keeps R1 training locked; it does not refuse campaign start or independent
+R2/R3 and Colab work. Owner authorization permits P0 acquisition/runtime validation on public RunPod, but does not
+authorize R1 training or the R1 benchmark before P0 unlock.
 
 ## What was completed
 
@@ -93,7 +98,7 @@ remains locked by R1-P0, not by the smoke result.
 
 The immediate owner action is to review the two exact duplicate-content groups crossing the released MMRDR train/test
 split. Do not ask for or place a secret in this handoff. Until the split-leakage finding is resolved in the governing
-protocol, do not train R1 or create another long-run Pod. IDRiD remains an independent R2/R3 lane and DDR/OIA-DDR
+protocol, do not train R1 or create another R1 long-run Pod. IDRiD remains an independent R2/R3 lane and DDR/OIA-DDR
 remains not admitted.
 
 From a clean machine/session:
@@ -103,7 +108,8 @@ git pull
 ```
 
 Then review `docs/R1_P0_ACQUISITION_PREFLIGHT.md` and the compact local evidence. Do not bypass the split-leakage
-blocker, reshuffle the released split, or start R1 until OWNER approves a protocol-level resolution.
+blocker, reshuffle the released split, or start R1 training/benchmark execution until OWNER approves a protocol-level
+resolution.
 
 ## Resume commands/checks
 
@@ -133,8 +139,8 @@ blocking split finding must be resolved before training. Training may begin only
 
 ## Do-not-do / governance reminders
 
-- Do not train models, execute R1, or create a long-run Pod during R1-P0. The owner-authorized short lifecycle smoke
-  is infrastructure evidence only.
+- Do not train models or execute the R1 benchmark while R1-P0 is blocked. Owner-authorized P0 acquisition/runtime
+  validation and the accepted short lifecycle smoke are execution/infrastructure evidence only.
 - Acquire only the frozen public records/assets through official paths; do not use mirrors or silently substitute.
 - Do not put hospital images, PHI, credentials, secrets, private data, model weights, or machine-local secrets in Git or
   this handoff.

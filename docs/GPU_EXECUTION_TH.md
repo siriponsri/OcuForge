@@ -3,9 +3,10 @@
 **Status:** ACTIVE SUPPORTING RUNTIME GUIDE
 **Authority:** [`POC_MASTER_PLAN.md`](POC_MASTER_PLAN.md)
 
-The current gates are `R0_V3=PASS`, `R1_P0_ACQUISITION_PREFLIGHT=BLOCKED` on a released-split duplicate leakage
-finding, and R1 C0/C1/C2 is `READY_NOT_EXECUTED`. This document authorizes the owner-approved public RunPod runtime for R1-P0
-acquisition and validation only; it does not authorize training or R1 execution before P0 unlock. R1-P0 Global may
+The current gates are `R0_V3=PASS`, `CAMPAIGN_START_READY=YES`, `R1_P0_EXECUTION_READY=YES`,
+`R1_P0_ACQUISITION_PREFLIGHT=BLOCKED` on a released-split duplicate leakage finding, and `R1_TRAINING_READY=NO`.
+R1 C0/C1/C2 is `READY_NOT_EXECUTED`. This document authorizes the owner-approved public RunPod runtime for R1-P0
+acquisition and validation; it does not authorize R1 training or benchmark execution before P0 unlock. R1-P0 Global may
 acquire only MMRDR-UWF and the approved C0/C1/C2 assets under its contract; IDRiD is deferred to R2/R3.
 
 ## Allowed zones

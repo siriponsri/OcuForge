@@ -24,7 +24,10 @@ inference, clinical integration, and all hospital/private data and derived artif
 
 ```text
 R0_V3=PASS
+CAMPAIGN_START_READY=YES
+R1_P0_EXECUTION_READY=YES
 R1_P0_ACQUISITION_PREFLIGHT=BLOCKED
+R1_TRAINING_READY=NO
 R1_THREE_CANDIDATE_BENCHMARK=READY_NOT_EXECUTED
 CURRENT_R1_CHAMPION=NONE
 HISTORICAL_PRIOR=AVAILABLE
@@ -93,12 +96,13 @@ inventories, schema smoke, preprocessing smoke, gated access, model loading, and
 
 R1-P0 is currently `BLOCKED` because its completed schema/split check found exact duplicate-content groups crossing the
 released train/test boundary. The official split is preserved and no rows are silently reshuffled or excluded. Its
-execution was authorized on the intended public-data RunPod runtime. The allowed states are `READY_NOT_EXECUTED`,
+execution was authorized and completed on the intended public-data RunPod runtime. The allowed states are `READY_NOT_EXECUTED`,
 `RUNNING`, `PASS_WITH_WARNINGS`, `PASS`, and `BLOCKED`. Training may unlock after `PASS` or `PASS_WITH_WARNINGS` only
 when no blocking finding remains and all warnings are carried into R1 artifacts. `BLOCKED` is reserved for a finding
 that invalidates the experiment, violates access/license/governance, creates leakage, uses corrupt/incompatible
 required assets, or makes execution impossible. P0 may provision only the owner-authorized public RunPod runtime and
-must not train, execute R1, or silently substitute data or model assets.
+must not train, execute the R1 benchmark, or silently substitute data or model assets. A `BLOCKED` or
+`READY_NOT_EXECUTED` P0 state starts or resumes P0 acquisition/runtime validation; it does not refuse campaign start.
 
 R1-P0 Global requires only MMRDR-UWF, the C0/C1/C2 assets, storage/runtime readiness, and preprocessing/model-load
 checks. Those checks passed, but the released-split duplicate leakage is a blocker. IDRiD acquisition, mask coverage,
@@ -204,8 +208,9 @@ Document status is tracked in [DOCUMENT_STATUS.md](DOCUMENT_STATUS.md). A docume
 
 ## Execution gate
 
-The next permitted manual action is OWNER review of the released-split duplicate leakage recorded by R1-P0. Do not
-train, execute R1, or promote a model until the blocker is resolved and P0 reaches `PASS` or `PASS_WITH_WARNINGS`
-without a blocker. After that condition and `RUNPOD_AUTOMATION_SMOKE=PASS` or `PASS_WITH_WARNINGS`, the authorized
-unattended overnight run may continue automatically through C0, C1, and C2 in order with validated checkpoints.
+The next permitted manual action is OWNER review of the released-split duplicate leakage recorded by R1-P0. P0
+acquisition/runtime execution is already authorized and complete; do not train, execute the R1 benchmark, or promote a
+model until the blocker is resolved and P0 reaches `PASS` or `PASS_WITH_WARNINGS` without a blocker. After that
+condition and `RUNPOD_AUTOMATION_SMOKE=PASS` or `PASS_WITH_WARNINGS`, the authorized unattended overnight run may
+continue automatically through C0, C1, and C2 in order with validated checkpoints.
 No champion is selected and no CE-vs-CORN ablation is authorized by this continuation.
