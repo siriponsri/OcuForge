@@ -161,7 +161,7 @@
         "OCUFORGE_DATA_ROOT, OCUFORGE_MODEL_ROOT, OCUFORGE_CACHE_ROOT, and OCUFORGE_ARTIFACT_ROOT resolved",
         "Capacity and permissions check for the future manifest",
         "Runtime version and GPU/CPU class recorded where material",
-        "Public/synthetic-only cloud boundary confirmed; no cloud provisioning in P0"
+        "Public/synthetic-only cloud boundary confirmed; OWNER-authorized public RunPod provisioning only, with no private data, training, or Network Volume"
       ],
       "failure_action": "BLOCKED; repair storage/runtime configuration before downloading large archives.",
       "blocking_conditions": ["Required roots, capacity, permissions, or runtime readiness are unavailable, or the public/synthetic boundary cannot be enforced."],
