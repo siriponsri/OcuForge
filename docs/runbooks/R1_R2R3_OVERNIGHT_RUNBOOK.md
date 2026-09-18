@@ -14,17 +14,19 @@
 
 ## 1. Purpose
 
-Run the next OcuForge research campaign as two supervised, independent lanes:
+Run the next OcuForge research campaign as three supervised workstreams. The two research lanes are independent; the Colab lane is an optional utility/reproduction lane:
 
 ```text
 main / Reporter
 ├── exp/r1-global
-│   └── RunPod A
-└── exp/r2-r3-roi
-    └── RunPod B
+│   └── RunPod A: R1-P0 -> C0 -> C1 -> C2 -> evidence freeze
+├── exp/r2-r3-roi
+│   └── RunPod B: IDRiD preflight -> R2 -> R3 -> evidence freeze
+└── utility/colab-mcp
+    └── Colab MCP setup/smoke + Drive notebook readiness
 ```
 
-The campaign is notebook-first for review and presentation, while reusable data/model/evaluation logic remains in normal Python modules.
+Authoritative RunPod execution is headless and durable through reusable Python modules/scripts. Notebooks are first-class reproduction/review artifacts. Colab MCP is a non-blocking utility lane.
 
 Desired morning state:
 
@@ -91,6 +93,17 @@ If `POC_MASTER_PLAN.md` or `R1_GLOBAL_MODEL_SELECTION.md` still requires a human
 4. wait for OWNER approval and merge before unattended C0/C1/C2 execution.
 
 Do not silently reinterpret the current protocol.
+
+### OWNER campaign authorization
+
+For this campaign, the OWNER explicitly authorizes:
+
+- R1-P0 execution on the intended RunPod public-data runtime;
+- direct continuation from successful R1-P0 into `C0 -> C1 -> C2` without an additional human stop;
+- independent parallel execution of the IDRiD R2/R3 lane after its own preflight passes;
+- parallel Colab MCP setup/smoke as a non-blocking utility lane.
+
+If `POC_MASTER_PLAN.md`, `HANDOFF.md`, the P0 contract, or another active supporting document still contains stale wording that conflicts with these OWNER decisions, make the smallest documentation-only alignment first, validate it, commit/push it, then continue. Do not weaken any scientific, governance, leakage, split, target, or model-asset gate.
 
 ---
 
@@ -234,6 +247,12 @@ RUNPOD_AUTOMATION_SMOKE=BLOCKED
 
 No long-run experiment may begin without `PASS` or `PASS_WITH_WARNINGS` and no remaining blocker.
 
+### Reuse of accepted smoke evidence
+
+If the current authoritative main already records `RUNPOD_AUTOMATION_SMOKE=PASS` or `PASS_WITH_WARNINGS`, credential safety remains valid, no Pod is unexpectedly live, and the normal lifecycle/export path has not materially changed, **reuse that evidence**. Do not create another smoke Pod merely because a new campaign is starting.
+
+Run a new smoke only when the prior evidence is invalidated by a material lifecycle, credential, template, or control-path change.
+
 ---
 
 ## 8. R1-P0 ordering
@@ -248,6 +267,7 @@ The intended order is:
 infrastructure smoke
 -> R1-P0 acquisition/runtime checks on the intended RunPod environment
 -> R1-P0 PASS / PASS_WITH_WARNINGS with no blocker
+-> continue automatically in the same authorized campaign
 -> C0 -> C1 -> C2
 ```
 
@@ -255,7 +275,7 @@ The lifecycle smoke is infrastructure evidence, not scientific P0 evidence.
 
 If the authoritative main branch still states that no cloud provisioning is allowed during R1-P0, the coordinator must make the smallest documentation-only alignment required to encode the OWNER decision before paid P0 execution. Do not weaken dataset, split, target, model-asset, leakage, or license rules.
 
-Warnings from R1-P0 must propagate into every R1 artifact.
+Warnings from R1-P0 must propagate into every R1 artifact. A successful P0 does not require an additional OWNER stop before C0 for this campaign.
 
 ---
 
@@ -281,6 +301,23 @@ Do not use Orca's default official-Codex launcher for experiment workers.
 Use Orca structured Tasks/Dispatches and lifecycle receipts.
 
 Every Task must state `TARGET`, `CHANGE`, `CONSTRAINTS`, `OWNERSHIP`, and `OBSERVABLE ACCEPTANCE`.
+
+Parallel execution policy:
+
+```text
+START
+├── R1 GLOBAL: R1-P0 -> C0 -> C1 -> C2
+├── R2/R3 ROI: IDRiD preflight -> R2 -> R3
+└── COLAB MCP: setup/smoke -> Drive notebook readiness
+```
+
+Rules:
+
+- R2/R3 must not wait for R1-P0 unless a real shared dependency requires it.
+- Colab MCP must not delay either RunPod lane.
+- A blocker in one research lane does not stop the other when the other remains scientifically valid.
+- Use at most two paid long-run RunPod Pods concurrently under this runbook.
+- Do not keep a Colab GPU running merely for standby.
 
 ---
 
@@ -496,7 +533,7 @@ DagsHub/MLflow is the campaign observability/evidence mirror. Local structured a
 
 ## 14A. Optional Colab MCP standby lane
 
-After the infrastructure preflight passes and before the long run, the coordinator may configure `googlecolab/colab-mcp` as an **optional reproduction/fallback lane**.
+After accepted infrastructure-smoke evidence is confirmed, the coordinator may configure `googlecolab/colab-mcp` **in parallel with the research campaign** as an optional reproduction/fallback lane.
 
 Colab-ready reproduction notebooks are maintained through:
 
@@ -507,7 +544,7 @@ Colab-ready reproduction notebooks are maintained through:
 Rules:
 
 - Colab MCP is not an R1/R2/R3 scientific dependency;
-- failure to configure it does not block RunPod when the RunPod path is valid;
+- failure to configure it does not block or delay RunPod when the RunPod path is valid;
 - do not consume Colab GPU merely to keep the connection alive;
 - use it for Colab-ready notebook smoke, reproduction, debugging, or later demo work;
 - do not upload hospital/private data or secrets;
@@ -671,6 +708,7 @@ TOTAL_ESTIMATED_COST:
 ACTIVE_PODS:
 STOPPED_PODS:
 TERMINATED_PODS:
+COLAB_MCP_STATUS:
 OWNER_DECISION_NEEDED:
 ```
 
@@ -720,18 +758,32 @@ Do not merge experiment branches to `main`, select the R1 winner, run CE-vs-CORN
 ```text
 /goal
 
-Run the OcuForge overnight research campaign from the current clean main.
+Run the OcuForge campaign from current clean main using docs/runbooks/R1_R2R3_OVERNIGHT_RUNBOOK.md as the execution runbook.
 
-Read AGENTS.md, HANDOFF.md, docs/POC_MASTER_PLAN.md, and
-docs/runbooks/R1_R2R3_OVERNIGHT_RUNBOOK.md first.
+Read AGENTS.md, HANDOFF.md, docs/POC_MASTER_PLAN.md, docs/R1_P0_ACQUISITION_PREFLIGHT.{md,json}, docs/R1_GLOBAL_MODEL_SELECTION.md, docs/GPU_EXECUTION_TH.md, and the runbook.
 
-Act only as the Main Reporter/Coordinator. Use supervised Orca workers launched through MaxPlus Codex + Luna Max.
+Act as Main Reporter/Coordinator only. Launch experiment workers only through C:\Users\Siripon Sri\bin\maxplus-codex.cmd.
 
-Follow the runbook exactly: satisfy R1-P0 and protocol alignment; prove automatic RunPod create/start/stop/terminate with the mandatory short lifecycle smoke; if automation cannot be proven, mark BLOCKED and do not start long Pods; then run independent exp/r1-global and exp/r2-r3-roi lanes using durable headless project execution plus Colab-ready reproduction notebooks and executed results reports; checkpoint/commit/push, export results locally, mirror public-safe evidence to DagsHub/MLflow, and use no Network Volume.
+OWNER authorizes three concurrent workstreams:
 
-After verified local export, automatically terminate long-run Pods. If export or lifecycle safety is uncertain, stop the affected Pod and wait for OWNER review.
+A) R1 GLOBAL
+Reuse accepted RUNPOD_AUTOMATION_SMOKE=PASS/PASS_WITH_WARNINGS; do not repeat smoke unless materially invalidated. If active docs still contain stale wording that forbids OWNER-authorized RunPod P0 or requires a human stop between successful P0 and R1, make the smallest docs-only alignment, validate, commit/push, then continue. Run R1-P0 on RunPod: frozen MMRDR-UWF + exact C0/C1/C2 assets, hashes/integrity, released split/schema/duplicate checks, preprocessing, exact model load + forward-pass, runtime/roots. NO TRAINING until P0=PASS/PASS_WITH_WARNINGS with no blocker. Then automatically continue C0 CE -> checkpoint -> C1 CE -> checkpoint -> C2 MIL+CE -> comparison/calibration/error-analysis evidence freeze. No champion. No CE-vs-CORN.
 
-Do not merge to main, select the R1 winner, or run CE-vs-CORN. Stop at the morning-review boundary.
+B) R2/R3 ROI
+Run independently in parallel: IDRiD acquisition/preflight -> identity/split/leakage review -> R2 spatial/ROI build -> geometry/provenance QA -> R3 supported-lesion train/eval -> evidence freeze. IDRiD research-only RunPod is authorized. DDR/OIA-DDR not admitted. R1 failure must not stop valid R2/R3.
+
+C) COLAB MCP
+In parallel, configure/smoke googlecolab/colab-mcp and OWNER Drive ocuforge folder from the runbook. Create only a small notebook smoke and prepare Colab-ready reproduction notebooks. Do not keep Colab GPU alive for standby. Colab failure is non-blocking.
+
+Use max two paid long-run RunPod Pods, no Network Volume, total GPU budget <= USD50. Run authoritative training headlessly; also produce Colab-ready reproduction notebooks and executed result/report notebooks.
+
+Mirror public-safe evidence to DagsHub/MLflow experiments ocuforge-r1-global, ocuforge-r2-spatial, ocuforge-r3-roi. DagsHub failure alone = PASS_WITH_WARNINGS if local evidence is complete.
+
+Checkpoint -> validate -> commit -> push -> evidence -> continue. OWNER workstation is CPU-only/limited-disk: export notebooks, reports, metrics, figures, manifests/configs, calibration/preprocessing contracts, revision/hash metadata, and lightweight heads when useful. Do not copy raw datasets or reacquirable full backbones by default.
+
+Before Pod termination: export -> verify manifest/hashes -> verify branch pushed -> record DagsHub status. If verified, terminate immediately and confirm gone. If export uncertain, STOP Pod; do not terminate.
+
+Do not merge experiment branches to main. Stop only at R1 evidence freeze + R2/R3 evidence freeze + verified exports + Pod cleanup. Report morning state per runbook.
 ```
 
 ---
@@ -755,12 +807,13 @@ Inspect existing Tasks, Dispatches, worktrees, RunPod resources, Git branches, l
 [ ] runbook committed
 [ ] protocol docs allow unattended C0 -> C1 -> C2 checkpoint continuation
 [ ] HANDOFF points to the correct next execution path
-[ ] RunPod automation exists locally without exposing secrets
+[ ] accepted RunPod smoke evidence is PASS/PASS_WITH_WARNINGS and not materially invalidated
 [ ] DagsHub/MLflow credentials remain outside Git
 [ ] DagsHub target is siriponsri/OcuForge experiments
 [ ] local CPU/limited-disk export policy is accepted
 [ ] local-state/ is Git-ignored
 [ ] no existing OcuForge Pod will be duplicated
+[ ] max two paid long-run RunPod Pods concurrently
 [ ] budget guard is accepted
 ```
 
