@@ -2,14 +2,14 @@
   "schema_version": "0.1",
   "status": "PASS_WITH_WARNINGS",
   "branch": "siriponsri/exp-colab-mcp-utility",
-  "commit_checked": "99f4a06f66e05495910f5f5934a9d1c4731cd5d0",
+  "commit_checked": "78374a0ba96d5e627da38525e2a0bd56bc9024ef",
   "baseline_commit_inspected": "a0accc0",
   "commits_inspected": [
+    "78374a0 Harden Colab readiness evidence checks",
     "99f4a06 Add non-blocking Colab readiness lane",
     "a0accc0 Align campaign execution gate semantics",
     "09d4f99 Align headless R1 checkpoint continuation",
-    "707efd5 Align current R1 P0 execution state",
-    "88f9735 Record R1 P0 split leakage blocker"
+    "707efd5 Align current R1 P0 execution state"
   ],
   "files_inspected": [
     "AGENTS.md",
