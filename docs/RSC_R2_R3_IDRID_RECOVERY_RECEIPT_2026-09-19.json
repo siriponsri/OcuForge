@@ -12,7 +12,35 @@
     "invocation": "--help",
     "result": "PASS"
   },
-  "outcome": "BLOCKED_R3_RUNTIME",
+  "follow_up": {
+    "recorded_at": "2026-09-19T03:16:16+07:00",
+    "runpod_rest_probe": {
+      "method": "GET",
+      "path": "/v1/pods",
+      "http_status": 200,
+      "active_pods": 0,
+      "credential_values_recorded": false
+    },
+    "mlflow_probe": {
+      "method": "GET",
+      "tracking_uri": "https://dagshub.com/siriponsri/OcuForge.mlflow",
+      "experiment_name": "ocuforge-r3-roi",
+      "endpoint": "/api/2.0/mlflow/experiments/get-by-name",
+      "credential_source": "CURRENT_OR_WINDOWS_USER_ENVIRONMENT",
+      "credential_values_recorded": false,
+      "http_status": 404,
+      "write_attempted": false
+    },
+    "entrypoint_audit": {
+      "r3_train_eval_entrypoint": "NOT_IMPLEMENTED",
+      "r3_config": "NOT_PRESENT",
+      "roi_image_manifest": "NOT_PRESENT",
+      "supported_lesion_target_manifest": "NOT_PRESENT",
+      "generic_global_mil_path_compatible": false,
+      "reason": "Committed train/evaluate modules require feature-indexed ImageManifest records and dr_grade or binary_dr targets; the R2 ROI manifest is class-level geometry/provenance and is not an R3 classifier input contract."
+    }
+  },
+  "outcome": "BLOCKED_R3_IMPLEMENTATION",
   "preflight": {
     "outcome": "PASS_WITH_WARNINGS",
     "official_drive_folder_id": "1JYKhcSf9IWjIItbGtq3mN4hTEl5Of_jp",
@@ -79,14 +107,20 @@
   },
   "r3": {
     "outcome": "BLOCKED",
-    "blocker": "BLOCKED_R3_RUNTIME_AUTH_OR_TORCH",
+    "blocker": "BLOCKED_R3_IMPLEMENTATION_ENTRYPOINT_AND_CONTRACT",
     "torch_installed": false,
+    "mlflow_client_installed": false,
     "runpodctl_present": false,
-    "runpod_authenticated": false,
-    "mlflow_authenticated_probe": "NOT_EXECUTED_NO_CREDENTIALS",
+    "runpod_authenticated": true,
+    "runpod_rest_probe": "HTTP_200_ZERO_ACTIVE_PODS",
+    "mlflow_authenticated_probe": "HTTP_404_READ_ONLY_GET_NO_WRITE",
+    "r3_train_eval_entrypoint": "NOT_IMPLEMENTED",
+    "r3_contract_inputs": "NOT_PRESENT",
     "training_started": false,
     "evaluation_started": false,
     "checkpoint_created": false,
+    "metrics": "NOT_EXECUTED_NO_R3_ENTRYPOINT",
+    "runtime_seconds": 0,
     "estimated_cost_usd": 0
   },
   "governance": {
@@ -96,5 +130,19 @@
     "secrets_recorded": false,
     "full_checkpoint_exported": false
   },
-  "next_safe_gate": "Provide an authorized non-logging runtime and complete the required in-memory MLflow probe before R3 baseline training/evaluation."
+  "export": {
+    "verified": false,
+    "status": "NOT_APPLICABLE_NO_POD_CREATED",
+    "pod_created": false,
+    "pod_terminated": false,
+    "active_pods_after_probe": 0
+  },
+  "validation": {
+    "receipt_and_r2_manifests_json_parse": "PASS",
+    "r0_r1_validator": "PASS",
+    "git_diff_check": "PASS",
+    "focused_pytest": "NOT_RUN_PYTEST_MODULE_UNAVAILABLE",
+    "dependency_install_attempted": false
+  },
+  "next_safe_gate": "Owner-approved R3 supported-lesion classifier train/eval entrypoint plus compatible ROI image/target contract inputs; do not invent a scientific pipeline in this recovery checkpoint."
 }

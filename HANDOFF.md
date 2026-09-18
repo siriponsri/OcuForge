@@ -16,7 +16,7 @@ R1_GLOBAL_BENCHMARK=READY_NOT_EXECUTED
 CURRENT_R1_CHAMPION=NONE
 R2_R3_IDRID_PREFLIGHT=PASS_WITH_WARNINGS
 R2_R3_IDRID_R2=PASS_WITH_WARNINGS
-R2_R3_IDRID_R3=BLOCKED_RUNTIME
+R2_R3_IDRID_R3=BLOCKED_IMPLEMENTATION
 ```
 
 R0 scientific evidence review passed. R1-P0 Global is the active scientific unlock gate, while its acquisition/runtime
@@ -101,10 +101,15 @@ normalized geometry provenance; missing masks remain `UNKNOWN`, present empty ma
 `docs/RSC_R2_R3_IDRID_RECOVERY_RECEIPT_2026-09-19.json`; complete file inventories remain ignored under
 `local-state/campaigns/r2-r3-idrid-20260919/`.
 
-R3 did not start: Torch is not installed, RunPod control is unauthenticated, and the required MLflow/DagsHub
-credentials are unavailable for an in-memory probe. No Pod, Network Volume, checkpoint, upload, or paid resource was
-created; estimated lane cost is USD 0. The next safe action is to restore an authorized non-logging runtime and run
-the required one-time in-memory MLflow probe before R3 baseline training/evaluation.
+R3 did not start. The coordinator's official RunPod REST read-only probe returned HTTP 200 with zero active Pods, and
+the one required credentialed MLflow read-only GET for `ocuforge-r3-roi` returned HTTP 404 without a write. The exact
+implementation audit found no committed R3 supported-lesion classifier train/eval entrypoint, R3 config, ROI image
+manifest, or supported-lesion target manifest; only the generic global DR MIL train/evaluate path exists, and its
+feature-indexed `ImageManifest` plus `dr_grade`/`binary_dr` contract is incompatible with the R2 spatial ROI manifest.
+Torch is absent locally but is secondary because there is no executable R3 path to run in an approved PyTorch Pod.
+No model, metric, checkpoint, DagsHub run, Pod, Network Volume, upload, or export was created; runtime and estimated
+lane cost remain zero, and Pod termination is not applicable. The next safe action is an owner-approved R3 classifier
+implementation and compatible input contract; do not invent that scientific pipeline in this recovery checkpoint.
 
 ## Important artifacts/files
 
