@@ -15,7 +15,8 @@ CURRENT_R1_CHAMPION=NONE
 
 R0 scientific evidence review passed. R1-P0 Global is the next and only permitted execution gate. Its allowed terminal
 outcomes are `PASS`, `PASS_WITH_WARNINGS`, and `BLOCKED`; `PASS` or `PASS_WITH_WARNINGS` unlocks candidate training only
-when no blocking finding remains. It does not authorize cloud provisioning or execute R1 itself.
+when no blocking finding remains. Owner authorization permits P0 acquisition/runtime validation on public RunPod; it
+does not authorize training or execute R1 itself.
 
 ## What was completed
 
@@ -38,7 +39,7 @@ when no blocking finding remains. It does not authorize cloud provisioning or ex
 
 ## R1-P0 decision and checks
 
-The campaign cannot proceed: R1 remains locked by R1-P0 `BLOCKED`. The owner-authorized RunPod lifecycle smoke
+R1 training cannot proceed because R1-P0 remains `BLOCKED`. The owner-authorized RunPod lifecycle smoke
 verified creation/readiness, remote execution, exact C2 metadata access, Pod roots, local sentinel export/hash, stop,
 termination, and confirmation that no Pod remained. The prior stop/start probe failed only because the provider had
 insufficient GPU capacity; under the revised runbook this is recovery-path evidence and the infrastructure result is
@@ -111,8 +112,9 @@ python scripts/package_check.py
 git diff --check
 ```
 
-Inspect `git status --short --branch` before editing. Do not train or execute R1 as part of R1-P0. Training may begin
-only after P0 is `PASS` or `PASS_WITH_WARNINGS` with no blocker; copy P0 warnings to every R1 artifact.
+Inspect `git status --short --branch` before editing. Execute R1-P0 acquisition/runtime validation on the authorized
+public RunPod path, but do not train or execute R1 as part of P0. Training may begin only after P0 is `PASS` or
+`PASS_WITH_WARNINGS` with no blocker; copy P0 warnings to every R1 artifact.
 
 ## External dependencies/assets
 

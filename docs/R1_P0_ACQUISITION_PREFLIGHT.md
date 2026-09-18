@@ -5,7 +5,8 @@
 **Authority:** [`POC_MASTER_PLAN.md`](POC_MASTER_PLAN.md)
 **Machine-readable contract:** [`R1_P0_ACQUISITION_PREFLIGHT.json`](R1_P0_ACQUISITION_PREFLIGHT.json)
 
-R1-P0 is the post-R0 acquisition and runtime gate. It exists because archive/file hashes, extracted inventories,
+R1-P0 is the post-R0 acquisition and runtime gate. It may execute on the owner-authorized public RunPod runtime. It
+exists because archive/file hashes, extracted inventories,
 schema smoke tests, model weight hashes, gated access, and model loading cannot be verified before the authorized bytes
 are acquired. It is not an R1 training run.
 
@@ -29,7 +30,7 @@ R1 execution condition. `RUNNING` is not an unlock state. The 2026-09-18 receipt
 
 ## Current decision
 
-R1 cannot proceed because R1-P0 is `BLOCKED`. Authenticated access to the exact C2 revision was verified inside one
+R1 training cannot proceed because R1-P0 is `BLOCKED`; P0 execution itself is authorized. Authenticated access to the exact C2 revision was verified inside one
 short-lived RunPod, all four Pod-side OcuForge roots were writable, and no model or data bytes were downloaded. The
 normal smoke path passed; the prior stop/start probe failed only because RunPod reported insufficient free GPUs and
 the retry's sentinel persistence was not verified. Under the revised runbook this is a non-blocking recovery-path
@@ -50,9 +51,9 @@ that no Pod remained all passed. The one restart attempt returned provider succe
 after a bounded readiness wait; this is recorded as the allowed recovery-path warning. Therefore
 `RUNPOD_AUTOMATION_SMOKE=PASS_WITH_WARNINGS` with no smoke blocker.
 
-R1 training remains forbidden. Do not start long-run Pods until a later owner-authorized smoke proves the required
-normal path and R1-P0 acquisition, integrity, schema/split, preprocessing, model-load, and forward-pass checks reach
-`PASS` or `PASS_WITH_WARNINGS` with no blocker.
+R1 training remains forbidden. Do not start long-run training until R1-P0 acquisition, integrity, schema/split,
+preprocessing, model-load, and forward-pass checks reach `PASS` or `PASS_WITH_WARNINGS` with no blocker. The accepted
+infrastructure smoke is already `PASS_WITH_WARNINGS` and does not need to be repeated unless materially invalidated.
 
 ## Required sequence
 
@@ -60,7 +61,8 @@ normal path and R1-P0 acquisition, integrity, schema/split, preprocessing, model
 2. Resolve the four provider-neutral storage roots without placing secrets in Git.
 3. Authenticate and accept the exact gated C2 asset through the official Hugging Face path, without placing credentials
    or tokens in Git.
-4. Configure sufficient local runtime dependencies and roots before acquiring large archives.
+4. Configure the provider-neutral roots and runtime on the authorized RunPod target; local Windows torch/disk capacity
+   is not a P0 prerequisite.
 5. Preserve the owner decision authorizing IDRiD research-only RunPod execution under the public-data boundary.
 6. Acquire only the frozen MMRDR-UWF record and the exact C0/C1/C2 assets through their official access paths.
 7. Compute and record archive/file SHA-256 values, integrity results, and extracted inventories locally.
@@ -104,6 +106,6 @@ and claim ceilings as non-blocking warnings.
 - Treat unannotated IDRiD regions as `UNKNOWN` or `WEAK_NEGATIVE` unless a verified source rule supports clean negatives.
 - Do not convert MMRDR image-level lesion presence into ROI geometry.
 - Do not silently substitute model assets or use a TinyTestEncoder fallback.
-- Do not upload private data or derived artifacts. The owner-authorized lifecycle smoke is infrastructure evidence
-  only; it does not provision a long-run campaign Pod.
-- Do not execute R1 during P0; P0 only determines whether R1 may unlock.
+- Do not upload private data or derived artifacts. P0 may provision only its authorized short-lived public-data
+  validation runtime; it does not authorize a long-run training Pod.
+- Do not execute R1 during P0; P0 execution determines whether R1 may unlock.

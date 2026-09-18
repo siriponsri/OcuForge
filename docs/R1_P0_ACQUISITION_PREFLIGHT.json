@@ -10,11 +10,14 @@
   "authority": "docs/POC_MASTER_PLAN.md",
   "r0_status": "R0_DATASET_TAXONOMY=PASS",
   "r1_status": "R1_GLOBAL_BENCHMARK=READY_NOT_EXECUTED",
+  "campaign_start_ready": true,
+  "r1_p0_execution_ready": true,
+  "r1_training_ready": false,
   "training_unlock": "FORBIDDEN_UNTIL_PASS_OR_PASS_WITH_WARNINGS",
   "training_unlock_states": ["PASS", "PASS_WITH_WARNINGS"],
   "requires_no_blocking_finding": true,
   "manifest_reference": "docs/RSC_R0_DATASET_TAXONOMY_FREEZE_v0.1.json#future_download_manifest",
-  "execution_scope": "Acquire and verify only the frozen MMRDR-UWF record and approved C0/C1/C2 public model assets needed by R1; do not train, benchmark, promote a champion, or provision cloud in R1-P0.",
+  "execution_scope": "On the owner-authorized public RunPod runtime, acquire and verify only the frozen MMRDR-UWF record and approved C0/C1/C2 public model assets needed by R1; do not train, benchmark, promote a champion, or execute R1 in R1-P0.",
   "state_machine": {
     "states": [
       "READY_NOT_EXECUTED",
@@ -243,6 +246,7 @@
       "phi_or_image_bytes_recorded": false,
       "cloud_provisioning_performed": true,
       "cloud_provisioning_scope": "OWNER_AUTHORIZED_SHORT_LIVED_RUNPOD_LIFECYCLE_SMOKE_ONLY; no dataset or model bytes downloaded and no training",
+      "cloud_provisioning_authorized": true,
       "idrid_cloud_eligible": true,
       "idrid_r1_p0_blocker": false,
       "requested_runpod_idrid_lane": "AUTHORIZED_FOR_R2_R3_RESEARCH_EXECUTION; R2_R3_PREFLIGHT_NOT_EXECUTED"
@@ -266,7 +270,8 @@
     "no_pod_confirmation": "PASS; follow-up lookup was not_found and Pod list was empty",
     "prior_smoke_evidence_preserved": true,
     "training_allowed": false,
-    "long_run_allowed": false,
+    "r1_p0_execution_ready": true,
+    "r1_training_ready": false,
     "warning": "Stop/start persistence is recovery-path evidence only under the revised runbook; normal-path smoke controls passed."
   },
   "r1_dependencies": {
@@ -320,7 +325,7 @@
     }
   },
   "private_data_allowed": false,
-  "cloud_provisioning": false,
+  "cloud_provisioning_authorized": true,
   "completion_rule": "R1-P0 is PASS when every required check is PASS and all evidence is recorded. It is PASS_WITH_WARNINGS when every required check is PASS or PASS_WITH_WARNINGS, all warnings are explicit with blocks_r1=false, no blocker remains, and the warning record is carried into every R1 artifact. It is BLOCKED only under the blocking rule.",
-  "next_gate": "R1_GLOBAL_BENCHMARK=READY_NOT_EXECUTED after R1-P0 PASS or PASS_WITH_WARNINGS with no blocking finding; operator still runs one candidate at a time and stops for human review."
+  "next_gate": "Execute R1-P0 on the authorized public RunPod runtime. After PASS or PASS_WITH_WARNINGS with no blocking finding, continue automatically through C0 -> C1 -> C2 with validated checkpoints and stop at the evidence freeze."
 }

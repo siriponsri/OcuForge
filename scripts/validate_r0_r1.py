@@ -353,8 +353,10 @@ def validate_r1_p0(data, root=ROOT):
         raise ValueError("R1-P0 storage roots must use the four OcuForge root environment variables")
     for value in roots.get("layout", {}).values():
         relative_path(value)
-    if data.get("private_data_allowed") or data.get("cloud_provisioning"):
-        raise ValueError("R1-P0 cannot permit private data or cloud provisioning")
+    if data.get("private_data_allowed"):
+        raise ValueError("R1-P0 cannot permit private data")
+    if data.get("cloud_provisioning_authorized") is not True:
+        raise ValueError("R1-P0 must record owner authorization for its public RunPod runtime")
     return True
 
 

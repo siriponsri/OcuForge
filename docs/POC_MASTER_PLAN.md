@@ -92,12 +92,13 @@ inventories, schema smoke, preprocessing smoke, gated access, model loading, and
 
 ## R1-P0 - acquisition preflight
 
-R1-P0 is `READY_NOT_EXECUTED`. It is the only next gate. The allowed states are `READY_NOT_EXECUTED`, `RUNNING`,
-`PASS_WITH_WARNINGS`, `PASS`, and `BLOCKED`. Training may unlock after `PASS` or `PASS_WITH_WARNINGS` only when no
-blocking finding remains and all warnings are carried into R1 artifacts. `BLOCKED` is reserved for a finding that
-invalidates the experiment, violates access/license/governance, creates leakage, uses corrupt/incompatible required
-assets, or makes execution impossible. P0 must not execute R1, provision cloud compute, or silently substitute data
-or model assets.
+R1-P0 is currently `BLOCKED` because its byte-dependent checks have not executed. It is the only next gate, and its
+execution is authorized on the intended public-data RunPod runtime. The allowed states are `READY_NOT_EXECUTED`,
+`RUNNING`, `PASS_WITH_WARNINGS`, `PASS`, and `BLOCKED`. Training may unlock after `PASS` or `PASS_WITH_WARNINGS` only
+when no blocking finding remains and all warnings are carried into R1 artifacts. `BLOCKED` is reserved for a finding
+that invalidates the experiment, violates access/license/governance, creates leakage, uses corrupt/incompatible
+required assets, or makes execution impossible. P0 may provision only the owner-authorized public RunPod runtime and
+must not train, execute R1, or silently substitute data or model assets.
 
 R1-P0 Global requires only MMRDR-UWF, the C0/C1/C2 assets, storage/runtime readiness, and preprocessing/model-load
 checks. IDRiD acquisition, mask coverage, image-level split verification, and its conservative negative policy are
@@ -202,10 +203,9 @@ Document status is tracked in [DOCUMENT_STATUS.md](DOCUMENT_STATUS.md). A docume
 
 ## Execution gate
 
-The next permitted manual action is to execute the R1-P0 acquisition preflight. Do not train, execute R1, provision a
-cloud provider, or promote a model until P0 passes. After P0 reaches `PASS` or `PASS_WITH_WARNINGS` without a blocker,
-and `RUNPOD_AUTOMATION_SMOKE` reaches `PASS` or `PASS_WITH_WARNINGS`, the authorized unattended overnight run may
-execute C0, C1,
-and C2 in order with validated checkpoints between candidates. It must stop at the evidence freeze for the mandatory
-OWNER/morning architecture-selection gate; no champion is selected and no CE-vs-CORN ablation is authorized by this
-overnight continuation.
+The next permitted manual action is to execute the R1-P0 acquisition preflight on the owner-authorized public RunPod
+runtime. Do not train, execute R1, or promote a model until P0 passes. After P0 reaches `PASS` or `PASS_WITH_WARNINGS`
+without a blocker, and `RUNPOD_AUTOMATION_SMOKE` reaches `PASS` or `PASS_WITH_WARNINGS`, the authorized unattended
+overnight run may continue automatically through C0, C1, and C2 in order with validated checkpoints between
+candidates. It must stop at the evidence freeze for the mandatory OWNER/morning architecture-selection gate; no
+champion is selected and no CE-vs-CORN ablation is authorized by this overnight continuation.
