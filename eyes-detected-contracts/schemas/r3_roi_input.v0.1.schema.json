@@ -1,0 +1,298 @@
+{
+  "$defs": {
+    "R3MaskEvidence": {
+      "additionalProperties": false,
+      "description": "One supported-mask provenance entry for the source image and selected ROI.",
+      "properties": {
+        "lesion_class": {
+          "enum": [
+            "MICROANEURYSM",
+            "INTRARETINAL_HEMORRHAGE",
+            "HARD_EXUDATE",
+            "SOFT_EXUDATE"
+          ],
+          "title": "Lesion Class",
+          "type": "string"
+        },
+        "status": {
+          "enum": [
+            "PRESENT_NONEMPTY",
+            "PRESENT_EMPTY",
+            "MISSING",
+            "UNANNOTATED"
+          ],
+          "title": "Status",
+          "type": "string"
+        },
+        "roi_presence": {
+          "enum": [
+            "PRESENT",
+            "ABSENT",
+            "UNKNOWN"
+          ],
+          "title": "Roi Presence",
+          "type": "string"
+        },
+        "source_mask_relative_uri": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Source Mask Relative Uri"
+        },
+        "source_mask_sha256": {
+          "anyOf": [
+            {
+              "pattern": "^[a-f0-9]{64}$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Source Mask Sha256"
+        }
+      },
+      "required": [
+        "lesion_class",
+        "status",
+        "roi_presence"
+      ],
+      "title": "R3MaskEvidence",
+      "type": "object"
+    },
+    "R3ROIGeometry": {
+      "additionalProperties": false,
+      "description": "Pixel and normalized ROI geometry retained from the source derivation.",
+      "properties": {
+        "bbox_xyxy_px": {
+          "maxItems": 4,
+          "minItems": 4,
+          "prefixItems": [
+            {
+              "type": "integer"
+            },
+            {
+              "type": "integer"
+            },
+            {
+              "type": "integer"
+            },
+            {
+              "type": "integer"
+            }
+          ],
+          "title": "Bbox Xyxy Px",
+          "type": "array"
+        },
+        "bbox_xyxy_norm": {
+          "maxItems": 4,
+          "minItems": 4,
+          "prefixItems": [
+            {
+              "maximum": 1,
+              "minimum": 0,
+              "type": "number"
+            },
+            {
+              "maximum": 1,
+              "minimum": 0,
+              "type": "number"
+            },
+            {
+              "maximum": 1,
+              "minimum": 0,
+              "type": "number"
+            },
+            {
+              "maximum": 1,
+              "minimum": 0,
+              "type": "number"
+            }
+          ],
+          "title": "Bbox Xyxy Norm",
+          "type": "array"
+        },
+        "provenance": {
+          "enum": [
+            "IDRID_EXACT_MASK_FOREGROUND_BBOX",
+            "EXPLICIT_ROI_PROVENANCE"
+          ],
+          "title": "Provenance",
+          "type": "string"
+        }
+      },
+      "required": [
+        "bbox_xyxy_px",
+        "bbox_xyxy_norm",
+        "provenance"
+      ],
+      "title": "R3ROIGeometry",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "description": "A crop/input row for the separate IDRiD ROI classifier.",
+  "properties": {
+    "schema_version": {
+      "const": "r3_roi_input.v0.1",
+      "default": "r3_roi_input.v0.1",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "dataset_id": {
+      "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,127}$",
+      "title": "Dataset Id",
+      "type": "string"
+    },
+    "source_type": {
+      "enum": [
+        "PUBLIC_IDRID",
+        "SYNTHETIC_FIXTURE"
+      ],
+      "title": "Source Type",
+      "type": "string"
+    },
+    "roi_id": {
+      "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,127}$",
+      "title": "Roi Id",
+      "type": "string"
+    },
+    "source_image_id": {
+      "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,127}$",
+      "title": "Source Image Id",
+      "type": "string"
+    },
+    "source_image_sha256": {
+      "pattern": "^[a-f0-9]{64}$",
+      "title": "Source Image Sha256",
+      "type": "string"
+    },
+    "source_image_relative_uri": {
+      "title": "Source Image Relative Uri",
+      "type": "string"
+    },
+    "roi_image_sha256": {
+      "pattern": "^[a-f0-9]{64}$",
+      "title": "Roi Image Sha256",
+      "type": "string"
+    },
+    "roi_image_relative_uri": {
+      "title": "Roi Image Relative Uri",
+      "type": "string"
+    },
+    "source_width_px": {
+      "exclusiveMinimum": 1,
+      "title": "Source Width Px",
+      "type": "integer"
+    },
+    "source_height_px": {
+      "exclusiveMinimum": 1,
+      "title": "Source Height Px",
+      "type": "integer"
+    },
+    "roi_width_px": {
+      "exclusiveMinimum": 1,
+      "title": "Roi Width Px",
+      "type": "integer"
+    },
+    "roi_height_px": {
+      "exclusiveMinimum": 1,
+      "title": "Roi Height Px",
+      "type": "integer"
+    },
+    "released_split": {
+      "enum": [
+        "TRAIN",
+        "TEST"
+      ],
+      "title": "Released Split",
+      "type": "string"
+    },
+    "roi_class": {
+      "anyOf": [
+        {
+          "enum": [
+            "MICROANEURYSM",
+            "INTRARETINAL_HEMORRHAGE",
+            "HARD_EXUDATE",
+            "SOFT_EXUDATE"
+          ],
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Roi Class"
+    },
+    "roi_provenance": {
+      "enum": [
+        "IDRID_MASK_FOREGROUND_BBOX",
+        "PRESENT_EMPTY_MASK_ROI",
+        "EXPLICIT_CLEAN_NEGATIVE_ROI",
+        "UNANNOTATED_OR_UNSUPPORTED_REGION"
+      ],
+      "title": "Roi Provenance",
+      "type": "string"
+    },
+    "mask_coverage": {
+      "enum": [
+        "COMPLETE_SUPPORTED_MASK_COVERAGE",
+        "INCOMPLETE_SUPPORTED_MASK_COVERAGE"
+      ],
+      "title": "Mask Coverage",
+      "type": "string"
+    },
+    "mask_evidence": {
+      "items": {
+        "$ref": "#/$defs/R3MaskEvidence"
+      },
+      "maxItems": 4,
+      "minItems": 4,
+      "title": "Mask Evidence",
+      "type": "array"
+    },
+    "geometry": {
+      "$ref": "#/$defs/R3ROIGeometry"
+    },
+    "global_semantic": {
+      "default": "NOT_PROVIDED",
+      "enum": [
+        "NOT_PROVIDED",
+        "GLOBAL_NO_DR",
+        "GLOBAL_DR_PRESENT_OR_UNCERTAIN"
+      ],
+      "title": "Global Semantic",
+      "type": "string"
+    }
+  },
+  "required": [
+    "dataset_id",
+    "source_type",
+    "roi_id",
+    "source_image_id",
+    "source_image_sha256",
+    "source_image_relative_uri",
+    "roi_image_sha256",
+    "roi_image_relative_uri",
+    "source_width_px",
+    "source_height_px",
+    "roi_width_px",
+    "roi_height_px",
+    "released_split",
+    "roi_provenance",
+    "mask_coverage",
+    "mask_evidence",
+    "geometry"
+  ],
+  "title": "R3ROIInput",
+  "type": "object"
+}

@@ -42,12 +42,14 @@ no secret is requested or recorded here.
   setup metadata.
 - R1-P0 public acquisition/runtime evidence: MMRDR archive/inventory, schema/split audit, exact C0/C1/C2 hashes,
   official loader/forward checks, asset-specific preprocessing, gated access, and storage/runtime validation.
+- IDRiD R2/R3 implementation boundary: versioned ROI input/target contracts, split/identity/negative-semantic
+  validation, and a synthetic-tested NumPy supported-lesion baseline with train/evaluate CLI; no IDRiD runtime result.
 
 ## Planned, not executed
 
 - OWNER resolution and, if accepted, recovery/re-execution of R1-P0 after the released-split leakage blocker is resolved.
 - R1 C0, C1, and C2 runs, model comparison, calibration, and winner-only CORN ablation.
-- R2 spatial ROI dataset construction and R3 lesion classifier.
+- IDRiD R3 runtime training/evaluation, error analysis, and evidence freeze using acquired public inputs.
 - R4 Label Studio Community live QA validation and R5 contract/API integration into the existing GUI.
 - R6 DICOM, R7 model diff/drift, and R8 HL7/FHIR mapping/demo.
 

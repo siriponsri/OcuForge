@@ -28,6 +28,20 @@ def main():
     q = sub.add_parser("export-predictions")
     q.add_argument("input")
     q.add_argument("--out", required=True)
+    q = sub.add_parser("r3-train")
+    q.add_argument("--inputs", required=True)
+    q.add_argument("--targets", required=True)
+    q.add_argument("--data-root", required=True)
+    q.add_argument("--out", required=True)
+    q.add_argument("--config")
+    q = sub.add_parser("r3-evaluate")
+    q.add_argument("--inputs", required=True)
+    q.add_argument("--targets", required=True)
+    q.add_argument("--data-root", required=True)
+    q.add_argument("--model", required=True)
+    q.add_argument("--out", required=True)
+    q.add_argument("--split", choices=["TRAIN", "TEST"], default="TEST")
+    q.add_argument("--threshold", type=float)
     a = p.parse_args()
     try:
         if a.command == "validate-dataset":
@@ -65,6 +79,25 @@ def main():
             if not all(isinstance(x, Prediction) for x in records):
                 raise ValueError("Expected prediction records")
             write_records(a.out, records)
+        elif a.command == "r3-train":
+            from .lesions.roi_classifier import train_roi_classifier
+
+            print(
+                json.dumps(
+                    train_roi_classifier(a.inputs, a.targets, a.data_root, a.out, a.config), indent=2
+                )
+            )
+        elif a.command == "r3-evaluate":
+            from .lesions.roi_classifier import evaluate_roi_classifier
+
+            print(
+                json.dumps(
+                    evaluate_roi_classifier(
+                        a.inputs, a.targets, a.data_root, a.model, a.out, a.split, a.threshold
+                    ),
+                    indent=2,
+                )
+            )
     except (ValueError, RuntimeError, OSError) as e:
         p.exit(2, f"{e}\n")
 

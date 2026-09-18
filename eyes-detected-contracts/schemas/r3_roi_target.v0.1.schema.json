@@ -1,0 +1,88 @@
+{
+  "additionalProperties": false,
+  "description": "A target row whose semantic state is checked against an R3 input row.",
+  "properties": {
+    "schema_version": {
+      "const": "r3_roi_target.v0.1",
+      "default": "r3_roi_target.v0.1",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "dataset_id": {
+      "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,127}$",
+      "title": "Dataset Id",
+      "type": "string"
+    },
+    "roi_id": {
+      "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,127}$",
+      "title": "Roi Id",
+      "type": "string"
+    },
+    "source_image_id": {
+      "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,127}$",
+      "title": "Source Image Id",
+      "type": "string"
+    },
+    "source_image_sha256": {
+      "pattern": "^[a-f0-9]{64}$",
+      "title": "Source Image Sha256",
+      "type": "string"
+    },
+    "released_split": {
+      "enum": [
+        "TRAIN",
+        "TEST"
+      ],
+      "title": "Released Split",
+      "type": "string"
+    },
+    "target_semantic": {
+      "enum": [
+        "SUPPORTED_LESION",
+        "NO_SUPPORTED_LESION_IN_ROI",
+        "UNKNOWN_OR_UNSUPPORTED_FINDING",
+        "WEAK_NEGATIVE_FOR_SUPPORTED_CLASS"
+      ],
+      "title": "Target Semantic",
+      "type": "string"
+    },
+    "target_class": {
+      "anyOf": [
+        {
+          "enum": [
+            "MICROANEURYSM",
+            "INTRARETINAL_HEMORRHAGE",
+            "HARD_EXUDATE",
+            "SOFT_EXUDATE"
+          ],
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Target Class"
+    },
+    "global_semantic": {
+      "default": "NOT_PROVIDED",
+      "enum": [
+        "NOT_PROVIDED",
+        "GLOBAL_NO_DR",
+        "GLOBAL_DR_PRESENT_OR_UNCERTAIN"
+      ],
+      "title": "Global Semantic",
+      "type": "string"
+    }
+  },
+  "required": [
+    "dataset_id",
+    "roi_id",
+    "source_image_id",
+    "source_image_sha256",
+    "released_split",
+    "target_semantic"
+  ],
+  "title": "R3ROITarget",
+  "type": "object"
+}

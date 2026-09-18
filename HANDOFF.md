@@ -16,7 +16,8 @@ R1_GLOBAL_BENCHMARK=READY_NOT_EXECUTED
 CURRENT_R1_CHAMPION=NONE
 R2_R3_IDRID_PREFLIGHT=PASS_WITH_WARNINGS
 R2_R3_IDRID_R2=PASS_WITH_WARNINGS
-R2_R3_IDRID_R3=BLOCKED_IMPLEMENTATION
+R2_R3_IDRID_R3=IMPLEMENTED_NOT_EXECUTED
+R2_R3_IDRID_R3_IMPLEMENTATION=PASS
 ```
 
 R0 scientific evidence review passed. R1-P0 Global is the active scientific unlock gate, while its acquisition/runtime
@@ -111,6 +112,19 @@ No model, metric, checkpoint, DagsHub run, Pod, Network Volume, upload, or expor
 lane cost remain zero, and Pod termination is not applicable. The next safe action is an owner-approved R3 classifier
 implementation and compatible input contract; do not invent that scientific pipeline in this recovery checkpoint.
 
+## R3 implementation checkpoint — 2026-09-19
+
+The owner-approved implementation is complete on `agent/r3-roi-implementation`. The contracts package now validates
+`r3_roi_input.v0.1` and `r3_roi_target.v0.1` records for IDRiD-only identity, exact supported lesion taxonomy, source
+image/ROI/mask hashes, geometry, explicit mask coverage, and released `TRAIN`/`TEST` split leakage. Unknown and
+unannotated rows cannot become negatives; `WEAK_NEGATIVE_FOR_SUPPORTED_CLASS` requires present-empty mask evidence;
+`NO_SUPPORTED_LESION_IN_ROI` requires complete four-class coverage and explicit clean-negative ROI provenance.
+
+The separate NumPy `R3_MASKED_LINEAR_RGB_BASELINE` and `eyes-models r3-train`/`r3-evaluate` entrypoints are covered by
+offline synthetic tests. The baseline is not MIL attention, does not use the global DR trainer, and remains
+`scientific_result_eligible=false`. No IDRiD data, model, checkpoint, Pod, MLflow run, or metric was executed or added.
+R3 runtime training/evaluation and scientific evidence remain not executed.
+
 ## Important artifacts/files
 
 - `docs/RSC_R0_DATASET_TAXONOMY_FREEZE_v0.1.json` - authoritative R0 evidence record and future manifest.
@@ -121,6 +135,9 @@ implementation and compatible input contract; do not invent that scientific pipe
 - `eyes-detected-models/configs/research/r1-global-benchmark.json` - R1 C0/C1/C2 readiness registry; no measured result.
 - `R0_DATASET_COMPARISON_AND_SOURCE_GUIDE.md` - research companion, not authority.
 - `validation/FINAL_DELIVERY_REPORT.md` - repository validation report.
+- `eyes-detected-contracts/src/eyes_contracts/r3.py` - R3 input/target contracts and split/semantic validator.
+- `eyes-detected-models/docs/R3_IDRID_ROI_IMPLEMENTATION.md` - R3 implementation and execution boundary.
+- `eyes-detected-models/configs/research/r3-idrid-roi-baseline.json` - safe baseline configuration.
 - `local-state/campaigns/ocuforge-r1-p0-20260918/r1-p0/` - ignored, compact P0 evidence and hash-verified export.
 
 ## Exact owner-resolvable next action
