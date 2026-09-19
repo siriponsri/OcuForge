@@ -89,6 +89,10 @@ async function dicomCases(file, sourceConfig) {
   const bytes = await file.arrayBuffer();
   const sourceFolder = sourceFolderOf(file, sourceConfig.sourceReference);
   const parsed = await parseDicomBytes(bytes, file.name);
+  const supportedTransferSyntaxes = new Set(["1.2.840.10008.1.2", "1.2.840.10008.1.2.1"]);
+  if (!supportedTransferSyntaxes.has(parsed.technical.transfer_syntax_uid)) {
+    throw new Error(`Unsupported DICOM transfer syntax: ${parsed.technical.transfer_syntax_uid || "unknown"}`);
+  }
   const cases = [];
   for (let frameNumber = 1; frameNumber <= parsed.frameCount; frameNumber += 1) {
     let derivative = { dataUrl: null, provenance: { available: false } };
