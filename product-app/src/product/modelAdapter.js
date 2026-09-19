@@ -35,7 +35,7 @@ export const MockModelAdapter = {
         label: grade > 0 ? "System suggestion" : "System point",
         source_prediction_id: predictionId,
       }],
-      created_at: new Date().toISOString(),
+      created_at: "1970-01-01T00:00:00.000Z",
     };
   },
 };

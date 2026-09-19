@@ -234,6 +234,7 @@ button { cursor: pointer; }
 .annotation-shape { position: absolute; display: block; }
 .annotation-system { border: 2px dashed #f0bf50; background: rgb(201 154 69 / .12); }
 .annotation-user { border: 2px solid #7bd0a0; background: rgb(37 122 85 / .16); }
+.annotation-selected { box-shadow: 0 0 0 3px rgb(255 255 255 / .84), 0 0 0 5px #5ba384; }
 .annotation-ellipse { border-radius: 50%; }
 .annotation-area { background: rgb(50 137 185 / .26); border-color: #78c4eb; }
 .annotation-point { width: 14px; height: 14px; margin: -7px 0 0 -7px; border-radius: 50%; }

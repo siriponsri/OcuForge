@@ -7,6 +7,10 @@ function csvValue(value) {
 export function buildManifestRows(cases) {
   return cases.map((item) => {
     const latestRevision = item.annotation_revisions?.at(-1);
+    const hasHumanGrade = item.humanGrade !== null && item.humanGrade !== undefined;
+    const trainingEligibility = item.trainingEligibility === "HUMAN" && !hasHumanGrade
+      ? "UNREVIEWED_SYSTEM"
+      : item.trainingEligibility || "UNREVIEWED_SYSTEM";
     return {
       manifest_version: "manifest.v0.1",
       manifest_snapshot_id: "local-live-snapshot",
@@ -57,8 +61,8 @@ export function buildManifestRows(cases) {
       training_image_uri: item.training_image_uri || item.displayDerivativeUri || item.sourceReference,
       training_image_sha256: item.training_image_sha256 || item.sourceSha256,
       derivative_preprocessing_version: item.derivative_preprocessing_version,
-      training_eligibility: item.trainingEligibility,
-      label_provenance: item.humanGrade === null ? "UNREVIEWED_SYSTEM" : "HUMAN",
+      training_eligibility: trainingEligibility,
+      label_provenance: trainingEligibility === "HUMAN" && hasHumanGrade ? "HUMAN" : trainingEligibility,
       output_policy: item.output_policy,
       export_uri: item.export_uri,
       export_hash: item.export_hash,

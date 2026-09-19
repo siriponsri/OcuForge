@@ -3,23 +3,28 @@ import { Crosshair, MousePointer2, Minus, Plus, RotateCcw, ScanSearch } from "lu
 import { ProvenanceBadge, StatusBadge } from "./StatusBadge";
 import { TOOLS, deriveQueueBadge } from "../product/constants";
 
-function AnnotationShape({ annotation }) {
+function AnnotationShape({ annotation, selected, onSelectAnnotation }) {
   const isSystem = annotation.provenance === "SYSTEM";
-  const className = `annotation-shape ${isSystem ? "annotation-system" : "annotation-user"}`;
+  const className = `annotation-shape ${isSystem ? "annotation-system" : "annotation-user"} ${selected ? "annotation-selected" : ""}`;
   const style = { left: `${annotation.x * 100}%`, top: `${annotation.y * 100}%` };
+  const select = (event) => {
+    event.stopPropagation();
+    onSelectAnnotation?.(annotation);
+  };
 
   if (annotation.type === "point") {
-    return <span className={`${className} annotation-point`} style={style} aria-label={`${annotation.label} ${annotation.provenance}`} />;
+    return <span className={`${className} annotation-point`} style={style} onClick={select} aria-label={`${annotation.label} ${annotation.provenance}`} />;
   }
 
   if (annotation.type === "polygon") {
-    return <span className={`${className} annotation-polygon`} style={{ ...style, width: `${annotation.width * 100}%`, height: `${annotation.height * 100}%` }} aria-label={`${annotation.label} ${annotation.provenance}`} />;
+    return <span className={`${className} annotation-polygon`} style={{ ...style, width: `${annotation.width * 100}%`, height: `${annotation.height * 100}%` }} onClick={select} aria-label={`${annotation.label} ${annotation.provenance}`} />;
   }
 
   return (
     <span
       className={`${className} annotation-${annotation.type}`}
       style={{ ...style, width: `${annotation.width * 100}%`, height: `${annotation.height * 100}%` }}
+      onClick={select}
       aria-label={`${annotation.label} ${annotation.provenance}`}
     >
       <span className="annotation-label"><ProvenanceBadge provenance={annotation.provenance} /> {annotation.label}</span>
@@ -27,7 +32,7 @@ function AnnotationShape({ annotation }) {
   );
 }
 
-export function ReviewCanvas({ item, tool, onSelectTool, onCanvasClick, onZoom }) {
+export function ReviewCanvas({ item, tool, selectedAnnotationId, onSelectTool, onCanvasClick, onSelectAnnotation, onZoom }) {
   return (
     <Box className="review-stage-panel">
       <Flex className="review-stage-toolbar" align="center" justify="space-between" gap="3" wrap="wrap">
@@ -51,7 +56,7 @@ export function ReviewCanvas({ item, tool, onSelectTool, onCanvasClick, onZoom }
       <Box className="review-canvas" onClick={onCanvasClick} role="application" aria-label="Retinal image annotation canvas">
         <Box className="image-frame">
           {item.imageUrl ? <img src={item.imageUrl} alt={`Reviewable retinal image for ${item.id}`} /> : <Box className="derivative-empty"><Text>No display derivative</Text><Text>Source bytes remain preserved</Text></Box>}
-          {item.annotations.map((annotation) => <AnnotationShape key={annotation.id} annotation={annotation} />)}
+          {item.annotations.map((annotation) => <AnnotationShape key={annotation.id} annotation={annotation} selected={annotation.id === selectedAnnotationId} onSelectAnnotation={onSelectAnnotation} />)}
         </Box>
         <HStack className="canvas-meta" gap="2">
           <span className="canvas-chip">{item.modality}</span>

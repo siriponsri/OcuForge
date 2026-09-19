@@ -98,7 +98,7 @@ export default function App() {
         systemConfidence: prediction.confidence,
         systemPredictionId: prediction.prediction_id,
         systemModelManifestId: prediction.model_manifest.model_manifest_id,
-        audit: [...current.audit, { actor: "SYSTEM", actorLabel: "System", at: prediction.created_at, event: "AI_PROCESSED", detail: "Deterministic mock bundle produced an immutable system prediction." }],
+        audit: [...current.audit, { actor: "SYSTEM", actorLabel: "System", at: now(), event: "AI_PROCESSED", detail: "Deterministic mock bundle produced an immutable system prediction." }],
       }));
       showToast("System prediction saved. It remains separate from human review.");
     } catch (error) {
@@ -116,25 +116,50 @@ export default function App() {
     if (!current) return;
     let nextAnnotations = current.annotations;
     let revision = null;
-    if (changes.annotation) {
-      nextAnnotations = [...current.annotations, changes.annotation];
+    const { annotation, annotationUpdate, ...reviewChanges } = changes;
+    if (annotation) {
+      nextAnnotations = [...current.annotations, annotation];
       revision = {
         revision_id: `REV-${caseId}-${Date.now()}`,
         revision_hash: await hashJson(nextAnnotations),
         schema_version: "annotation.v0.1",
         provenance: "USER",
-        base_prediction_id: changes.annotation.source_prediction_id || current.systemPredictionId || null,
+        base_prediction_id: annotation.source_prediction_id || current.systemPredictionId || null,
         annotation_ids: nextAnnotations.map((annotation) => annotation.id),
         created_at: now(),
       };
     }
+    if (annotationUpdate) {
+      const target = current.annotations.find((entry) => entry.id === annotationUpdate.annotationId);
+      if (target && annotationUpdate.label?.trim()) {
+        const corrected = {
+          ...target,
+          id: `ANN-U-CORRECTION-${caseId}-${Date.now()}`,
+          provenance: "USER",
+          label: annotationUpdate.label.trim(),
+          corrects_annotation_id: target.id,
+          source_prediction_id: target.source_prediction_id || current.systemPredictionId || null,
+        };
+        nextAnnotations = [...current.annotations, corrected];
+        revision = {
+          revision_id: `REV-${caseId}-${Date.now()}`,
+          revision_hash: await hashJson(nextAnnotations),
+          schema_version: "annotation.v0.1",
+          provenance: "USER",
+          base_prediction_id: corrected.source_prediction_id,
+          corrected_annotation_id: target.id,
+          annotation_ids: nextAnnotations.map((entry) => entry.id),
+          created_at: now(),
+        };
+      }
+    }
     updateCase(caseId, (item) => ({
       ...item,
-      ...changes,
+      ...reviewChanges,
       annotations: nextAnnotations,
       annotation_revisions: revision ? [...item.annotation_revisions, revision] : item.annotation_revisions,
       review_status: item.review_status === REVIEW_STATUS.HUMAN_REVIEWED ? item.review_status : REVIEW_STATUS.IN_REVIEW,
-      audit: changes.annotation ? [...item.audit, { actor: "reviewer-7f3a", actorLabel: "Reviewer", at: now(), event: "ANNOTATION_DRAFTED", detail: `${changes.annotation.type} annotation added as USER provenance.` }] : item.audit,
+      audit: annotation ? [...item.audit, { actor: "reviewer-7f3a", actorLabel: "Reviewer", at: now(), event: "ANNOTATION_DRAFTED", detail: `${annotation.type} annotation added as USER provenance.` }] : annotationUpdate ? [...item.audit, { actor: "reviewer-7f3a", actorLabel: "Reviewer", at: now(), event: "ANNOTATION_CORRECTED", detail: "A new USER annotation revision was created; the previous geometry remains immutable." }] : item.audit,
     }));
     showToast("Draft persisted locally.", "info");
   };
@@ -198,8 +223,8 @@ export default function App() {
   const openReview = (caseId) => {
     setSelectedCaseId(caseId);
     const item = state.cases.find((entry) => entry.id === caseId);
-    if (item && item.review_status !== REVIEW_STATUS.HUMAN_REVIEWED && item.qcStatus !== "QUARANTINED") {
-      updateCase(caseId, (current) => ({ ...current, review_status: REVIEW_STATUS.IN_REVIEW, audit: [...current.audit, { actor: "reviewer-7f3a", actorLabel: "Reviewer", at: now(), event: "REVIEW_OPENED", detail: "Review session opened; AI remains explicit." }] }));
+    if (item && item.qcStatus !== "QUARANTINED") {
+      updateCase(caseId, (current) => ({ ...current, review_status: REVIEW_STATUS.IN_REVIEW, audit: [...current.audit, { actor: "reviewer-7f3a", actorLabel: "Reviewer", at: now(), event: "REVIEW_OPENED", detail: current.review_status === REVIEW_STATUS.HUMAN_REVIEWED ? "Correction session opened; prior human review remains in immutable history." : "Review session opened; AI remains explicit." }] }));
     }
     setPage("review");
   };

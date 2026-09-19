@@ -1,7 +1,11 @@
-import { hashJson } from "./crypto.js";
+import { hashJson, sha256Blob } from "./crypto.js";
 
 function jsonBlob(value) {
   return new Blob([JSON.stringify(value, null, 2)], { type: "application/json" });
+}
+
+function jsonlBlob(values) {
+  return new Blob([values.map((value) => JSON.stringify(value)).join("\n") + "\n"], { type: "application/x-ndjson" });
 }
 
 function dataUrlBlob(dataUrl) {
@@ -66,6 +70,10 @@ async function writeFile(directoryHandle, segments, blob) {
   const writable = await fileHandle.createWritable();
   await writable.write(blob);
   await writable.close();
+  const written = await fileHandle.getFile();
+  const [expectedHash, writtenHash] = await Promise.all([sha256Blob(blob), sha256Blob(written)]);
+  if (expectedHash !== writtenHash) throw new Error(`Export hash verification failed for ${segments.join("/")}.`);
+  return writtenHash;
 }
 
 export async function writeExportPackage(item, directoryHandle, sourceBlob) {
@@ -83,14 +91,15 @@ export async function writeExportPackage(item, directoryHandle, sourceBlob) {
     "system_predictions.json": packageValue.system_predictions,
     "annotations.json": packageValue.annotations,
     "review.json": packageValue.review,
-    "audit_events.json": packageValue.audit_events,
+    "audit_events.jsonl": jsonlBlob(packageValue.audit_events),
   };
   if (directoryHandle) {
-    for (const [name, value] of Object.entries(files)) await writeFile(directoryHandle, [path, name], jsonBlob(value));
+    for (const [name, value] of Object.entries(files)) await writeFile(directoryHandle, [path, name], name.endsWith(".jsonl") ? value : jsonBlob(value));
     if (copiesOriginal) await writeFile(directoryHandle, [path, "source", `original.${item.fileName.split(".").pop() || "bin"}`], sourceBlob);
     if (exportsDerived) {
       const derivedBlob = dataUrlBlob(item.displayDerivativeUri);
-      if (derivedBlob) await writeFile(directoryHandle, [path, "preview", "display-derivative.png"], derivedBlob);
+      if (!derivedBlob) throw new Error("Display derivative is unavailable for the selected derived-image policy.");
+      await writeFile(directoryHandle, [path, "preview", "display-derivative.png"], derivedBlob);
     }
   }
   return { exportHash, exportUri: directoryHandle ? `local-folder://${path}` : `browser-download://${path}`, packageValue, fileNames: Object.keys(files) };

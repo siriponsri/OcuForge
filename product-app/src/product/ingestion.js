@@ -93,6 +93,10 @@ async function dicomCases(file, sourceConfig) {
   if (!supportedTransferSyntaxes.has(parsed.technical.transfer_syntax_uid)) {
     throw new Error(`Unsupported DICOM transfer syntax: ${parsed.technical.transfer_syntax_uid || "unknown"}`);
   }
+  const supportedPhotometric = new Set(["MONOCHROME1", "MONOCHROME2", "RGB", "YBR_FULL"]);
+  if (!supportedPhotometric.has(parsed.technical.photometric_interpretation)) {
+    throw new Error(`Unsupported DICOM photometric interpretation: ${parsed.technical.photometric_interpretation || "unknown"}`);
+  }
   const cases = [];
   for (let frameNumber = 1; frameNumber <= parsed.frameCount; frameNumber += 1) {
     let derivative = { dataUrl: null, provenance: { available: false } };

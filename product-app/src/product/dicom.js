@@ -120,6 +120,7 @@ export function extractDicomTechnicalMetadata(dataSet) {
     orientation_windowing: {
       orientation_patient: metadata.orientation_patient,
       window: displayWindow(metadata),
+      color: metadata.photometric_interpretation || "UNKNOWN",
     },
   };
 }
@@ -152,23 +153,37 @@ function readPixels(buffer, frame, metadata) {
   const count = metadata.rows * metadata.columns;
   const samples = metadata.samples_per_pixel || 1;
   const values = new Array(count);
+  const colors = metadata.samples_per_pixel >= 3 ? new Array(count) : null;
   const signed = metadata.pixel_representation === 1;
   const bits = metadata.bits_allocated || 8;
   for (let index = 0; index < count; index += 1) {
     const offset = frame.offset + index * samples * frame.bytesPerSample;
-    let sample;
-    if (bits <= 8) sample = bytes[offset];
-    else if (signed) sample = view.getInt16(offset, true);
-    else sample = view.getUint16(offset, true);
-    values[index] = sample;
+    const readSample = (channel) => {
+      const channelOffset = offset + channel * frame.bytesPerSample;
+      if (bits <= 8) return bytes[channelOffset];
+      if (signed) return view.getInt16(channelOffset, true);
+      return view.getUint16(channelOffset, true);
+    };
+    values[index] = readSample(0);
+    if (colors) {
+      let [red, green, blue] = [readSample(0), readSample(1), readSample(2)];
+      if (metadata.photometric_interpretation === "YBR_FULL") {
+        const [y, cb, cr] = [red, green, blue];
+        red = y + 1.402 * (cr - 128);
+        green = y - 0.344136 * (cb - 128) - 0.714136 * (cr - 128);
+        blue = y + 1.772 * (cb - 128);
+      }
+      colors[index] = [red, green, blue];
+    }
   }
-  return values;
+  return { values, colors };
 }
 
 export async function generateDisplayDerivative(buffer, dataSet, metadata, frameNumber = 1) {
   const frame = pixelFrame(dataSet, metadata, frameNumber);
   if (!frame) return { dataUrl: null, provenance: { available: false } };
-  const values = readPixels(buffer, frame, metadata);
+  const { values, colors } = readPixels(buffer, frame, metadata);
+  const isColor = Boolean(colors && ["RGB", "YBR_FULL"].includes(metadata.photometric_interpretation));
   const window = displayWindow(metadata);
   const min = window.center === null ? Math.min(...values) : window.center - window.width / 2;
   const max = window.center === null ? Math.max(...values) : window.center + window.width / 2;
@@ -183,11 +198,17 @@ export async function generateDisplayDerivative(buffer, dataSet, metadata, frame
   const context = canvas.getContext("2d");
   const image = context.createImageData(metadata.columns, metadata.rows);
   values.forEach((sample, index) => {
-    const output = scaleSample(sample, min, max);
     const pixelIndex = index * 4;
-    image.data[pixelIndex] = output;
-    image.data[pixelIndex + 1] = output;
-    image.data[pixelIndex + 2] = output;
+    if (isColor) {
+      image.data[pixelIndex] = Math.max(0, Math.min(255, Math.round(colors[index][0])));
+      image.data[pixelIndex + 1] = Math.max(0, Math.min(255, Math.round(colors[index][1])));
+      image.data[pixelIndex + 2] = Math.max(0, Math.min(255, Math.round(colors[index][2])));
+    } else {
+      const output = scaleSample(sample, min, max);
+      image.data[pixelIndex] = output;
+      image.data[pixelIndex + 1] = output;
+      image.data[pixelIndex + 2] = output;
+    }
     image.data[pixelIndex + 3] = 255;
   });
   context.putImageData(image, 0, 0);
@@ -200,7 +221,8 @@ export async function generateDisplayDerivative(buffer, dataSet, metadata, frame
       available: true,
       frame_number: frameNumber,
       orientation_patient: metadata.orientation_patient,
-      window,
+      window: isColor ? { center: null, width: null, source: "COLOR_PRESERVED" } : window,
+      color: metadata.photometric_interpretation || "UNKNOWN",
       preprocessing_version: "dicom-display-v0.1",
     },
   };

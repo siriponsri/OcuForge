@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
-import { Box, Button, Flex, Grid, HStack, Text, Textarea, VStack } from "@chakra-ui/react";
+import { Box, Button, Flex, Grid, HStack, Input, Text, Textarea, VStack } from "@chakra-ui/react";
 import { AlertTriangle, ArrowLeft, Check, ChevronDown, Clock3, ExternalLink, History, Play, Save, Sparkles, UserRound } from "lucide-react";
 import { PageHeader } from "../components/PageHeader";
 import { ReviewCanvas } from "../components/ReviewCanvas";
@@ -17,9 +17,9 @@ function SystemPanel({ item, onRunAi }) {
   return <Box className="surface-panel detail-panel system-panel"><Flex className="panel-title-row" align="center" justify="space-between"><HStack gap="2"><span className="panel-icon system-icon"><Sparkles size={16} /></span><Box><Text className="panel-kicker">System output</Text><Text className="panel-title">Auto label & DR grade</Text></Box></HStack><ProvenanceBadge provenance="SYSTEM" /></Flex>{item.qcStatus === "QUARANTINED" ? <Box className="run-ai-prompt"><AlertTriangle size={22} /><Text>This source is quarantined and cannot run AI.</Text><Text className="field-helper">{item.quarantineReason}</Text></Box> : !prediction ? <Box className="run-ai-prompt"><Sparkles size={22} /><Text>{item.ai_status === "RUNNING" ? "AI is running locally..." : "AI is waiting for your explicit action."}</Text><Button className="primary-action" onClick={onRunAi} disabled={item.ai_status === "RUNNING"}><Play size={15} /> {item.ai_status === "FAILED" ? "Retry AI" : "Run AI"}</Button></Box> : <><Flex className="system-grade-block" align="flex-end" justify="space-between"><Box><Text className="system-grade-label">System DR grade</Text><Text className="system-grade-value">{item.systemGrade}<span>/4</span></Text></Box><Box className="confidence-ring"><Text>{Math.round(item.systemConfidence * 100)}%</Text><small>confidence</small></Box></Flex><Box className="system-summary"><Text>Versioned adapter output. It is not human ground truth and remains immutable after correction.</Text><Text className="mono-line">{prediction.model_manifest.model_manifest_id} <span>/</span> {prediction.prediction_id}</Text></Box><Flex className="system-meta-row" justify="space-between"><span>Preprocess <strong>{prediction.model_manifest.preprocessing_version}</strong></span><span>Calibration <strong>{prediction.model_manifest.calibration_version}</strong></span></Flex></>}</Box>;
 }
 
-function HumanPanel({ item, setHumanGrade, setRemark, onSave, onSaveDraft }) {
+function HumanPanel({ item, annotationLabel, setAnnotationLabel, selectedAnnotation, setHumanGrade, setRemark, onSave, onSaveDraft, onSaveAnnotationLabel }) {
   const eligibility = item.humanGrade === null ? "UNREVIEWED_SYSTEM" : "HUMAN";
-  return <Box className="surface-panel detail-panel human-panel"><Flex className="panel-title-row" align="center" justify="space-between"><HStack gap="2"><span className="panel-icon human-icon"><UserRound size={16} /></span><Box><Text className="panel-kicker">Human review</Text><Text className="panel-title">Record your decision</Text></Box></HStack><ProvenanceBadge provenance="USER" /></Flex><VStack align="stretch" gap="4"><GradeSelect label="Human reviewed DR grade" value={item.humanGrade} onChange={setHumanGrade} /><Box className="form-field compact-field"><Text as="label" htmlFor="review-remark">Remark</Text><Textarea id="review-remark" value={item.remark} onChange={(event) => setRemark(event.target.value)} placeholder="Add context for the next reviewer..." /></Box><Box className="training-callout"><Check size={16} /><Text><strong>Training eligibility:</strong> {eligibility}<small>{eligibility === "HUMAN" ? "Explicit human review makes this row eligible for downstream selection." : "System output stays excluded until a human grade is saved."}</small></Text><EligibilityBadge value={eligibility} /></Box><Flex className="human-actions" gap="2"><Button className="secondary-action" onClick={onSaveDraft}><Save size={15} /> Save draft</Button><Button className="primary-action" onClick={onSave}><Check size={15} /> Save & Return</Button></Flex></VStack></Box>;
+  return <Box className="surface-panel detail-panel human-panel"><Flex className="panel-title-row" align="center" justify="space-between"><HStack gap="2"><span className="panel-icon human-icon"><UserRound size={16} /></span><Box><Text className="panel-kicker">Human review</Text><Text className="panel-title">Record your decision</Text></Box></HStack><ProvenanceBadge provenance="USER" /></Flex><VStack align="stretch" gap="4"><GradeSelect label="Human reviewed DR grade" value={item.humanGrade} onChange={setHumanGrade} /><Box className="form-field compact-field"><Text as="label" htmlFor="annotation-label">Annotation label</Text><HStack gap="2"><Input id="annotation-label" value={annotationLabel} onChange={(event) => setAnnotationLabel(event.target.value)} placeholder="Select an annotation or add a label" /><Button className="secondary-action" onClick={onSaveAnnotationLabel} disabled={!selectedAnnotation || !annotationLabel.trim()}>Apply</Button></HStack><Text className="field-helper">{selectedAnnotation ? `${selectedAnnotation.provenance} annotation selected; applying creates a new USER revision.` : "Select a system or user annotation on the canvas to correct its label."}</Text></Box><Box className="form-field compact-field"><Text as="label" htmlFor="review-remark">Remark</Text><Textarea id="review-remark" value={item.remark} onChange={(event) => setRemark(event.target.value)} placeholder="Add context for the next reviewer..." /></Box><Box className="training-callout"><Check size={16} /><Text><strong>Training eligibility:</strong> {eligibility}<small>{eligibility === "HUMAN" ? "Explicit human review makes this row eligible for downstream selection." : "System output stays excluded until a human grade is saved."}</small></Text><EligibilityBadge value={eligibility} /></Box><Flex className="human-actions" gap="2"><Button className="secondary-action" onClick={onSaveDraft}><Save size={15} /> Save draft</Button><Button className="primary-action" onClick={onSave}><Check size={15} /> Save & Return</Button></Flex></VStack></Box>;
 }
 
 function AuditPanel({ item }) {
@@ -35,16 +35,25 @@ export function ReviewPage({ cases, selectedCaseId, setSelectedCaseId, onRunAi, 
   const [tool, setTool] = useState("select");
   const [humanGrade, setHumanGrade] = useState(null);
   const [remark, setRemark] = useState("");
+  const [annotationLabel, setAnnotationLabel] = useState("User annotation");
+  const [selectedAnnotationId, setSelectedAnnotationId] = useState(null);
   const active = cases.find((item) => item.id === selectedCaseId) || cases[0];
   const activeId = active.id;
 
   useEffect(() => {
     setHumanGrade(active.humanGrade);
     setRemark(active.remark || "");
+    setAnnotationLabel("User annotation");
+    setSelectedAnnotationId(null);
   }, [activeId, active.humanGrade, active.remark]);
 
   const visibleItems = useMemo(() => cases.filter((item) => item.qcStatus !== "QUARANTINED").slice(0, layout), [cases, layout]);
   const selectCase = (id) => setSelectedCaseId(id);
+  const selectedAnnotation = active.annotations.find((annotation) => annotation.id === selectedAnnotationId) || null;
+  const selectAnnotation = (annotation) => {
+    setSelectedAnnotationId(annotation.id);
+    setAnnotationLabel(annotation.label || "User annotation");
+  };
   const addAnnotation = (event) => {
     if (tool === "select") return;
     const imageFrame = event.currentTarget.querySelector(".image-frame");
@@ -52,9 +61,12 @@ export function ReviewPage({ cases, selectedCaseId, setSelectedCaseId, onRunAi, 
     const rect = imageFrame.getBoundingClientRect();
     const x = Math.max(0.02, Math.min(0.92, (event.clientX - rect.left) / rect.width));
     const y = Math.max(0.02, Math.min(0.92, (event.clientY - rect.top) / rect.height));
-    const shapes = { rectangle: { width: 0.18, height: 0.14, label: "User box" }, ellipse: { width: 0.16, height: 0.12, label: "User ellipse" }, polygon: { width: 0.2, height: 0.16, label: "User polygon" }, area: { width: 0.22, height: 0.18, label: "User area" }, point: { label: "User point" } };
-    onSaveDraft(activeId, { annotation: { id: `ANN-U-${activeId}-${Date.now()}`, type: tool, x, y, provenance: "USER", ...(shapes[tool] || shapes.point), source_prediction_id: active.systemPredictionId || null } });
+    const shapes = { rectangle: { width: 0.18, height: 0.14 }, ellipse: { width: 0.16, height: 0.12 }, polygon: { width: 0.2, height: 0.16 }, area: { width: 0.22, height: 0.18 }, point: {} };
+    onSaveDraft(activeId, { annotation: { id: `ANN-U-${activeId}-${Date.now()}`, type: tool, x, y, provenance: "USER", label: annotationLabel.trim() || `User ${tool}`, ...(shapes[tool] || shapes.point), source_prediction_id: active.systemPredictionId || null } });
     setTool("select");
+  };
+  const saveAnnotationLabel = () => {
+    if (selectedAnnotation) onSaveDraft(activeId, { annotationUpdate: { annotationId: selectedAnnotation.id, label: annotationLabel.trim() } });
   };
   const commitReview = (mode) => {
     const updated = { humanGrade, remark };
@@ -72,8 +84,8 @@ export function ReviewPage({ cases, selectedCaseId, setSelectedCaseId, onRunAi, 
     <Box className="surface-panel layout-toolbar"><HStack gap="3"><Text className="toolbar-label">Review layout</Text><HStack className="layout-switcher" gap="1">{[1, 2, 4, 8].map((value) => <button type="button" key={value} className={layout === value ? "is-active" : ""} onClick={() => setLayout(value)}>{value}</button>)}</HStack><Text className="toolbar-helper">Each image keeps independent review state.</Text></HStack><HStack gap="2"><span className="layout-note"><span className="live-dot" /> Live local state</span></HStack></Box>
 
     <Grid className="review-workspace-grid" templateColumns={{ base: "1fr", xl: "minmax(0, 1.32fr) minmax(21rem, .68fr)" }} gap="5">
-      <Box><Box className={`review-tile-grid layout-${layout}`}>{visibleItems.map((item) => <Tile key={item.id} item={item} selected={item.id === activeId} onSelect={() => selectCase(item.id)} />)}</Box><ReviewCanvas item={active} tool={tool} onSelectTool={setTool} onCanvasClick={addAnnotation} /><Text className="review-disclaimer">POC workflow only. System predictions are preliminary model outputs, not diagnoses or clinical decisions. Original DICOM is never overwritten.</Text></Box>
-      <VStack className="review-sidebar" align="stretch" gap="4"><SystemPanel item={active} onRunAi={() => onRunAi(activeId)} /><HumanPanel item={{ ...active, humanGrade, remark }} setHumanGrade={setHumanGrade} setRemark={setRemark} onSave={() => commitReview("save")} onSaveDraft={() => commitReview("draft")} /><>{active.export_status === "FAILED" && <Box className="surface-panel export-recovery"><Flex align="center" justify="space-between" gap="3"><Box><Text className="panel-kicker">Export recovery</Text><Text className="panel-title">Review is safe; retry export</Text></Box><Button className="secondary-action" onClick={() => onRetryExport(active.id)}><RefreshIcon /> Retry</Button></Flex><Text className="field-helper">Export failure does not revert HUMAN_REVIEWED or alter the immutable prediction.</Text></Box>}</><AuditPanel item={active} /></VStack>
+      <Box><Box className={`review-tile-grid layout-${layout}`}>{visibleItems.map((item) => <Tile key={item.id} item={item} selected={item.id === activeId} onSelect={() => selectCase(item.id)} />)}</Box><ReviewCanvas item={active} tool={tool} selectedAnnotationId={selectedAnnotationId} onSelectTool={setTool} onCanvasClick={addAnnotation} onSelectAnnotation={selectAnnotation} /><Text className="review-disclaimer">POC workflow only. System predictions are preliminary model outputs, not diagnoses or clinical decisions. Original DICOM is never overwritten.</Text></Box>
+      <VStack className="review-sidebar" align="stretch" gap="4"><SystemPanel item={active} onRunAi={() => onRunAi(activeId)} /><HumanPanel item={{ ...active, humanGrade, remark }} annotationLabel={annotationLabel} setAnnotationLabel={setAnnotationLabel} selectedAnnotation={selectedAnnotation} setHumanGrade={setHumanGrade} setRemark={setRemark} onSaveAnnotationLabel={saveAnnotationLabel} onSave={() => commitReview("save")} onSaveDraft={() => commitReview("draft")} /><>{active.export_status === "FAILED" && <Box className="surface-panel export-recovery"><Flex align="center" justify="space-between" gap="3"><Box><Text className="panel-kicker">Export recovery</Text><Text className="panel-title">Review is safe; retry export</Text></Box><Button className="secondary-action" onClick={() => onRetryExport(active.id)}><RefreshIcon /> Retry</Button></Flex><Text className="field-helper">Export failure does not revert HUMAN_REVIEWED or alter the immutable prediction.</Text></Box>}</><AuditPanel item={active} /></VStack>
     </Grid>
   </Box>;
 }

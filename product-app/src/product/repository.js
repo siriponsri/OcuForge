@@ -57,6 +57,8 @@ export class CaseRepository {
   async putObject(key, value) {
     if (!hasIndexedDb()) return;
     const db = await openDb();
+    const existing = await transaction(db, "objects", "readonly", (store) => store.get(key));
+    if (existing) return;
     await transaction(db, "objects", "readwrite", (store) => store.put(value, key));
   }
 
