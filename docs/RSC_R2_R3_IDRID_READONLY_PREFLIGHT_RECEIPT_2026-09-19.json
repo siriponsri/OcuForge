@@ -1,0 +1,108 @@
+{
+  "receipt_schema_version": "r2_r3_idrid_readonly_preflight_receipt.v1",
+  "record_type": "R2_R3_IDRID_READONLY_PREFLIGHT_RECEIPT",
+  "recorded_at": "2026-09-19T01:23:43.3915636+07:00",
+  "branch": "agent/r2-r3-idrid-execution",
+  "lane": "R2_R3_IDRID_RESEARCH_ONLY",
+  "dataset_scope": ["idrid_v1"],
+  "excluded_datasets": ["DDR", "OIA-DDR"],
+  "outcome": "BLOCKED",
+  "blocker": {
+    "id": "BLOCKED_AUTHENTICATED_OWNER_DRIVE_ACCESS",
+    "summary": "The OWNER Drive folder is reachable only as an unauthenticated public HTML shell; no authenticated Drive path was available for recursive inventory or authorized IDRiD acquisition.",
+    "evidence": [
+      "The OWNER Drive URL returned HTTP 200 with text/html and a public shell titled IDRiD - Google Drive; this establishes URL reachability only, not authenticated OWNER access.",
+      "The MaxPlus-launched read-only capability probe found no usable Drive, Google, Colab, or browser-backed authenticated capability.",
+      "The Colab browser connection attempt returned false.",
+      "The public shell exposed only a top-level listing: A. Segmentation, B. Disease Grading, C. Localization, and Instruction.txt; recursive same-name-directory enumeration was not executed because authenticated access was unavailable."
+    ],
+    "required_next": "Restore an already-authorized non-logging OWNER Drive path, then rerun only the IDRiD read-only inventory/preflight."
+  },
+  "drive_access": {
+    "folder_id": "1JYKhcSf9IWjIItbGtq3mN4hTEl5Of_jp",
+    "url": "https://drive.google.com/drive/folders/1JYKhcSf9IWjIItbGtq3mN4hTEl5Of_jp?usp=sharing",
+    "url_http_status": 200,
+    "url_content_type": "text/html; charset=utf-8",
+    "authenticated_owner_access": "BLOCKED_NOT_VERIFIED",
+    "public_shell_only": true,
+    "top_level_shell_entries": [
+      {"name": "A. Segmentation", "mime_type": "application/vnd.google-apps.folder", "size_bytes": null},
+      {"name": "B. Disease Grading", "mime_type": "application/vnd.google-apps.folder", "size_bytes": null},
+      {"name": "C. Localization", "mime_type": "application/vnd.google-apps.folder", "size_bytes": null},
+      {"name": "Instruction.txt", "mime_type": "text/plain", "size_bytes": 1080}
+    ],
+    "recursive_inventory": "NOT_EXECUTED_AUTHENTICATED_PATH_UNAVAILABLE",
+    "same_name_directory_check": "NOT_EXECUTED_AUTHENTICATED_PATH_UNAVAILABLE"
+  },
+  "official_source_checks": [
+    {
+      "source": "IDRiD Grand Challenge Data",
+      "url": "https://idrid.grand-challenge.org/Data/",
+      "http_status": 200,
+      "result": "SOURCE_PAGE_REACHABLE_METADATA_ONLY"
+    },
+    {
+      "source": "IEEE DataPort IDRiD record",
+      "url": "https://ieee-dataport.org/open-access/indian-diabetic-retinopathy-image-dataset-idrid",
+      "http_status": 200,
+      "result": "SOURCE_PAGE_REACHABLE_METADATA_ONLY"
+    }
+  ],
+  "runpod_control": {
+    "maxplus_launcher": "C:\\Users\\Siripon Sri\\bin\\maxplus-codex.cmd",
+    "maxplus_launcher_invoked": true,
+    "runpodctl_present": false,
+    "runpod_api_key_present": false,
+    "local_runpod_config_exists": true,
+    "local_runpod_config_key_nonempty": false,
+    "rest_v2_read_only_inventory": {
+      "method": "GET",
+      "endpoint": "https://rest.runpod.io/v1/pods",
+      "authorization": "not_available",
+      "http_status": 401,
+      "result": "BLOCKED_UNAUTHENTICATED"
+    },
+    "mcp_authentication": "REJECTED_OR_UNAVAILABLE",
+    "account_inventory": "NOT_VERIFIED_UNAUTHENTICATED"
+  },
+  "bytes_and_resources": {
+    "idrid_bytes_downloaded": false,
+    "idrid_bytes_total": 0,
+    "archive_hashes": [],
+    "file_hashes": [],
+    "worker_created_pods": [],
+    "network_volume_created": false,
+    "experiment_started": false,
+    "r2_spatial_construction_started": false,
+    "r3_training_or_evaluation_started": false,
+    "estimated_lane_cost_usd": 0
+  },
+  "data_and_semantics": {
+    "image_mask_inventory": "NOT_EXECUTED_NO_IDRID_BYTES",
+    "split_check": "NOT_EXECUTED_NO_IDRID_BYTES",
+    "class_coverage_check": "NOT_EXECUTED_NO_IDRID_BYTES",
+    "duplicate_leakage_check": "NOT_EXECUTED_NO_IDRID_BYTES",
+    "supported_classes": [
+      "MICROANEURYSM",
+      "INTRARETINAL_HEMORRHAGE",
+      "HARD_EXUDATE",
+      "SOFT_EXUDATE"
+    ],
+    "unannotated_regions": "UNKNOWN_OR_WEAK_NEGATIVE_ONLY",
+    "no_supported_lesion_in_roi": "SCOPED_ROI_SEMANTIC_NOT_GLOBAL_NEGATIVE",
+    "ddr_or_oia_ddr_admitted": false
+  },
+  "prior_receipt_validation": {
+    "path": "docs/RSC_R2_R3_IDRID_EXECUTION_RECEIPT_2026-09-18.json",
+    "json_parse": "PASS",
+    "prior_outcome": "BLOCKED",
+    "prior_blocker_preserved": true
+  },
+  "stages": {
+    "R2_SPATIAL_ROI_CONSTRUCTION": "LOCKED",
+    "R2_GEOMETRY_PROVENANCE_QA": "LOCKED",
+    "R3_SUPPORTED_LESION_TRAIN_EVAL": "LOCKED",
+    "R3_EVIDENCE_FREEZE": "LOCKED"
+  },
+  "next_action": "Obtain an authenticated OWNER Drive path and rerun only the IDRiD acquisition/preflight. Stop before R2/R3 until authenticated access and byte integrity checks pass or pass with warnings and no blocker."
+}
