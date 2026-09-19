@@ -2,354 +2,342 @@
 
 **Status:** Product-track planning specification
 **Storage direction:** Local/on-prem NoSQL plus immutable local object storage
-**Scope:** Product workflow state, provenance, review, export, and manifest eligibility
+**Scope:** Ingestion, DICOM identity, review, export, manifest eligibility, and future model-factory lineage
 
 ## 1. Modeling rules
 
-The data model keeps five things separate:
+The model keeps immutable source objects, DICOM identity, display derivatives, system predictions, human revisions,
+operational state, training eligibility, dataset snapshots, and future model-factory lineage separate.
 
-1. original source objects;
-2. system predictions;
-3. user annotations and human grades;
-4. operational materialized queue/review state;
-5. downstream training eligibility.
+Existing eyes-detected-contracts identity, geometry, prediction, annotation, protocol, and model-manifest semantics
+remain authoritative. Product documents are additive and versioned. Mongo documents may be denormalized for reads,
+but immutable facts and source bytes are never overwritten. Hospital/private records and artifacts remain local-only.
 
-The current `eyes-detected-contracts` identity, geometry, prediction, annotation, protocol, and model-manifest
-semantics remain authoritative. Product-specific documents should be additive and versioned. Mongo documents may be
-denormalized for reads, but immutable facts must not be overwritten.
+The data layer is reached through `LocalFileSystemBridge` / `LocalPathAdapter` and `ModelAdapter` interfaces; it does
+not depend on a browser-specific filesystem API or a concrete encoder architecture.
 
-All documents use a schema version, stable ID, created/updated timestamps, and an integrity hash where the document
-is immutable or exported. Private documents and artifacts are local-only.
+## 2. Canonical vocabulary and states
 
-## 2. Collections and documents
+~~~
+review_status: NOT_STARTED | IN_REVIEW | HUMAN_REVIEWED
+ai_status:     NOT_RUN | RUNNING | PROCESSED | FAILED
+export_status: NOT_EXPORTED | EXPORTING | EXPORTED | FAILED
+~~~
 
-### `sources`
+queue_status is a derived presentation value, not a replacement for the three dimensions. It may be materialized
+for query speed only when it remains recomputable.
 
-```text
+Every manifest row has exactly one training eligibility value:
+
+~~~
+HUMAN | PSEUDO_LABEL | WEAK_LABEL | UNREVIEWED_SYSTEM
+~~~
+
+UNREVIEWED_SYSTEM is the default for system-only output and is never included in a human/training-eligible
+selection. PSEUDO_LABEL and WEAK_LABEL require explicit policy, source, confidence/quality metadata, and downstream
+opt-in. No save operation silently promotes system output to HUMAN.
+
+Output policy is also explicit:
+
+~~~
+REFERENCE_ONLY | COPY_ORIGINAL | DERIVED_IMAGE_ONLY | COPY_ORIGINAL_AND_DERIVED
+~~~
+
+REFERENCE_ONLY is the default for large DICOM workflows.
+
+## 3. Collections and documents
+
+All documents include schema_version, a stable ID, timestamps, and an integrity hash when immutable/exported.
+
+### sources
+
+~~~
 source_id
 schema_version
 provider_type: LOCAL_FOLDER | GOOGLE_DRIVE_FOLDER
 source_reference
-provider_item_id
+provider_item_id: optional
 display_name
-folder_path_or_name
-authorization_state
+folder_path_or_name: local-only when sensitive
+authorization_state: NOT_CHECKED | READY | UNAUTHORIZED | UNREACHABLE | ERROR
+filesystem_bridge: LOCAL_BACKEND | DESKTOP_SHELL | BROWSER_FILE_SYSTEM | GOOGLE_DRIVE
 scan_options
 source_policy
 created_at
 updated_at
-```
+~~~
 
-`source_reference` may be a local path or provider URL/reference. The browser should not persist provider tokens.
-`authorization_state` distinguishes `NOT_CHECKED`, `READY`, `UNAUTHORIZED`, `UNREACHABLE`, and `ERROR`.
+The browser stores no provider token. A local path reference is governed local metadata, not proof that a browser can
+access that path.
 
-### `destinations`
+### destinations
 
-```text
+~~~
 destination_id
 schema_version
 provider_type: LOCAL_FOLDER | GOOGLE_DRIVE_FOLDER
 destination_reference
-provider_item_id
+provider_item_id: optional
 display_name
-write_policy
+filesystem_bridge: LOCAL_BACKEND | DESKTOP_SHELL | BROWSER_FILE_SYSTEM | GOOGLE_DRIVE
+output_policy: REFERENCE_ONLY | COPY_ORIGINAL | DERIVED_IMAGE_ONLY | COPY_ORIGINAL_AND_DERIVED
 authorization_state
 created_at
 updated_at
-```
+~~~
 
-Destination references are configuration, not proof that an export succeeded. Export receipts provide that proof.
+Configuration is not proof of a successful write; receipts provide that proof.
 
-### `ingestion_jobs`
+### ingestion_jobs and ingestion_items
 
-```text
-job_id
-schema_version
-source_id
-destination_id: optional
-actor_id_hash
-status: CREATED | SCANNING | PERSISTING | COMPLETED | COMPLETED_WITH_ERRORS | FAILED
-counts: { discovered, accepted, duplicates, unsupported, failed, persisted }
-scan_options
-item_results_reference
-started_at
-completed_at
-error_summary
-```
+~~~
+ingestion_jobs:
+  job_id, schema_version, source_id, destination_id, actor_id_hash
+  status: CREATED | SCANNING | PERSISTING | COMPLETED | COMPLETED_WITH_ERRORS | FAILED
+  counts: { discovered, dicom_discovered, raster_discovered, accepted, duplicates,
+            unsupported, malformed, quarantined, failed, persisted }
+  scan_options, item_results_reference, started_at, completed_at, error_summary
 
-Item results contain stable source references, file type, byte size, file hash when available, outcome, and error
-code. Large result lists belong in separate documents or local files, not one unbounded document.
+ingestion_items:
+  ingestion_item_id, job_id, source_item_reference, source_relative_path, original_file_name
+  detected_file_type: DICOM | JPEG | PNG | TIFF | OTHER
+  sha256, byte_size
+  outcome: ACCEPTED | DUPLICATE | UNSUPPORTED | MALFORMED | QUARANTINED | FAILED
+  quarantine_reason, image_id, case_id, attempt_id, created_at
+~~~
 
-### `images`
+Large item-result lists remain in separate local documents/files. Malformed/unsupported DICOM is not silently treated
+as raster.
 
-```text
-image_id
-schema_version
-case_id
-source_id
-source_item_reference
-source_relative_path
-original_file_name
-file_sha256
-byte_size
+### images
+
+~~~
+image_id, schema_version, case_id, source_id, source_item_reference
+source_relative_path, original_file_name, file_sha256, byte_size
 file_type: DICOM | JPEG | PNG | TIFF | OTHER
-immutable_object_uri
-modality
-laterality
-width_px
-height_px
+immutable_object_uri, modality, laterality, width_px, height_px, frame_count
 patient_pseudo_id: optional/local-only
 study_id: optional/local-only
 series_id: optional/local-only
-eye_id: optional
-visit_id: optional
-acquisition_time_bucket: optional
-dicom_metadata_reference: optional
+eye_id: optional/local-only
+visit_id: optional/local-only
+acquisition_time_bucket: optional/local-only
+dicom_metadata_reference: optional/local-only
 display_derivative_reference: optional
 ingested_at
-```
+~~~
 
-The original object hash is the identity anchor. A duplicate source occurrence may refer to the same immutable
-object while retaining its own source provenance.
+The original object hash is the identity anchor. Duplicate occurrences can share an immutable object while retaining
+independent source provenance.
 
-### `cases`
+### dicom_identities
 
-```text
-case_id
-schema_version
-source_folder_id
-image_ids
-queue_status
+This local-governed document is never sent to browser logs, public manifests, Git, cloud services, or external
+telemetry.
+
+~~~
+image_id, schema_version
+study_instance_uid: optional
+series_instance_uid: optional
+sop_instance_uid: optional
+frame_number: optional
+transfer_syntax_uid: optional
+specific_character_set: optional/local-only
+patient_id_reference: optional/local-only
+patient_name_reference: optional/local-only
+technical_metadata_hash
+privacy_policy_version
+created_at
+~~~
+
+UID and frame identity support exact source/derivative linkage. Patient-identifying values remain local and governed.
+
+### display_derivatives
+
+~~~
+derivative_id, schema_version, image_id, source_file_sha256
+derivative_uri, derivative_sha256, derivative_format, width_px, height_px
+frame_number: optional
+orientation_transform: optional
+windowing: optional { center, width, function }
+color_transform: optional
+preprocessing_version, generation_parameters_hash, generated_at
+~~~
+
+Derivatives are reproducible display artifacts; they never replace original bytes.
+
+### cases
+
+~~~
+case_id, schema_version, source_folder_id, image_ids
+review_status: NOT_STARTED | IN_REVIEW | HUMAN_REVIEWED
+ai_status: NOT_RUN | RUNNING | PROCESSED | FAILED
+export_status: NOT_EXPORTED | EXPORTING | EXPORTED | FAILED
+derived_queue_status: optional
 qc_status
-system_dr_grade: optional
-system_prediction_id: optional
-human_reviewed_dr_grade: optional
-human_review_id: optional
-review_status
-export_status
+system_dr_grade, system_prediction_id
+human_reviewed_dr_grade, human_review_id
 training_eligibility_summary
-version
-created_at
-updated_at
-```
+version, created_at, updated_at
+~~~
 
-`version` supports optimistic concurrency. `queue_status` is the materialized UI state; immutable events remain the
-source for how it was reached.
+The derived Queue badge may be NOT_PROCESSED, AI_PROCESSED, IN_REVIEW, HUMAN_REVIEWED, EXPORTED, AI_FAILED, or
+HUMAN_REVIEWED / EXPORT_FAILED. It cannot replace the canonical fields.
 
-### `predictions`
+### predictions
 
-Each AI execution creates an immutable prediction document compatible with the existing `Prediction` contract.
+Each AI attempt creates an immutable document compatible with the existing Prediction contract.
 
-```text
-prediction_id
-schema_version: prediction.v0.1 or newer additive version
-image_id
-file_sha256_at_run
-model_manifest_id
-model_bundle_version
-preprocessing_version
-calibration_version: optional
+~~~
+prediction_id, schema_version, attempt_id, idempotency_key
+image_id, file_sha256_at_run
+model_manifest_id, model_bundle_version, encoder_identity, head_identity
+preprocessing_version, calibration_version
 dr: { grading_protocol, grade, ordinal_probs, confidence }
-lesion_presence
-objects
-evidence
-ood
-gradability_probability
+lesion_presence, objects, evidence, ood, gradability_probability
 origin: SYSTEM
-created_at
-run_parameters_hash
-```
+created_at, run_parameters_hash
+~~~
 
-The existing contract uses `AI_SUGGESTED` for prediction candidates and retains a model manifest ID. Product storage
-may expose a UI-level `SYSTEM` label while preserving the contract’s `AI_SUGGESTED` origin in the annotation object.
+The contract may use AI_SUGGESTED for prediction candidates. Product UI may say SYSTEM, while contract origin is
+preserved. A later run never deletes an earlier prediction.
 
-System predictions remain available after correction, rejection, replacement, or a later model run.
+### annotation_revisions
 
-### `annotation_revisions`
-
-Each revision is immutable and keyed by annotation ID plus revision hash, following the existing `MongoStore`
-pattern.
-
-```text
-annotation_id
-revision_hash
-schema_version: annotation.v0.1 or newer additive version
-image_id
-label
-geometry
-coordinate_space: normalized_0_1
+~~~
+annotation_id, revision_hash, schema_version, image_id, label
+geometry, coordinate_space: normalized_0_1
 display_fill: optional { enabled, opacity, color_token }
 origin: AI_SUGGESTED | CLINICIAN_CONFIRMED | CLINICIAN_CORRECTED | CLINICIAN_ADDED | EXPERT_ADJUDICATED
-parent_prediction_id: optional
-parent_object_id: optional
-source_model_version: optional
+parent_prediction_id, parent_object_id, source_model_version
 annotator_id_hash
-review_status
-clinician_certainty
-uncertain
-grading_protocol: optional
-dr_grade: optional
-gradability
-laterality
-created_at
-updated_at
-history[]
-```
+review_status: DRAFT | CONFIRMED | CORRECTED | REJECTED | ADJUDICATED | LOCKED
+clinician_certainty, uncertain, grading_protocol, dr_grade, gradability, laterality
+created_at, history[]
+~~~
 
-Supported product geometry is point, box/rectangle, ellipse/circle, polygon, and area-fill presentation. The existing
-contract uses normalized geometry and supports `point`, `box`, `ellipse`, `polygon`, and `mask`; a circle is stored as
-an ellipse with equal extents unless a future contract adds a distinct shape.
+Supported geometry is point, rectangle/box, ellipse/circle, polygon, and translucent area presentation. The existing
+contract stores normalized point, box, ellipse, polygon, and mask geometry; a circle is an ellipse with equal extents.
+Human edits create new revisions linked to parent IDs; system revisions are never overwritten.
 
-An edited system annotation creates a new clinician revision with parent IDs. The original system annotation is never
-overwritten.
+### reviews
 
-### `reviews`
-
-The review is a materialized user-facing document referencing immutable facts:
-
-```text
-review_id
-schema_version
-case_id
-image_id
-active_system_prediction_id: optional
-active_human_annotation_revision_ids
-system_dr_grade: optional
-human_reviewed_dr_grade: optional
+~~~
+review_id, schema_version, case_id, image_id
+active_system_prediction_id, active_human_annotation_revision_ids
+system_dr_grade, human_reviewed_dr_grade
 human_review_status: NOT_STARTED | DRAFT | SUBMITTED | ADJUDICATED | LOCKED
-remark: optional
-reviewer_id_hash
-reviewer_certainty
-last_saved_revision_hash
-version
-created_at
-updated_at
-```
+remark, reviewer_id_hash, reviewer_certainty
+last_saved_revision_hash, version, created_at, updated_at
+~~~
 
-System grade and human grade are never represented by one overloaded `grade` field.
+System and human grades are never represented by one overloaded grade field. Review content status is distinct from
+case-level review_status.
 
-### `export_jobs`
+### export_jobs
 
-```text
-export_job_id
-schema_version
-destination_id
-case_ids
-manifest_snapshot_id: optional
-artifact_selection
-idempotency_key
+~~~
+export_job_id, schema_version, destination_id, case_ids, manifest_snapshot_id
+output_policy: REFERENCE_ONLY | COPY_ORIGINAL | DERIVED_IMAGE_ONLY | COPY_ORIGINAL_AND_DERIVED
+artifact_selection, idempotency_key
 status: CREATED | WRITING | VERIFIED | FAILED | PARTIAL
-artifact_receipts[]
-error_code: optional
-created_at
-completed_at
-```
+artifact_receipts[], error_code, created_at, completed_at
+~~~
 
-An artifact receipt records logical path, provider/local reference, byte size, SHA-256, and verification time.
+Receipts record logical path, local/provider reference, byte size, SHA-256, source-hash relation, and verification
+time. Export failure never changes review state or deletes history.
 
-### `manifest_snapshots`
+### manifest_snapshots
 
-```text
-manifest_snapshot_id
-schema_version
-manifest_version
-selection_query_hash
-row_count
-eligibility_counts
-source_hash_coverage
-manifest_csv_reference
-index_csv_reference
-generation_hash
-created_at
-```
+~~~
+manifest_snapshot_id, schema_version, manifest_version, selection_query_hash
+identity_split_policy_reference: optional
+row_count, eligibility_counts, source_hash_coverage, annotation_revision_coverage
+manifest_csv_reference, index_csv_reference, generation_hash, created_at
+~~~
 
-Manifest generation is reproducible from persisted records and a selection query hash.
+A snapshot is immutable input to a future split/adaptation job. Creating one does not train or validate a model.
 
-### `audit_events`
+### dataset_factory_jobs and model_bundles (future)
 
-```text
-event_id
-schema_version
-aggregate_type
-aggregate_id
-action
-actor_type: SYSTEM | USER | SERVICE
-actor_id_hash
-prior_state
-next_state
-reason
-related_prediction_id: optional
-related_annotation_id: optional
-timestamp
-```
+~~~
+dataset_factory_jobs:
+  factory_job_id, schema_version, manifest_snapshot_id
+  job_type: IDENTITY_SPLIT | SSL_ADAPTATION | HEAD_TRAINING | VALIDATION | CALIBRATION | BUNDLE_BUILD
+  status: PLANNED | READY | RUNNING | SUCCEEDED | FAILED | CANCELLED
+  input_hash, output_artifact_references, policy_reference, run_environment_reference
+  created_at, completed_at
 
-Audit events are append-only. They must not include raw image bytes, credentials, or unnecessary patient-identifying
-fields.
+model_bundles:
+  model_manifest_id, schema_version, encoder_identity, encoder_version
+  head_identity, head_version, preprocessing_version, calibration_version
+  bundle_version, artifact_uri, artifact_sha256, supported_inputs
+  output_protocol_references, deployment_status, license_status, created_at
+~~~
 
-## 3. Annotation provenance and training eligibility
+These are future lineage documents only. They do not authorize training, Pods, experiments, or changes to research
+conclusions. The product boundary remains architecture-agnostic.
 
-### Provenance rules
+### audit_events
 
-- `SYSTEM AUTO LABEL` is not `HUMAN GROUND TRUTH`.
-- System prediction objects are immutable and retain model manifest, preprocessing, calibration, image hash, and
-  creation metadata.
-- Human confirmation/correction/rejection is a new revision/event linked to the original system object.
-- User-created annotations start as explicit drafts and acquire human eligibility only after the configured review
-  action is complete.
-- Expert adjudication and lock remain separate from ordinary user submission where the deployment requires them.
+~~~
+event_id, schema_version, aggregate_type, aggregate_id
+dimension: REVIEW | AI | EXPORT | INGESTION | ANNOTATION | FACTORY
+action, actor_type: SYSTEM | USER | SERVICE, actor_id_hash, attempt_id
+prior_state, next_state, reason
+related_prediction_id, related_annotation_id, timestamp
+~~~
+
+Audit events are append-only and contain no raw bytes, credentials, or unnecessary patient-identifying fields.
+
+## 4. Provenance and training eligibility
+
+- SYSTEM AUTO LABEL is not HUMAN GROUND TRUTH.
+- Predictions retain model bundle, preprocessing, calibration, image hash, and creation metadata.
+- Human confirmation/correction/rejection creates a linked revision/event.
+- User annotations start as drafts and gain HUMAN eligibility only after configured review.
+- Expert adjudication and lock remain separate where deployment requires them.
 - Unannotated regions are not silently converted to negative labels.
-- Human grade remains distinct from system grade and carries its grading protocol.
+- Human grade remains distinct from system grade and carries human_grading_protocol.
+- PSEUDO_LABEL and WEAK_LABEL are explicit, policy-governed alternatives.
 
-### Training eligibility
+## 5. Independent operational transitions
 
-Every manifest row has exactly one explicit eligibility value:
+~~~
+review_status: NOT_STARTED -> IN_REVIEW -> HUMAN_REVIEWED
+review_status: HUMAN_REVIEWED -> IN_REVIEW             (new correction)
 
-```text
-HUMAN
-PSEUDO_LABEL
-WEAK_LABEL
-UNREVIEWED_SYSTEM
-```
+ai_status: NOT_RUN -> RUNNING -> PROCESSED
+ai_status: RUNNING -> FAILED
+ai_status: FAILED -> RUNNING                           (explicit idempotent retry)
 
-`UNREVIEWED_SYSTEM` is the default for system-only output and is never included in a training-eligible selection.
-`PSEUDO_LABEL` and `WEAK_LABEL` require explicit policy, source, confidence/quality metadata, and a downstream
-selection that opts in. No UI save operation may silently promote either to `HUMAN`.
+export_status: NOT_EXPORTED -> EXPORTING -> EXPORTED
+export_status: EXPORTING -> FAILED
+export_status: FAILED -> EXPORTING                     (explicit idempotent retry)
+~~~
 
-## 4. Queue state transitions
+AI failure does not destroy review or annotation revisions. Export failure does not revert HUMAN_REVIEWED. Retries
+use stable idempotency keys and never duplicate immutable revisions or verified artifacts. Every transition records
+actor/system origin, timestamp, reason, attempt ID, and prior/next state.
 
-```text
-NOT_PROCESSED --explicit Run AI success--> AI_PROCESSED
-NOT_PROCESSED --ingestion/QC/model error--> ERROR
-AI_PROCESSED --review materialized--> IN_REVIEW
-AI_PROCESSED --valid human save--> HUMAN_REVIEWED
-IN_REVIEW --valid human save--> HUMAN_REVIEWED
-IN_REVIEW --persistence/export failure--> ERROR
-HUMAN_REVIEWED --verified export--> EXPORTED
-EXPORTED --new correction--> IN_REVIEW
-ERROR --explicit retry--> prior state or NOT_PROCESSED
-```
+## 6. DICOM boundary
 
-Every transition records actor/system origin, timestamp, reason, and prior/next state. `ERROR` must retain enough
-context to retry without losing previous successful work.
+- DICOM is a first-class Phase-1 file type.
+- Hash and persist original bytes before pixel extraction or display conversion.
+- Preserve study_instance_uid, series_instance_uid, sop_instance_uid, frame_number, and transfer_syntax_uid where
+  applicable in the local identity document.
+- Keep source DICOM and display/annotated preview objects separate.
+- Record frame selection, orientation, windowing, color conversion, and preprocessing as derivative metadata.
+- Keep patient-identifying values local; never expose them in browser logs, public manifests, Git, cloud services, or
+  external telemetry.
+- Never draw annotations into or overwrite original DICOM.
+- Unsupported/malformed objects become quarantined records with actionable reasons.
 
-## 5. DICOM boundary
+## 7. Export artifact contract
 
-- Accept DICOM as a first-class file type.
-- Hash and persist original bytes before any display conversion.
-- Keep original DICOM and derived display/preview objects separate.
-- Extract only approved technical metadata into normal query documents.
-- Keep patient-identifying values local and out of Google Drive, browser logs, public manifests, and reports.
-- Record transfer syntax, frame selection, orientation/windowing, and display conversion as derivation metadata when
-  relevant.
-- Never draw annotations into or overwrite the original DICOM.
-- Optional annotated previews reference the original DICOM hash and derivative hash.
-- Unsupported DICOM objects become visible errors, not silently substituted raster files.
+The default REFERENCE_ONLY layout is:
 
-## 6. Export artifact contract
-
-Default export avoids duplicating large source files. It writes references and hashes instead:
-
-```text
+~~~
 <output-root>/<source-folder-id>/<case-id>/
   export_manifest.json
   image_metadata.json
@@ -358,22 +346,21 @@ Default export avoids duplicating large source files. It writes references and h
   annotations.json
   review.json
   audit_events.jsonl
-  preview/annotated.<format>       optional
-```
+  preview/annotated.<format>       optional derived artifact
+  source/original.<format>         only for explicit copy policy
+~~~
 
-`export_manifest.json` includes schema versions, artifact list, source/image IDs, source SHA-256, generation time,
-export job ID, and destination receipt. `source_reference.json` contains the original provider/path reference and
-hash; it does not duplicate the DICOM by default.
+export_manifest.json includes schemas, artifact list, IDs, source SHA-256, output policy, generation time, export job
+ID, and destination receipt. The same logical layout applies to local and Google Drive destinations. Provider IDs and
+URLs are receipts, not the only identity. Export is complete only after output hashes are verified.
 
-The same logical layout is used for local and Google Drive destinations. Provider IDs/URLs are recorded in receipts,
-not used as the only identity. Export is complete only after written artifact hashes are verified.
+## 8. manifest.csv and index.csv
 
-## 7. `manifest.csv` and `index.csv`
+The canonical manifest.csv columns are:
 
-The canonical `manifest.csv` columns are:
-
-```text
+~~~
 manifest_version
+manifest_snapshot_id
 row_id
 case_id
 image_id
@@ -385,49 +372,79 @@ local_object_uri
 file_name
 file_extension
 file_sha256
+file_type
 modality
 laterality
 width_px
 height_px
-study_id
-series_id
+frame_count
+study_instance_uid_reference
+series_instance_uid_reference
+sop_instance_uid_reference
+frame_number
+transfer_syntax_uid
 patient_pseudo_id
 eye_id
 visit_id
 qc_status
-queue_status
+review_status
+ai_status
+export_status
+derived_queue_status
 system_dr_grade
 system_dr_confidence
 system_prediction_id
 system_model_manifest_id
 human_reviewed_dr_grade
+human_grading_protocol
 human_review_status
 human_reviewer_id_hash
 human_reviewed_at
 annotation_count
 human_annotation_count
+annotation_artifact_uri
+annotation_revision_hash
+annotation_schema_version
+training_image_uri
+training_image_sha256
+derivative_preprocessing_version
 training_eligibility
 label_provenance
-export_status
+output_policy
 export_uri
 export_hash
 created_at
 updated_at
-```
+~~~
 
-`index.csv` is an operationally compact index but must retain at least `manifest_version`, `row_id`, `case_id`,
-`image_id`, `file_sha256`, `source_folder_id`, `queue_status`, `system_dr_grade`, `human_reviewed_dr_grade`,
-`training_eligibility`, and `export_status`.
+Identity fields ending in _reference are approved local or de-identified references only. Raw PHI is never written to a
+public-safe or external manifest.
 
-The builder must fail closed or mark an explicit error when source hash, prediction provenance, human review status,
-or eligibility cannot be determined. It must never infer `HUMAN` from a system prediction.
+For lesion/ROI training, annotation_artifact_uri, annotation_revision_hash, and annotation_schema_version are required
+when annotations exist; counts alone cannot locate exact geometry. For image training, training_image_uri,
+training_image_sha256, and derivative_preprocessing_version identify exact downstream input. human_grading_protocol
+identifies the human grade protocol.
 
-## 8. Compatibility and migration notes
+index.csv is compact but retains at least:
 
-- Reuse `ImageManifest` for source identity where its current modality/source semantics fit.
-- Reuse `Prediction`, `Annotation`, `Geometry`, `ProtocolRef`, and `ModelManifest` rather than redefining them in the
-  product layer.
-- Add product documents and schemas as new versioned contracts; do not change existing contract meaning in place.
-- Preserve the existing Mongo revision key pattern `annotation_id:revision_hash`.
-- Keep local storage path references relative and provider-neutral where possible.
-- Store large exports and image bytes outside MongoDB; Mongo contains references, compact metadata, and revision data.
+~~~
+manifest_version, manifest_snapshot_id, row_id, case_id, image_id, file_sha256
+training_image_uri, training_image_sha256, source_folder_id
+review_status, ai_status, export_status
+system_dr_grade, human_reviewed_dr_grade, human_grading_protocol
+annotation_artifact_uri, annotation_revision_hash, annotation_schema_version
+derivative_preprocessing_version, training_eligibility, export_status
+~~~
+
+The builder fails closed or marks an explicit error when source hash, prediction provenance, human review status,
+annotation revision, training image identity, or eligibility cannot be determined. It never infers HUMAN from a system
+prediction.
+
+## 9. Compatibility and migration notes
+
+- Reuse ImageManifest, Prediction, Annotation, Geometry, ProtocolRef, and ModelManifest where semantics fit.
+- Add product documents and schemas as new versioned contracts; do not mutate existing shared meaning in place.
+- Preserve the existing annotation_id:revision_hash key pattern.
+- Keep storage paths relative and provider-neutral where possible.
+- Keep large exports, images, derivatives, embeddings, and checkpoints outside MongoDB; Mongo stores references,
+  compact metadata, and revision data.

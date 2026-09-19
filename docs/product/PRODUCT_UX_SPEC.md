@@ -2,318 +2,324 @@
 
 **Status:** Product-track planning specification
 **Audience:** Product, design, frontend, runtime, data, and clinician-review implementers
-**Scope:** On-prem retinal model factory and clinician review POC; not a diagnostic product
+**Scope:** On-prem retinal model factory and clinician review system; not a diagnostic product
 
 ## 1. Product promise
 
-OcuForge turns mostly unlabeled hospital retinal images into a controlled local workflow for ingestion, review,
-human labeling, model-assisted screening support, export, and downstream dataset preparation. The system keeps the
-original source object, system output, human review, and training eligibility visibly separate.
+OcuForge helps a hospital start with mostly unlabeled retinal images, commonly DICOM, and progressively build a
+governed hospital-specific encoder plus lightweight task head. The product loop is:
 
-Research evidence supports the product, but the current R1 scientific blocker does not block this product track. The
-first product POC may use a deterministic mock `ModelAdapter`; that validates workflow and provenance, not model
-quality.
+```text
+mostly unlabeled hospital images
+    -> local ingestion and QC
+    -> clinician-reviewed labels
+    -> reviewed dataset snapshot
+    -> future encoder adaptation / SSL
+    -> lightweight task-specific head
+    -> validation and calibration
+    -> versioned encoder + head bundle
+    -> local deployment and Review Workspace
+    -> iterative relabel / retrain loop
+```
+
+Research evidence supports product engineering, but `RESEARCH_BLOCKED != PRODUCT_BLOCKED`. The current R1 scientific
+blocker remains unchanged and does not authorize training or experiments. The first product POC may use a
+deterministic mock `ModelAdapter`; that validates workflow and provenance, not model quality.
 
 ## 2. Information architecture
 
-The primary navigation has five areas:
+The five primary areas remain:
 
 | Area | User question | Primary action |
 |---|---|---|
 | Sources | Where are images coming from and where should results go? | Configure source and destination |
 | Queue | Which images need attention? | Filter, select, and open review |
 | Review & Label | What should I record for this image? | Run AI explicitly, annotate, grade, save |
-| Summary | What has been processed and reviewed? | Group, compare, and inspect completion |
-| Dataset / Manifest | What is eligible for downstream use? | Inspect and export manifest |
+| Summary | What has been processed and reviewed? | Group, compare, and inspect recovery |
+| Dataset / Manifest | What is eligible for downstream use? | Inspect, snapshot, and export a manifest |
 
-The existing `templates/` workspace remains the behavioral reference. Its Overview, Screening, Review Queue,
-Explainability, Model Comparison, and Integrations concepts may be reused, but the product navigation should make
-Sources, Queue, Review & Label, Summary, and Dataset / Manifest primary. Model-lab and integration details remain
-secondary or administrative surfaces.
+The existing `templates/` DR Review Workspace remains the behavioral reference. Its review layout, queue patterns,
+decision controls, and safety language can be reused. Label Studio CE remains optional internal HITL infrastructure;
+CVAT remains optional advanced annotation infrastructure.
 
 ## 3. Page-by-page flow
 
 ### 3.1 Sources
 
-The user selects one input source:
+The user selects an input source and output destination through adapter-shaped controls:
 
-- local image folder;
+- local folder or mounted hospital share;
 - Google Drive folder URL through an optional governed adapter.
 
-The user selects one output destination:
+The user selects an output destination:
 
-- local folder;
+- local folder or mounted output share;
 - Google Drive folder URL through an optional governed adapter.
 
-Before ingestion, show source type, source reference, authorization/read readiness, output readiness, supported file
-types, scan scope, and the policy that original files are preserved. The primary action is `Start ingestion`.
+The UI depends on `SourceAdapter`, `DestinationAdapter`, and `LocalPathAdapter` readiness, not directly on browser filesystem APIs. A local
+deployment may provide a backend path picker, a desktop/native shell may provide a native picker, and a browser may
+use the File System Access API where supported. Unsupported browser capabilities must produce a clear setup state,
+not a false local-path promise.
 
-Validation must distinguish:
+Before ingestion, show source type, destination type, adapter readiness, scan scope, supported formats, DICOM policy,
+output policy, and the fact that original objects are preserved. The primary action is `Start ingestion`.
 
-- source reachable but not authorized;
-- source authorized but scan failed;
-- destination configured but not writable;
-- valid configuration ready to run.
+No provider credential is placed in the browser log, public manifest, Git, or external telemetry. Entering a Drive URL
+does not upload data until the governed adapter and local policy permit it.
 
-No image is uploaded to Google Drive by default merely because a Drive URL was entered. The adapter and local policy
-must explicitly permit the operation.
+### 3.2 Ingestion progress and quarantine
 
-### 3.2 Ingestion progress
+Show a resumable job with discovered, DICOM, raster, accepted, duplicate, unsupported, malformed, quarantined,
+failed, and persisted counts. Every item has a stable reference and retry/quarantine action.
 
-Show a resumable progress view with discovered, accepted, duplicate, unsupported, failed, and persisted counts.
-Each failure has a stable item reference and a retry action. Discovery is not presented as persistence.
+Phase-1/core DICOM behavior must be visible:
 
-After ingestion, the user can go to Queue even when some files failed. Partial ingestion is visible and auditable.
+- discover DICOM objects, including common multi-frame objects;
+- hash and preserve immutable source bytes before conversion;
+- extract approved technical metadata;
+- generate a display derivative with orientation, frame, color, and windowing provenance where applicable;
+- create an image/case and Queue entry when accepted;
+- quarantine malformed or unsupported DICOM without silently treating it as raster.
+
+Where applicable, the local technical identity includes `study_instance_uid`, `series_instance_uid`,
+`sop_instance_uid`, `frame_number`, and `transfer_syntax_uid`. These are shown only through the approved local
+privacy boundary; patient-identifying values are not exposed.
+
+Patient-identifying DICOM metadata remains in the local governed boundary. The UI shows safe technical metadata only.
+Partial ingestion is usable and auditable; a failed item does not hide successfully ingested cases.
 
 ### 3.3 Queue
 
 Queue is a searchable, sortable, filterable table or adaptive card list. It shows:
 
-- image/case ID;
-- source folder;
-- filename or source reference;
-- modality and laterality;
-- QC state;
-- System DR Grade, if present;
-- Human Reviewed Grade, if present;
-- review status;
-- export status;
-- last updated time.
+- image/case ID and source reference;
+- modality, laterality, and safe technical metadata;
+- system DR grade, if present;
+- human reviewed DR grade, if present;
+- review status, AI status, export status, and a derived composite badge;
+- last updated time and retry/recovery affordance.
 
-Required top-level queue states are:
+The three durable operational dimensions are independent:
 
 ```text
-NOT_PROCESSED
-AI_PROCESSED
-IN_REVIEW
-HUMAN_REVIEWED
-EXPORTED
-ERROR
+review_status: NOT_STARTED | IN_REVIEW | HUMAN_REVIEWED
+ai_status:     NOT_RUN | RUNNING | PROCESSED | FAILED
+export_status: NOT_EXPORTED | EXPORTING | EXPORTED | FAILED
 ```
 
-System grade and human grade are separate columns and filters. A missing human grade is not rendered as a system
-grade, and an unreviewed system grade is not shown as ground truth.
+Queue badges may render a derived composite such as `READY FOR REVIEW`, `AI FAILED`, `HUMAN REVIEWED / EXPORT
+FAILED`, or `EXPORTED`. The composite is never stored as the only state.
 
-The queue supports multi-select for review and export, but each image retains independent state. Opening an item
-changes its state to `IN_REVIEW` only when the review session is materialized; merely previewing a row may remain
-read-only.
+The Queue must make these rules apparent:
+
+- successful human review remains durable if export fails;
+- export failure never reverts `HUMAN_REVIEWED`;
+- AI failure never destroys an existing review or annotation history;
+- retry is explicit, idempotent, and scoped to the failed operation;
+- system grade and human grade remain separate and neither is silently substituted for the other.
+
+Opening a row materializes `IN_REVIEW` only when a review session is created. Read-only preview does not change review
+state.
 
 ### 3.4 Review & Label
 
-The review page is image-first. The user must explicitly click `Run AI`. Opening an image does not trigger model
-execution.
+The user must explicitly click `Run AI`. Opening an image never starts AI execution. The page contains:
 
-The page contains:
-
-1. case context: source folder, image ID, modality, laterality, QC state, and queue status;
-2. image canvas: zoom, pan, fit-to-view, and annotation overlays;
-3. annotation toolbar: pointer/select, rectangle, point, circle/ellipse, polygon, and translucent area fill;
-4. system panel: model bundle identity, preprocessing/calibration identity, DR grade, confidence, evidence, and
-   generated system annotations;
+1. case context: source folder, IDs, modality, laterality, safe DICOM metadata, QC, and operational statuses;
+2. image canvas: zoom, pan, fit-to-view, frame selection where applicable, and overlays;
+3. annotation toolbar: select, rectangle, point, circle/ellipse, polygon, and translucent area fill;
+4. system panel: versioned bundle identity, preprocessing, calibration, grade, confidence, and system annotations;
 5. human panel: human DR grade, annotation label, certainty, remark, and review action;
-6. history drawer: immutable prediction, revisions, actor, timestamps, and audit events;
-7. save controls: `Save & Return`, `Save draft`, and `Cancel changes` where the implementation supports drafts.
+6. history drawer: immutable predictions, annotation revisions, operational events, actor, and timestamps;
+7. save controls: `Save draft`, `Save & Return`, `Retry export`, and explicit cancel where supported.
 
-System annotations are never edited in place. A correction creates a user annotation/revision linked to the original
-system prediction. Rejecting a system annotation preserves it and records the rejection.
+System annotations use a distinct line/fill style, provenance badge, and accessible label. User annotations use a
+different style and provenance badge. Color is not the only distinction. A correction creates a new user revision
+linked to the system object; it never edits or overwrites the original prediction.
 
-Allowed review actions are explicit and provenance-bearing: confirm, correct, add, reject, escalate, grade, and
-remark. `HUMAN_REVIEWED` requires a valid human review according to the configured product policy; it must not be
-inferred from simply opening the page.
+Allowed actions include confirm, correct, add, reject, escalate, grade, and remark. `HUMAN_REVIEWED` requires the
+configured valid human review action, not merely opening the page or running AI.
 
 ### 3.5 Multi-image review
 
-The user can choose 1, 2, 4, or 8 image layouts. Layout changes affect presentation only. Every tile owns its image
-selection, zoom, annotations, system output, human edits, dirty state, and save/error state.
+The user can choose 1, 2, 4, or 8 image layouts. Layout changes affect presentation only. Each tile retains its own
+selection, zoom, annotations, system output, human edits, dirty state, operational statuses, and save/export result.
+One tile failing does not make another tile appear failed or erase a successful review.
 
-If one tile fails to save or export, the UI identifies that tile and preserves successful saves for the other tiles.
-The user cannot mistake a batch-level success message for all-image success.
+### 3.6 Save & Return and recovery
 
-### 3.6 Save & Return
+`Save & Return` first persists review revisions and the materialized review to local NoSQL. Export is then scheduled or
+performed through `ExportAdapter` according to output policy.
 
-`Save & Return` persists review revisions and the current case materialization to local NoSQL before writing export
-artifacts. It then returns to Queue and shows the resulting state.
+If persistence succeeds and export fails:
 
-If persistence succeeds but output writing fails, the review remains saved, the case remains `HUMAN_REVIEWED`, and
-the export error is visible and retryable. The UI must not show `EXPORTED` until the selected artifacts have been
-verified at the destination.
+- `review_status` remains `HUMAN_REVIEWED`;
+- `export_status` becomes `FAILED`;
+- the Queue shows a composite `HUMAN REVIEWED / EXPORT FAILED` badge;
+- the failed export is retryable with the same idempotency key;
+- the original DICOM and all review history remain intact.
+
+If AI fails, `ai_status` becomes `FAILED` while prior review and annotations remain unchanged. If a retry succeeds,
+the new immutable prediction is linked to the prior attempt; it does not rewrite history.
 
 ### 3.7 Summary
 
-Summary groups primarily by source folder and SYSTEM DR Grade. A separate view groups by Human Reviewed Grade.
-The header must state which grade dimension is active.
-
-Useful first-POC summary measures are counts by queue state, source folder, modality, QC status, system grade,
-human grade, and export status. Do not expose research benchmark metrics or imply clinical performance in the
-customer-facing summary.
+Summary groups primarily by source folder and SYSTEM DR Grade, with a separate Human Reviewed Grade view. The active
+dimension is always stated. First product measures include counts by source folder, modality, QC, review status, AI
+status, export status, system grade, human grade, and quarantine/failure reason. Do not show research benchmark
+metrics or imply clinical performance in customer-facing Summary.
 
 ### 3.8 Dataset / Manifest
 
-Dataset / Manifest shows manifest version, generated time, source selection, row counts, hash coverage, human-review
-coverage, training-eligibility counts, export location, and unresolved errors.
+Dataset / Manifest shows manifest version, snapshot ID, source selection, row counts, hash coverage, human-review
+coverage, training eligibility, annotation revision coverage, output policy, export location, and unresolved errors.
 
-Rows marked `UNREVIEWED_SYSTEM` are clearly excluded from training-eligible counts. The UI must distinguish
-`HUMAN`, `PSEUDO_LABEL`, `WEAK_LABEL`, and `UNREVIEWED_SYSTEM` rather than collapsing them into a generic label.
+Rows marked `UNREVIEWED_SYSTEM` are visible for audit but excluded from training-eligible selections. The UI must keep
+`HUMAN`, `PSEUDO_LABEL`, `WEAK_LABEL`, and `UNREVIEWED_SYSTEM` visibly distinct. The semantic rule is explicit:
+`SYSTEM AUTO LABEL != HUMAN GROUND TRUTH`.
 
-## 4. Layout and adaptive behavior
+For each eligible training row, show or provide a safe reference to the exact `annotation_artifact_uri`,
+`annotation_revision_hash`, `annotation_schema_version`, `training_image_uri`, `training_image_sha256`,
+`derivative_preprocessing_version`, and `human_grading_protocol`. An annotation count alone is not a usable ROI
+training reference.
 
-Use Chakra UI as the future adaptive component and layout system. Use Lucide icons for navigation, tools, status, and
-actions. The current static HTML/CSS package is a reference and must not be treated as the production component
-implementation.
+The UI supports a future `Create dataset snapshot` action. Snapshot creation records the selected reviewed rows and
+the identity-safe split policy; it does not start SSL, head training, validation, or calibration.
+
+## 4. Output policy
+
+The user or local policy selects one output policy:
+
+```text
+REFERENCE_ONLY
+COPY_ORIGINAL
+DERIVED_IMAGE_ONLY
+COPY_ORIGINAL_AND_DERIVED
+```
+
+`REFERENCE_ONLY` is the default for large DICOM workflows. It writes source references and hashes without duplicating
+large original bytes. Copying is explicit and policy-gated. `DERIVED_IMAGE_ONLY` writes display/preview derivatives
+without replacing the source. `COPY_ORIGINAL_AND_DERIVED` writes both when policy permits.
+
+Annotated previews are derived artifacts. An annotation is never burned into, written into, or used to overwrite the
+original DICOM. The review UI must display the selected policy before export and the receipt must record the policy.
+
+## 5. Layout and adaptive behavior
+
+Use Chakra UI as the future adaptive component/layout system and Lucide icons for navigation, tools, status, and
+actions. The current static HTML/CSS POC is a reference, not the production component implementation.
 
 ### Desktop
 
 - persistent grouped sidebar;
-- compact context header;
-- responsive content panels;
-- queue table with filters and saved view state;
+- compact context header with privacy/adapter status;
+- queue table with filters and derived state badges;
 - review canvas as the dominant surface;
 - system and human panels side-by-side where width allows.
 
-### Tablet
+### Tablet and small screens
 
 - collapse secondary panels into drawers;
-- keep image, active annotation tool, current grade, and save action visible;
-- preserve source/case context while switching images.
-
-### Small screens
-
-- single-image focus;
-- annotation tools in an accessible toolbar or bottom sheet;
-- system output and human decision in ordered drawers;
-- persistent save state and case identity;
-- no destructive or finalizing action hidden behind an unlabeled icon.
+- keep image, active tool, current grade, operational status, and save action visible;
+- use an accessible annotation toolbar or bottom sheet;
+- keep case identity and persistence/export status visible;
+- do not hide a finalizing action behind an unlabeled icon.
 
 Target checks are 375px, 768px, 1024px, and 1440px widths, plus keyboard navigation and reduced-motion mode.
 
-### Component/layout hierarchy
-
-The future Chakra-based application should compose these reusable layers:
+## 6. Component hierarchy
 
 ```text
 AppShell
-├── PrimaryNavigation
-│   ├── SourcesNavItem
-│   ├── QueueNavItem
-│   ├── ReviewNavItem
-│   ├── SummaryNavItem
-│   └── ManifestNavItem
-├── ContextHeader
-│   ├── Breadcrumbs / source context
-│   ├── Connection and privacy status
-│   └── User/session menu
-└── PageRegion
-    ├── PageHeader
-    ├── FilterToolbar / ActionToolbar
-    ├── MainContent
-    └── FeedbackRegion
+|-- PrimaryNavigation
+|-- ContextHeader
+|   |-- adapter/readiness status
+|   |-- privacy boundary status
+|   `-- user/session menu
+`-- PageRegion
+    |-- PageHeader
+    |-- ActionToolbar
+    |-- MainContent
+    `-- FeedbackRegion
 
 SourcesPage
-├── SourcePicker
-├── DestinationPicker
-├── ReadinessSummary
-└── IngestionJobPanel
+|-- SourcePicker
+|-- DestinationPicker
+|-- LocalFileSystemBridge status
+|-- OutputPolicyPicker
+|-- ReadinessSummary
+`-- IngestionJobPanel / QuarantinePanel
 
 QueuePage
-├── QueueFilters
-├── QueueTableOrCardList
-├── QueueStateBadge
-└── BulkActionBar
+|-- QueueFilters
+|-- QueueTableOrCardList
+|-- OperationalStatusBadges
+`-- RecoveryActionBar
 
 ReviewPage
-├── CaseHeader
-├── ReviewLayoutSelector
-├── ImageReviewGrid
-│   └── ReviewTile
-│       ├── ImageCanvas
-│       ├── AnnotationToolbar
-│       ├── ProvenanceLegend
-│       └── TileSaveState
-├── SystemEvidencePanel
-├── HumanDecisionPanel
-├── AuditHistoryDrawer
-└── SaveReturnBar
+|-- CaseHeader
+|-- ReviewLayoutSelector (1 / 2 / 4 / 8)
+|-- ImageReviewGrid
+|   `-- ReviewTile -> ImageCanvas -> AnnotationToolbar -> ProvenanceLegend
+|-- SystemEvidencePanel
+|-- HumanDecisionPanel
+|-- AuditHistoryDrawer
+`-- SaveReturnBar
 
 SummaryPage
-├── SummaryDimensionSwitcher
-├── SummaryFilters
-├── SummaryGroupList
-└── SummaryDetailDrawer
+|-- SummaryDimensionSwitcher
+|-- SummaryFilters
+`-- SummaryGroupList / RecoveryDetail
 
 ManifestPage
-├── ManifestOverview
-├── EligibilityBreakdown
-├── ManifestTable
-└── ExportHistoryPanel
+|-- SnapshotControls
+|-- EligibilityBreakdown
+|-- ManifestTable
+`-- ExportHistoryPanel
 ```
 
-Components should consume semantic tokens and contract-shaped data. They must not contain DICOM parsing, model
-architecture logic, provider credentials, or direct MongoDB calls.
+Components consume semantic contract-shaped data. They do not parse DICOM, import model architecture code, hold
+provider credentials, or call MongoDB directly.
 
-## 5. Visual direction
+## 7. UX states and transitions
 
-The design should be colorful and interesting within a minimal, professional clinical tone. Color roles are not
-bound to a fixed palette table. The supplied KKU colors are a seed, not a prescription:
+The UI renders independent dimensions and a derived composite:
 
 ```text
-#A73B24  #7C291A  #F4E5E0  #C99A45
-#202428  #667085  #FCFBFA  #FFFFFF  #E5E7EB
+review_status: NOT_STARTED -> IN_REVIEW -> HUMAN_REVIEWED
+review_status: HUMAN_REVIEWED -> IN_REVIEW     (new correction)
+
+ai_status: NOT_RUN -> RUNNING -> PROCESSED
+ai_status: RUNNING -> FAILED
+ai_status: FAILED -> RUNNING                   (explicit idempotent retry)
+
+export_status: NOT_EXPORTED -> EXPORTING -> EXPORTED
+export_status: EXPORTING -> FAILED
+export_status: FAILED -> EXPORTING             (explicit idempotent retry)
 ```
 
-Designers may introduce complementary cool clinical colors, neutral ramps, dark-theme values, and semantic status
-colors. The implementation must preserve sufficient contrast, avoid neon and AI-purple/pink gradients, and keep
-status colors distinct from provenance colors. The same semantic token must be used consistently across light/dark
-themes; component-level colors should not be hard-coded to brand values.
+AI and export transitions never rewrite review state. Every transition shows a cause, timestamp, actor/system origin,
+attempt ID, and related immutable object. Queue composite examples are presentation rules, not additional canonical
+states.
 
-Recommended visual characteristics:
+## 8. Reuse and POC acceptance criteria
 
-- warm or neutral base surfaces with a small number of vivid accents;
-- clear status chips and progress indicators;
-- subtle elevation and borders rather than decorative glass or dense shadows;
-- restrained motion, 150–300ms transitions, and reduced-motion fallback;
-- Public Sans or an equivalent highly legible sans-serif for interface text;
-- IBM Plex Mono or equivalent for IDs, hashes, and technical references;
-- Lucide outline icons with accessible labels.
+Reuse the current `templates/` information architecture, master/detail review layout, queue patterns, adapter seam,
+and safety language. Preserve explicit Run AI, system-vs-human provenance, all five annotation geometries, 1/2/4/8
+layouts, Save & Return, immutable history, NoSQL/object-storage direction, optional Google Drive, Label Studio CE,
+CVAT, and architecture-agnostic model bundles.
 
-System-vs-user annotation distinction must never rely on color alone. Combine configurable color, line style, fill
-opacity, legend label, provenance badge, and accessible text.
+The first POC is accepted when synthetic or explicitly authorized local fixtures demonstrate:
 
-## 6. UX states and transitions
-
-```text
-NOT_PROCESSED --Run AI success--> AI_PROCESSED
-NOT_PROCESSED --ingestion/QC/model failure--> ERROR
-AI_PROCESSED --review materialized--> IN_REVIEW
-AI_PROCESSED --valid review saved--> HUMAN_REVIEWED
-IN_REVIEW --valid review saved--> HUMAN_REVIEWED
-IN_REVIEW --persistence/export failure--> ERROR
-HUMAN_REVIEWED --verified export--> EXPORTED
-EXPORTED --new correction--> IN_REVIEW
-ERROR --explicit retry--> prior state or NOT_PROCESSED
-```
-
-All transitions must show a cause, timestamp, and actor/system origin in the history view. Retry must be explicit and
-idempotent.
-
-## 7. Reuse and future implementation boundary
-
-Reuse the current `templates/` information architecture and safety language. Reuse its mock/live adapter concept,
-master-detail review layout, queue patterns, review decision controls, explanation boundary, and integration page
-ideas. The future product adapter expands beyond the current `getTask`, `inferGlobal`, `inferLesionRoi`,
-`submitDecision`, and connection checks to cover sources, queue, cases, annotations, exports, and manifests.
-
-Label Studio Community remains an internal ROI QA/HITL workbench. CVAT remains optional advanced labeling
-infrastructure. Neither is required for the first customer-facing review loop.
-
-## 8. UX acceptance criteria for the first POC
-
-- Source and destination can be selected locally without external services.
-- At least one DICOM and supported raster fixture can be ingested without modifying source bytes.
-- Queue shows all six required states and keeps system/human grades separate.
-- `Run AI` is explicit and records a versioned mock model result.
-- Review supports rectangle, point, ellipse, polygon, and translucent area annotations.
-- System output remains recoverable after correction or rejection.
-- 1/2/4/8 layouts preserve independent image state.
-- Save persists before export; export failure does not lose review state.
-- Summary and Dataset / Manifest identify system grade, human grade, and training eligibility separately.
-- Keyboard, focus, contrast, reduced-motion, and small-screen checks pass.
+- local source/destination adapter selection without assuming unrestricted browser filesystem access;
+- at least one DICOM fixture and one supported raster fixture ingested without source-byte modification;
+- DICOM SHA-256, safe technical metadata, display derivative, and derivation provenance;
+- malformed/unsupported DICOM quarantine;
+- Queue dimensions for review, AI, and export statuses;
+- explicit deterministic mock `Run AI` with immutable prediction;
+- all five annotation geometries and system/user distinction;
+- independent 1/2/4/8 review state;
+- Save & Return before export;
+- export failure retaining `HUMAN_REVIEWED` and remaining retryable;
+- manifest fields sufficient to locate annotation revisions and training images;
+- no training, Pod, experiment, or R1 scientific state change.

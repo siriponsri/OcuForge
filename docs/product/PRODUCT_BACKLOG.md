@@ -1,147 +1,152 @@
 # OcuForge Product Backlog
 
 **Status:** Product-track implementation sequence
-**Starting branch:** `product/encoder-head-v0.1`
-**Ordering principle:** Customer value first, with provenance and safety as prerequisites
+**Starting branch:** product/encoder-head-v0.1
+**Ordering principle:** Customer value first, with provenance, privacy, and recovery as prerequisites
 
 ## 1. Product-track guardrails
 
 This backlog does not authorize model training, Pods, external experiments, R1 scientific blocker resolution, or
-production clinical deployment. Research status and product status are independent:
+production clinical deployment. Product and research status are independent:
 
-```text
+~~~
 RESEARCH_BLOCKED != PRODUCT_BLOCKED
-```
+~~~
 
-The first product POC uses synthetic or explicitly authorized local fixtures and a deterministic mock model adapter.
-Private hospital data remains on-premise. Google Drive support is optional and policy-gated.
+The first workflow POC uses synthetic or explicitly authorized local fixtures and a deterministic mock ModelAdapter.
+Private hospital data, patient linkage, private predictions, and derived artifacts remain on-premise. Google Drive is
+optional and policy-gated.
+
+The current research conclusions, including the R1 blocker and no-champion state, are unchanged by this product plan.
 
 ## 2. Ordered phases
 
-### Phase 0 — Product contracts and vocabulary
+### Phase 0 - Contracts and vocabulary
 
 **Customer value:** Prevents unsafe ambiguity before implementation.
 
 Deliver:
 
-- product document IDs and schema versions;
-- source/destination terminology;
-- queue states and transitions;
-- separate system/human grade semantics;
-- annotation provenance and revision rules;
-- training eligibility values;
+- versioned product contracts for source, image, DICOM identity, derivative, case, review, prediction, annotation
+  revision, export job, manifest snapshot, and future model bundle;
+- canonical operational dimensions: review_status, ai_status, and export_status;
+- derived Queue badge rules and idempotent retry semantics;
+- source/destination and LocalFileSystemBridge vocabulary;
+- output policies: REFERENCE_ONLY, COPY_ORIGINAL, DERIVED_IMAGE_ONLY, COPY_ORIGINAL_AND_DERIVED;
+- system/human grade semantics, provenance, and eligibility values;
 - adapter seams and local/cloud boundary;
-- acceptance fixture strategy.
+- acceptance fixture strategy including valid, malformed, unsupported, multi-frame, and raster inputs.
 
 Exit criteria:
 
-- all product teams use the same `case`, `image`, `prediction`, `annotation revision`, `review`, `export job`, and
-  `manifest snapshot` definitions;
+- all product teams use the same terms and schema versions;
 - no document treats system output as ground truth;
-- contract ownership is agreed before code begins.
+- a queue composite cannot replace its underlying status dimensions;
+- contract ownership is agreed before implementation.
 
-### Phase 1 — Local source ingestion and Queue
+### Phase 1 - Local ingestion + first-class DICOM + Queue
 
-**Customer value:** Turns an unlabeled folder into a searchable, durable work queue.
+**Customer value:** Turns a mostly unlabeled hospital folder into a safe, searchable, durable work queue.
 
 Deliver:
 
-- local folder `SourceAdapter`;
-- `ImageIngestionService` with hash, deduplication, immutable object storage, and item-level errors;
-- image/case/source documents;
-- Queue query and required state badges;
-- raster fixtures first, with DICOM routed through an explicit capability check.
+- LocalFileSystemBridge / LocalPathAdapter capability detection and provider-neutral folder references;
+- local folder source and destination adapters;
+- DICOM discovery as a core ingestion path, not a late integration;
+- immutable source-byte preservation and SHA-256 before conversion;
+- DICOM technical metadata extraction, including study/series/SOP/frame/transfer-syntax identifiers where applicable;
+- explicit local identity fields: `study_instance_uid`, `series_instance_uid`, `sop_instance_uid`, `frame_number`,
+  and `transfer_syntax_uid` where applicable;
+- local privacy-safe metadata boundary;
+- display derivative generation with frame, orientation, windowing, color, and preprocessing provenance;
+- Queue creation for accepted DICOM and raster objects;
+- malformed/unsupported DICOM quarantine with stable reasons and retry/review path;
+- explicit raster adapters for supported JPEG, PNG, and TIFF inputs;
+- deduplication, resumable ingestion, and item-level audit records.
 
 Exit criteria:
 
-- source bytes are preserved and hashed;
-- duplicate content is not stored twice as authoritative data;
-- partial ingestion is resumable and visible;
-- Queue supports filtering by source folder, modality, laterality, and queue state.
+- an accepted DICOM retains byte-identical original storage and a verified SHA-256;
+- accepted DICOM has a display derivative linked to the source hash;
+- technical identifiers are retained locally without PHI entering browser logs, public manifests, Git, cloud services, or telemetry;
+- frame/orientation/windowing provenance is present where applicable;
+- malformed/unsupported DICOM is quarantined and not silently rasterized;
+- Queue can filter source, modality, laterality, ingestion outcome, and derived operational badge;
+- raster remains supported but DICOM is the tested hospital-default path.
 
-### Phase 2 — First review loop with mock ModelAdapter
+### Phase 2 - Mock ModelAdapter + first review loop
 
 **Customer value:** Gives a clinician a complete local review loop without waiting for research model execution.
 
 Deliver:
 
-- explicit `Run AI` action;
-- versioned deterministic mock model bundle manifest;
+- explicit Run AI action;
+- deterministic versioned mock bundle manifest;
 - immutable system prediction storage;
-- Review & Label page;
-- human DR grade, remark, and save/return flow;
-- system/human distinction in UI and storage.
+- independent ai_status transitions and retry;
+- Review & Label page with human DR grade, remark, and save/return;
+- system/human distinction in UI and storage;
+- durable review state before any export attempt.
 
 Exit criteria:
 
-- AI never runs merely by opening a case;
+- opening a case never runs AI;
 - system prediction survives correction and rejection;
+- AI failure does not erase existing review or annotations;
 - Save persists review state before export;
-- stale concurrent edits are rejected and recoverable.
+- stale concurrent edits are rejected and recoverable;
+- no mock result is presented as a diagnosis or human ground truth.
 
-### Phase 3 — Annotation editor and provenance history
+### Phase 3 - Annotation editor + multi-image review
 
 **Customer value:** Makes review useful for localized labeling and correction.
 
 Deliver:
 
-- rectangle/box;
-- point;
-- circle/ellipse;
-- polygon;
-- translucent area fill presentation;
-- system/user visual legend and accessible provenance labels;
-- immutable revision history, undo/cancel, rejection, correction, and audit drawer;
-- 1/2/4/8 layouts with independent image state.
+- rectangle/box, point, circle/ellipse, polygon, and translucent area fill;
+- system/user style and accessible provenance legend;
+- immutable revision history, undo/cancel, reject, correct, confirm, and audit drawer;
+- 1/2/4/8 layouts with independent image state;
+- exact parent prediction/object links for edited system annotations;
+- annotation schema version and revision hash capture.
 
 Exit criteria:
 
 - every edit creates a new revision or explicit event;
 - original system geometry remains recoverable;
-- all five geometry interactions are testable offline;
-- changing one tile does not mutate another tile.
+- all geometry types are tested offline;
+- changing one tile does not mutate another tile;
+- annotation provenance is never inferred from visual appearance alone.
 
-### Phase 4 — Local export and training manifest
+### Phase 4 - Export + manifest
 
 **Customer value:** Produces usable review artifacts and a safe downstream dataset index.
 
 Deliver:
 
-- local `ExportAdapter`;
+- local ExportAdapter;
+- explicit output-policy selection and receipts;
 - deterministic artifact directory;
-- metadata, predictions, annotations, review, audit, and optional preview artifacts;
-- `manifest.csv` and `index.csv` builder;
-- explicit `HUMAN`, `PSEUDO_LABEL`, `WEAK_LABEL`, and `UNREVIEWED_SYSTEM` eligibility;
-- export verification and retry.
+- metadata, predictions, annotation revisions, review, audit, and optional annotated preview artifacts;
+- manifest.csv and index.csv builder;
+- annotation_artifact_uri, annotation_revision_hash, annotation_schema_version;
+- training_image_uri, training_image_sha256, derivative_preprocessing_version;
+- human_grading_protocol;
+- explicit `SYSTEM AUTO LABEL != HUMAN GROUND TRUTH` semantics;
+- explicit HUMAN, PSEUDO_LABEL, WEAK_LABEL, and UNREVIEWED_SYSTEM eligibility;
+- export verification and idempotent retry.
 
 Exit criteria:
 
-- no raw DICOM duplication by default;
-- source references and hashes are preserved;
-- export failure does not lose review state;
-- unreviewed system rows cannot enter a training-eligible selection.
+- REFERENCE_ONLY is the default for large DICOM workflows;
+- original DICOM is never overwritten or annotated;
+- COPY_ORIGINAL behavior is explicit and policy-gated;
+- export failure does not lose review state or revert HUMAN_REVIEWED;
+- ROI rows locate an exact annotation revision, not only a count;
+- unreviewed system rows cannot enter a training-eligible selection;
+- all exported artifact hashes verify before EXPORTED.
 
-### Phase 5 — First-class DICOM support
-
-**Customer value:** Makes the product useful for the common hospital input format.
-
-Deliver:
-
-- `DICOMAdapter` technical metadata extraction;
-- immutable original DICOM persistence;
-- display derivative pipeline;
-- frame/orientation/windowing provenance;
-- malformed/unsupported DICOM quarantine;
-- DICOM privacy and local-only acceptance tests.
-
-Exit criteria:
-
-- original DICOM bytes remain identical after review/export;
-- display previews link back to original source hash;
-- no patient-identifying fields leave the local boundary;
-- unsupported objects become actionable errors.
-
-### Phase 6 — Summary, recovery, and operational polish
+### Phase 5 - Summary, recovery, and workflow polish
 
 **Customer value:** Helps users understand throughput and recover from ordinary failures.
 
@@ -149,20 +154,23 @@ Deliver:
 
 - source-folder and System Grade summary;
 - separate Human Reviewed Grade summary;
-- queue-state and export-state counts;
+- review, AI, export, quarantine, and ingestion counts;
 - retryable ingestion/model/export errors;
 - idempotent jobs and recovery receipts;
-- saved filters and clear empty/error/loading states.
+- saved filters and clear empty/error/loading states;
+- derived composite Queue badges that explain the underlying failure dimension.
 
 Exit criteria:
 
-- summary labels the grade dimension unambiguously;
+- summary labels its grade dimension unambiguously;
 - partial failures are visible at case and item level;
-- retries do not duplicate revisions or artifacts.
+- AI/export retries do not duplicate revisions or artifacts;
+- successful review stays durable through export failure;
+- Queue badges never hide a failed operational dimension.
 
-### Phase 7 — Optional Google Drive source/output adapters
+### Phase 6 - Optional Google Drive adapters
 
-**Customer value:** Supports governed remote file workflows without changing the local authority model.
+**Customer value:** Supports governed remote file workflows without changing local authority.
 
 Deliver:
 
@@ -170,93 +178,136 @@ Deliver:
 - Google Drive output adapter;
 - provider authorization/read/write readiness states;
 - resumable transfer and checksum verification;
-- provider IDs/URLs in export receipts;
-- no browser-held credentials or raw-data upload outside policy.
+- provider IDs/URLs in receipts;
+- no browser-held credentials or policy-forbidden raw-data upload.
 
 Exit criteria:
 
-- Drive is optional and can be disabled without affecting local workflows;
+- Drive can be disabled without affecting local workflows;
 - unauthorized/revoked access is visible and recoverable;
-- the same logical artifact contract works for local and Drive output.
+- the same output policy and artifact contract works for local and Drive destinations;
+- local/on-prem remains authoritative.
 
-### Phase 8 — Optional internal HITL adapters
+### Phase 7 - Optional Label Studio CE / CVAT adapters
 
-**Customer value:** Adds specialist review capacity without coupling the customer UI to a labeling vendor.
+**Customer value:** Adds specialist review capacity without coupling the customer UI to a vendor.
 
 Deliver:
 
 - Label Studio CE suggestion/confirm/correct/reject/escalate adapter;
-- existing provenance sidecar mapping;
+- provenance sidecar and annotation-revision mapping;
 - optional CVAT advanced geometry adapter;
-- import/export conflict detection.
+- import/export conflict detection and idempotent synchronization.
 
 Exit criteria:
 
 - external task systems cannot overwrite system predictions;
 - imported decisions retain source task, model, reviewer, and geometry provenance;
-- core product review works with both adapters disabled.
+- core product review works with both adapters disabled;
+- Label Studio CE remains internal HITL infrastructure.
 
-### Phase 9 — Real versioned model bundles
+### Phase 8 - Real versioned model bundles
 
-**Customer value:** Replaces the mock adapter with locally deployable encoder + head bundles when approved.
+**Customer value:** Replaces the mock adapter with locally deployable encoder + head bundles after explicit approval.
 
 Deliver:
 
-- bundle registry and local runtime loading;
-- encoder/head/preprocessing/calibration manifest validation;
-- model health and compatibility checks;
+- local model registry and runtime loading;
+- architecture-agnostic encoder/head/preprocessing/calibration manifest validation;
+- model health, compatibility, and input constraints;
 - explicit model selection and audit record;
-- inference latency/error state handling.
+- prediction latency/error state handling;
+- deployment/license status separate from research evidence.
 
 Exit criteria:
 
-- UI remains architecture-agnostic;
-- every prediction records the complete bundle identity;
+- UI remains independent of a concrete encoder architecture;
+- every prediction records complete bundle identity;
+- local deployment has a reproducible rollback target;
 - no model is presented as a diagnosis or clinical decision;
-- deployment/license status is distinct from research evidence.
+- this phase does not claim scientific validation by itself.
+
+### Phase 9+ - Product Model Factory
+
+**Customer value:** Lets a hospital progressively create and maintain a hospital-specific encoder + head model from
+clinician-reviewed supervision.
+
+The future loop is:
+
+~~~
+Reviewed Dataset
+    -> Dataset Snapshot
+    -> patient/identity-safe split
+    -> SSL / encoder adaptation
+    -> lightweight task-specific head training
+    -> validation
+    -> calibration
+    -> versioned encoder + head bundle
+    -> local deployment
+    -> Review Workspace
+    -> iterative relabel / retrain loop
+~~~
+
+Planned subphases:
+
+- **9A - Dataset snapshots:** freeze a reproducible reviewed selection, identity-safe split policy, source/hash
+  coverage, annotation revision references, and eligibility policy;
+- **9B - SSL / encoder adaptation:** future local or approved execution path for unlabeled hospital images, with
+  explicit data boundary and lineage;
+- **9C - Supervised task head:** train a lightweight task-specific head from explicitly eligible human/policy-approved
+  rows while retaining system-vs-human semantics;
+- **9D - Validation and calibration:** record validation, calibration, uncertainty, and error-analysis artifacts before
+  deployment decisions;
+- **9E - Registry and local deployment:** register versioned encoder + head + preprocessing + calibration bundles with
+  rollback and deployment audit;
+- **9F - Iterative loop:** route reviewed corrections back into a new snapshot and retraining decision without silently
+  modifying a prior dataset or bundle.
+
+Exit criteria for each subphase require explicit governance, lineage, identity-safe splits, reproducible artifacts,
+privacy review, and owner approval. These phases are planned only; they are not implemented or scientifically
+validated by this product POC.
 
 ## 3. First working POC acceptance criteria
 
-The first working POC is complete when synthetic or explicitly authorized local fixtures can demonstrate:
+The first POC is complete when synthetic or explicitly authorized local fixtures demonstrate:
 
-- local input-folder selection and local output-folder selection;
-- ingestion of supported raster data and at least one DICOM fixture;
-- immutable source hash and stable image/case IDs;
-- duplicate detection;
-- Queue with all six required states;
-- explicit `Run AI` through a deterministic versioned mock adapter;
+- local input and output selection through a supported filesystem bridge;
+- one DICOM fixture and one supported raster fixture ingested without source-byte modification;
+- DICOM SHA-256, safe technical metadata, display derivative, and derivation provenance;
+- malformed/unsupported DICOM quarantine;
+- independent review, AI, and export statuses plus derived Queue badges;
+- explicit deterministic mock Run AI with immutable prediction;
 - separate system prediction and human grade;
-- all five annotation geometry interactions;
-- system/user visual and provenance distinction;
+- all five annotation geometries and system/user provenance;
 - independent 1/2/4/8 review layouts;
 - Save & Return persistence before export;
-- immutable audit/revision history;
-- deterministic export artifacts and optional preview;
-- `manifest.csv`/`index.csv` with training eligibility;
-- `UNREVIEWED_SYSTEM` excluded from training eligibility;
-- failed export retained as a retryable error;
-- offline automated tests with no Pod, training run, external experiment, or R1 state change.
+- export failure retaining HUMAN_REVIEWED and remaining retryable;
+- deterministic output artifacts and optional annotated preview;
+- manifest.csv/index.csv with exact annotation and training-image references;
+- HUMAN, PSEUDO_LABEL, WEAK_LABEL, and UNREVIEWED_SYSTEM eligibility;
+- UNREVIEWED_SYSTEM excluded from training selection;
+- offline tests with no Pod, training run, external experiment, or R1 state change.
 
 ## 4. Test and verification backlog
 
-- unit-test source adapters, hashing, deduplication, queue transitions, and idempotency;
-- contract-test DICOM metadata extraction and immutable byte preservation;
+- unit-test filesystem bridges, source adapters, hashing, deduplication, and quarantine;
+- contract-test DICOM discovery, technical metadata, frame/orientation/windowing provenance, and byte preservation;
 - repository tests for optimistic concurrency and immutable revision keys;
-- model-adapter tests for explicit invocation, manifest identity, deterministic mock output, and unavailable-model
-  failure;
-- annotation tests for all geometry types, normalized coordinates, correction/rejection provenance, and multi-image
-  independence;
-- export tests for deterministic paths, receipts, hash verification, retry, and no-DICOM-duplication default;
-- manifest tests for all eligibility values and fail-closed ambiguous provenance;
-- browser tests for source setup, Queue states, explicit Run AI, review save, export error, and responsive layouts;
+- ModelAdapter tests for explicit invocation, manifest identity, deterministic mock output, unavailable-model failure,
+  and independent ai_status;
+- annotation tests for all geometry types, normalized coordinates, correction/rejection provenance, and
+  multi-image independence;
+- export tests for all output policies, deterministic paths, receipts, hash verification, retry, and no-DICOM-copy
+  default;
+- manifest tests for eligibility, annotation revision references, training image hashes, and fail-closed ambiguity;
+- browser tests for source setup, Queue states, explicit Run AI, review save, export failure, recovery, and responsive
+  layouts;
 - accessibility checks for keyboard navigation, focus, labels, contrast, reduced motion, and icon semantics.
 
 ## 5. Explicitly deferred
 
-- training, SSL, fine-tuning, and encoder selection;
+- implementation of SSL, fine-tuning, supervised head training, validation, calibration, registry, and deployment;
 - Pods, GPU execution, and external experiments;
-- R1 split-leakage resolution;
-- scientific benchmark claims and model promotion;
-- clinical deployment, diagnosis, referral, treatment, DICOM clinical integration certification, HL7/FHIR, and
-  production IAM;
+- R1 split-leakage resolution and any change to current scientific conclusions;
+- clinical deployment certification, diagnosis/referral/treatment claims, HL7/FHIR, and production IAM;
 - automatic conversion of system predictions into human or training ground truth.
