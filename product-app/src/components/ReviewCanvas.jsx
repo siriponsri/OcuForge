@@ -1,7 +1,7 @@
 import { Box, Flex, HStack, Text } from "@chakra-ui/react";
 import { Crosshair, MousePointer2, Minus, Plus, RotateCcw, ScanSearch } from "lucide-react";
 import { ProvenanceBadge, StatusBadge } from "./StatusBadge";
-import { TOOLS } from "../data/demoData";
+import { TOOLS, deriveQueueBadge } from "../product/constants";
 
 function AnnotationShape({ annotation }) {
   const isSystem = annotation.provenance === "SYSTEM";
@@ -50,7 +50,7 @@ export function ReviewCanvas({ item, tool, onSelectTool, onCanvasClick, onZoom }
       </Flex>
       <Box className="review-canvas" onClick={onCanvasClick} role="application" aria-label="Retinal image annotation canvas">
         <Box className="image-frame">
-          <img src={item.imageUrl} alt={`Synthetic retinal image for ${item.id}`} />
+          {item.imageUrl ? <img src={item.imageUrl} alt={`Reviewable retinal image for ${item.id}`} /> : <Box className="derivative-empty"><Text>No display derivative</Text><Text>Source bytes remain preserved</Text></Box>}
           {item.annotations.map((annotation) => <AnnotationShape key={annotation.id} annotation={annotation} />)}
         </Box>
         <HStack className="canvas-meta" gap="2">
@@ -65,7 +65,7 @@ export function ReviewCanvas({ item, tool, onSelectTool, onCanvasClick, onZoom }
           <HStack gap="2"><span className="legend-swatch system-swatch" /><Text>SYSTEM prediction</Text></HStack>
           <HStack gap="2"><span className="legend-swatch user-swatch" /><Text>USER annotation</Text></HStack>
         </HStack>
-        <HStack gap="2"><StatusBadge status={item.status} /><Text className="legend-note">Original source unchanged</Text></HStack>
+        <HStack gap="2"><StatusBadge status={deriveQueueBadge(item)} /><Text className="legend-note">Original source unchanged</Text></HStack>
       </Flex>
     </Box>
   );

@@ -339,6 +339,20 @@ button { cursor: pointer; }
 
 .toast-message { position: fixed; right: 24px; bottom: 24px; z-index: 100; max-width: min(390px, calc(100vw - 32px)); padding: 13px 17px; border: 1px solid #b8dfcb; border-radius: 9px; background: #effaf4; color: var(--green); box-shadow: var(--shadow-md); font-size: 12px; font-weight: 700; animation: toast-in 180ms ease both; }
 .toast-info { border-color: #c8deee; background: #f0f7fc; color: var(--blue); }
+.toast-error { border-color: #efb4ad; background: #fff1ef; color: var(--red); }
+.queue-status-note { margin: 0 18px; padding: 10px 12px; border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); background: #fffaf0; color: #80652b; font-size: 10px; line-height: 1.4; }
+.status-stack { display: grid; gap: 4px; }
+.status-subline, .manifest-state-line { color: var(--quiet); font-family: "IBM Plex Mono", monospace; font-size: 8px; line-height: 1.35; white-space: nowrap; }
+.retry-action { margin-top: 4px; padding: 0; color: var(--brick); font-size: 9px; }
+.full-select { width: 100%; min-height: 38px; padding: 0 10px; border: 1px solid var(--line-strong); border-radius: 8px; background: var(--surface); color: var(--ink); }
+.derivative-empty { display: grid; place-items: center; align-content: center; gap: 5px; width: 100%; height: 100%; color: #98a6b2; font-family: "IBM Plex Mono", monospace; font-size: 10px; text-align: center; }
+.derivative-empty p:last-child { color: #64717d; font-size: 9px; }
+.tile-empty { display: grid; height: 100%; place-items: center; color: var(--quiet); font-family: "IBM Plex Mono", monospace; font-size: 9px; }
+.export-recovery { padding: 14px 16px; border: 1px solid #efc3bd; background: #fff8f6; }
+.qc-fail { color: var(--red); }
+.state-section-label { display: block; margin: 12px 0 3px; padding-top: 8px; border-top: 1px solid var(--line); }
+.ingestion-error { border-color: #efb4ad; background: #fff1ef; color: var(--red); }
+.recovery-toggle { display: flex; align-items: center; gap: 8px; margin: 12px 0; color: var(--quiet); font-size: 10px; }
 @keyframes toast-in { from { opacity: 0; transform: translateY(7px); } to { opacity: 1; transform: translateY(0); } }
 .mobile-scrim { display: none; }
 

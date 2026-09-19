@@ -1,5 +1,5 @@
 import { Badge } from "@chakra-ui/react";
-import { STATUS_META } from "../data/demoData";
+import { STATUS_META } from "../product/constants";
 
 const toneMap = {
   neutral: "gray",
